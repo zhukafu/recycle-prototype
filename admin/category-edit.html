@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>编辑分类 - 铝老板管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: {
+                    brand: { 50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',500:'#22c55e',600:'#16a34a',700:'#15803d' },
+                    metal: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a' }
+                },
+                fontFamily: { sans: ['Noto Sans SC','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] }
+            } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .admin-app { min-height: 100vh; background: #f5f5f5; }
+        .admin-sticky-header { position: sticky; top: 0; z-index: 40; background: #ffffff; }
+        .admin-content { padding-bottom: 80px; }
+        .content-inner { max-width: 1200px; margin: 0 auto; }
+        .input { width: 100%; height: 40px; padding: 0 12px; background: #f1f5f9; border-radius: 10px; font-size: 13px; color: #0f172a; outline: none; border: 0; }
+        .input:focus { background: #ffffff; box-shadow: 0 0 0 2px #22c55e; }
+        textarea.input { height: auto; padding: 10px 12px; resize: none; }
+        .field-label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+        .color-swatch { width: 36px; height: 36px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
+        .color-swatch.active { border-color: #22c55e; transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .grad-blue { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+        .grad-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+        .grad-teal { background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%); }
+        .grad-red { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
+        .grad-purple { background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); }
+        .grad-yellow { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
+        .grad-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+        .grad-pink { background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); }
+        @media (min-width: 1024px) {
+            .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
+            .content-inner { padding: 0 24px; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="admin-app">
+    <header class="admin-sticky-header">
+        <div id="admin-topbar"></div>
+    </header>
+
+    <main class="admin-content">
+        <div class="content-inner px-4 lg:px-0 py-4 space-y-3">
+
+            <!-- 分类信息 -->
+            <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <h3 class="text-[14px] font-bold text-metal-900 mb-3">分类信息</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="field-label">分类名称 *</label>
+                        <input class="input" value="常见品牌">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="field-label">分类编码</label>
+                            <input class="input font-mono" value="BRAND-001">
+                        </div>
+                        <div>
+                            <label class="field-label">排序</label>
+                            <input class="input font-mono" type="number" value="1">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label">所属父分类</label>
+                        <select class="input">
+                            <option>顶级分类</option>
+                            <option>接触器</option>
+                            <option>断路器</option>
+                            <option>继电器</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="field-label">分类图标</label>
+                        <div class="flex items-center gap-3">
+                            <div class="w-14 h-14 rounded-full grad-blue flex items-center justify-center text-white text-xl shadow-md">
+                                🛡️
+                            </div>
+                            <button class="h-9 px-3 rounded-full bg-metal-100 text-metal-700 text-[12px] font-medium tap-active">选择图标</button>
+                            <span class="text-[11px] text-metal-400">建议使用 emoji</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 主题色 -->
+            <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <h3 class="text-[14px] font-bold text-metal-900 mb-3">主题色</h3>
+                <div class="flex flex-wrap gap-3">
+                    <div class="color-swatch grad-blue active" data-color="blue"></div>
+                    <div class="color-swatch grad-orange" data-color="orange"></div>
+                    <div class="color-swatch grad-teal" data-color="teal"></div>
+                    <div class="color-swatch grad-red" data-color="red"></div>
+                    <div class="color-swatch grad-purple" data-color="purple"></div>
+                    <div class="color-swatch grad-yellow" data-color="yellow"></div>
+                    <div class="color-swatch grad-green" data-color="green"></div>
+                    <div class="color-swatch grad-pink" data-color="pink"></div>
+                </div>
+            </section>
+
+            <!-- 关联信息 -->
+            <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <h3 class="text-[14px] font-bold text-metal-900 mb-3">关联信息</h3>
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="field-label">子项数量</label>
+                            <input class="input font-mono" type="number" value="8">
+                        </div>
+                        <div>
+                            <label class="field-label">关联型号数</label>
+                            <input class="input font-mono" type="number" value="42">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label">分类描述</label>
+                        <textarea class="input" rows="3" placeholder="请输入分类描述">常见接触器品牌分类：包含正泰、德力西、人民、施耐德、西门子等主流品牌。</textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 操作 -->
+            <div class="flex gap-3 pt-2">
+                <button class="flex-1 h-11 rounded-full bg-rose-50 text-rose-600 text-[14px] font-semibold tap-active">删除分类</button>
+                <button class="flex-1 h-11 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold tap-active">取消</button>
+                <button class="flex-1 h-11 rounded-full bg-brand-500 text-white text-[14px] font-semibold tap-active shadow-[0_4px_12px_rgba(34,197,94,0.25)]">保存</button>
+            </div>
+            <div class="h-4"></div>
+        </div>
+    </main>
+
+    <div id="admin-bottom-nav"></div>
+</div>
+
+<script type="module">
+    import { mountAdminTopbar } from '/src/components/admin-topbar.js';
+    import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
+
+    mountAdminTopbar('#admin-topbar', {
+        title: '编辑分类',
+        back: true,
+        onMenu: () => openActionMenu(['保存草稿', '预览效果', '刷新']),
+        onAvatar: () => location.href = 'mine.html',
+    });
+    mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
+
+    // 颜色选择
+    document.querySelectorAll('.color-swatch').forEach(el => {
+        el.addEventListener('click', () => {
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+        });
+    });
+
+    function openActionMenu(items) {
+        const existing = document.getElementById('__action_menu__');
+        if (existing) existing.remove();
+        const menu = document.createElement('div');
+        menu.id = '__action_menu__';
+        menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
+        menu.innerHTML = `
+          <div class="absolute inset-0 bg-black/40" data-close></div>
+          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 animate-up">
+            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
+            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
+            <button class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 font-medium active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
+          </div>`;
+        document.body.appendChild(menu);
+        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
+    }
+</script>
+
+</body>
+</html>

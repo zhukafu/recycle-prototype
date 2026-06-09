@@ -67,7 +67,7 @@
         <!-- 卡片区域 -->
         <div class="grid grid-cols-3 gap-3">
             <!-- 关于铝老板 -->
-            <div class="col-span-1 row-span-2 gradient-blue rounded-2xl p-5 flex flex-col justify-between text-white relative overflow-hidden shadow-md" onclick="openDetailModal('关于铝老板', '铝老板金属网是专业的金属废料回收服务平台，致力于为广大回收商、加工厂提供准确的接触器型号查询、实时回收报价、专业技术指导等一站式服务。')">
+            <div class="col-span-1 row-span-2 gradient-blue rounded-2xl p-5 flex flex-col justify-between text-white relative overflow-hidden shadow-md cursor-pointer" data-article-id="article-about" onclick="openArticle('article-about')">
                 <div>
                     <h3 class="text-lg font-bold">关于铝老板</h3>
                     <p class="text-xs text-blue-100 mt-1">About Us</p>
@@ -77,7 +77,7 @@
                 </div>
             </div>
             <!-- 行业资讯 -->
-            <div class="col-span-2 bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm" onclick="openDetailModal('行业资讯', '最新金属回收行业动态：2024年铝价持续上涨，含银废料回收市场活跃。建议关注国际大宗商品走势，把握最佳出货时机。')">
+            <div class="col-span-2 bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm cursor-pointer" data-article-id="article-news" onclick="openArticle('article-news')">
                 <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-newspaper text-al-orange text-lg"></i>
                 </div>
@@ -88,7 +88,7 @@
                 <i class="fas fa-chevron-right text-al-gray text-xs ml-auto"></i>
             </div>
             <!-- 回收知识 -->
-            <div class="col-span-2 bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm" onclick="openDetailModal('回收知识', '金属废料分类指南：铝合金按系列分为1系纯铝、2系硬铝、3系防锈铝、5系铝镁合金、6系铝镁硅合金、7系超硬铝。不同系列回收价格差异较大。')">
+            <div class="col-span-2 bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm cursor-pointer" data-article-id="article-knowledge" onclick="openArticle('article-knowledge')">
                 <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-book-open text-al-green text-lg"></i>
                 </div>
@@ -123,7 +123,7 @@
         <!-- 内容列表 -->
         <div class="space-y-3">
             <!-- 条目1 -->
-            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm" onclick="openDetailModal('20221024期学员简介', '本期学员来自全国各地，涵盖废铝回收、含银废料处理、接触器拆解等多个细分领域。通过系统培训，学员们掌握了先进的分拣技术和市场分析方法。')">
+            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm cursor-pointer" data-article-id="article-1" onclick="openArticle('article-1')">
                 <div class="w-12 h-12 rounded-xl gradient-pink flex items-center justify-center text-white font-bold text-lg flex-shrink-0">1</div>
                 <div class="flex-1 min-w-0">
                     <h4 class="text-sm font-bold text-al-dark truncate">20221024期学员简介</h4>
@@ -132,7 +132,7 @@
                 <i class="fas fa-chevron-right text-al-gray text-xs"></i>
             </div>
             <!-- 条目2 -->
-            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm" onclick="openDetailModal('什么是三元催化', '三元催化器是汽车尾气净化装置，含有铂、钯、铑等贵金属。回收价值极高，但需专业拆解和提炼技术。本文详细介绍三元催化的结构、成分及回收流程。')">
+            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm cursor-pointer" data-article-id="article-2" onclick="openArticle('article-2')">
                 <div class="w-12 h-12 rounded-xl gradient-orange flex items-center justify-center text-white font-bold text-lg flex-shrink-0">2</div>
                 <div class="flex-1 min-w-0">
                     <h4 class="text-sm font-bold text-al-dark truncate">什么是三元催化</h4>
@@ -141,7 +141,7 @@
                 <i class="fas fa-chevron-right text-al-gray text-xs"></i>
             </div>
             <!-- 条目3 -->
-            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm" onclick="openDetailModal('铝合金废料分类指南', '铝合金废料按合金成分分为多个系列：1系（纯铝）、2系（硬铝/航空铝）、3系（防锈铝）、5系（铝镁合金）、6系（铝镁硅合金）、7系（超硬铝）。不同系列价格差异大，准确分类是盈利关键。')">
+            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm cursor-pointer" data-article-id="article-3" onclick="openArticle('article-3')">
                 <div class="w-12 h-12 rounded-xl gradient-green flex items-center justify-center text-white font-bold text-lg flex-shrink-0">3</div>
                 <div class="flex-1 min-w-0">
                     <h4 class="text-sm font-bold text-al-dark truncate">铝合金废料分类指南</h4>
@@ -150,7 +150,7 @@
                 <i class="fas fa-chevron-right text-al-gray text-xs"></i>
             </div>
             <!-- 条目4 -->
-            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm" onclick="openDetailModal('接触器银触点提取技术', '接触器中的银触点是高价值回收物。提取技术包括：物理拆解法、化学溶解法、电解法等。本文详解各种方法的优缺点、操作步骤及安全注意事项。')">
+            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm cursor-pointer" data-article-id="article-4" onclick="openArticle('article-4')">
                 <div class="w-12 h-12 rounded-xl gradient-violet flex items-center justify-center text-white font-bold text-lg flex-shrink-0">4</div>
                 <div class="flex-1 min-w-0">
                     <h4 class="text-sm font-bold text-al-dark truncate">接触器银触点提取技术</h4>
@@ -216,6 +216,52 @@
     </script>
 
     <script>
+        // 文章数据字典（按 article id 索引，供 openArticle + 列表项共用）
+        const ARTICLES = {
+            'article-about': {
+                title: '关于铝老板',
+                content: '铝老板金属网是专业的金属废料回收服务平台，致力于为广大回收商、加工厂提供准确的接触器型号查询、实时回收报价、专业技术指导等一站式服务。'
+            },
+            'article-news': {
+                title: '行业资讯',
+                content: '最新金属回收行业动态：2024年铝价持续上涨，含银废料回收市场活跃。建议关注国际大宗商品走势，把握最佳出货时机。'
+            },
+            'article-knowledge': {
+                title: '回收知识',
+                content: '金属废料分类指南：铝合金按系列分为1系纯铝、2系硬铝、3系防锈铝、5系铝镁合金、6系铝镁硅合金、7系超硬铝。不同系列回收价格差异较大。'
+            },
+            'article-1': {
+                title: '20221024期学员简介',
+                content: '本期学员来自全国各地，涵盖废铝回收、含银废料处理、接触器拆解等多个细分领域。通过系统培训，学员们掌握了先进的分拣技术和市场分析方法。'
+            },
+            'article-2': {
+                title: '什么是三元催化',
+                content: '三元催化器是汽车尾气净化装置，含有铂、钯、铑等贵金属。回收价值极高，但需专业拆解和提炼技术。本文详细介绍三元催化的结构、成分及回收流程。'
+            },
+            'article-3': {
+                title: '铝合金废料分类指南',
+                content: '铝合金废料按合金成分分为多个系列：1系（纯铝）、2系（硬铝/航空铝）、3系（防锈铝）、5系（铝镁合金）、6系（铝镁硅合金）、7系（超硬铝）。不同系列价格差异大，准确分类是盈利关键。'
+            },
+            'article-4': {
+                title: '接触器银触点提取技术',
+                content: '接触器中的银触点是高价值回收物。提取技术包括：物理拆解法、化学溶解法、电解法等。本文详解各种方法的优缺点、操作步骤及安全注意事项。'
+            }
+        };
+
+        function openArticle(id) {
+            const a = ARTICLES[id];
+            if (!a) return;
+            document.getElementById('modalTitle').textContent = a.title;
+            document.getElementById('modalContent').textContent = a.content;
+            const modal = document.getElementById('detailModal');
+            const panel = document.getElementById('modalPanel');
+            modal.classList.remove('hidden');
+            setTimeout(() => panel.classList.add('modal-active'), 10);
+            // 同步 URL hash（便于分享 + 浏览器后退）
+            history.replaceState(null, '', '#' + id);
+        }
+
+        // 兼容旧调用
         function openDetailModal(title, content) {
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalContent').textContent = content;
@@ -229,6 +275,8 @@
             const panel = document.getElementById('modalPanel');
             panel.classList.remove('modal-active');
             setTimeout(() => document.getElementById('detailModal').classList.add('hidden'), 300);
+            // 清除 hash
+            if (location.hash) history.replaceState(null, '', location.pathname);
         }
 
         function submitComment() {
@@ -249,6 +297,15 @@
             input.value = '';
             setTimeout(() => div.classList.remove('animate-pulse'), 500);
         }
+
+        // 页面加载时，根据 URL hash 自动打开对应文章（支持从首页轮播跳入）
+        document.addEventListener('DOMContentLoaded', () => {
+            const id = (location.hash || '').replace('#', '');
+            if (id && ARTICLES[id]) {
+                // 稍微延迟，等 modal 节点 ready
+                setTimeout(() => openArticle(id), 60);
+            }
+        });
     </script>
 </body>
 </html>

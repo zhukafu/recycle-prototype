@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>分类管理 - 铝老板管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: {
+                    brand: { 50:'#f0fdf4',100:'#dcfce7',500:'#22c55e',600:'#16a34a',700:'#15803d' },
+                    metal: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a' }
+                },
+                fontFamily: { sans: ['Noto Sans SC','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] }
+            } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .admin-app { min-height: 100vh; background: #f5f5f5; }
+        .admin-sticky-header { position: sticky; top: 0; z-index: 40; background: #ffffff; }
+        .admin-content { padding-bottom: 80px; }
+        .content-inner { max-width: 1200px; margin: 0 auto; }
+        .tap-active:active { transform: scale(0.97); }
+        .grad-blue { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+        .grad-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+        .grad-teal { background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%); }
+        .grad-red { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
+        .grad-purple { background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); }
+        .grad-yellow { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
+        .grad-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+        .grad-pink { background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); }
+        @media (min-width: 1024px) {
+            .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
+            .content-inner { padding: 0 24px; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="admin-app">
+    <header class="admin-sticky-header">
+        <div id="admin-topbar"></div>
+    </header>
+
+    <main class="admin-content">
+        <div class="content-inner px-4 lg:px-0 py-4">
+
+            <!-- 统计 -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                    <div class="text-[20px] font-black text-metal-900 font-mono">26</div>
+                    <div class="text-[11px] text-metal-500 mt-0.5">分类总数</div>
+                </div>
+                <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                    <div class="text-[20px] font-black text-brand-600 font-mono">12</div>
+                    <div class="text-[11px] text-metal-500 mt-0.5">含子项</div>
+                </div>
+            </div>
+
+            <!-- 分类网格 -->
+            <div class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <div class="grid grid-cols-3 gap-3">
+                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
+                        <div class="w-14 h-14 rounded-full grad-blue flex items-center justify-center text-white shadow-md">
+                            <i class="text-lg">🛡️</i>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[12px] font-medium text-metal-800">常见品牌</p>
+                            <p class="text-[10px] text-metal-400">8 个子项</p>
+                        </div>
+                    </a>
+                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
+                        <div class="w-14 h-14 rounded-full grad-orange flex items-center justify-center text-white shadow-md">
+                            <i class="text-lg">🔌</i>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[12px] font-medium text-metal-800">常见接触器</p>
+                            <p class="text-[10px] text-metal-400">12 个子项</p>
+                        </div>
+                    </a>
+                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
+                        <div class="w-14 h-14 rounded-full grad-teal flex items-center justify-center text-white shadow-md">
+                            <p class="text-[11px] font-bold">ΔJ8</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[12px] font-medium text-metal-800">ΔJ8FEDI</p>
+                            <p class="text-[10px] text-metal-400">3 个子项</p>
+                        </div>
+                    </a>
+                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
+                        <div class="w-14 h-14 rounded-full grad-red flex items-center justify-center text-white shadow-md">
+                            <i class="text-lg">⚡</i>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[12px] font-medium text-metal-800">直流价器</p>
+                            <p class="text-[10px] text-metal-400">5 个子项</p>
+                        </div>
+                    </a>
+                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
+                        <div class="w-14 h-14 rounded-full grad-purple flex items-center justify-center text-white shadow-md">
+                            <i class="text-lg">🏷️</i>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[12px] font-medium text-metal-800">触点价格</p>
+                            <p class="text-[10px] text-metal-400">6 个子项</p>
+                        </div>
+                    </a>
+                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
+                        <div class="w-14 h-14 rounded-full grad-yellow flex items-center justify-center text-white shadow-md">
+                            <p class="text-[11px] font-bold">ZIM</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[12px] font-medium text-metal-800">ZIMBR</p>
+                            <p class="text-[10px] text-metal-400">4 个子项</p>
+                        </div>
+                    </a>
+                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
+                        <div class="w-14 h-14 rounded-full grad-green flex items-center justify-center text-white shadow-md">
+                            <i class="text-lg">✅</i>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[12px] font-medium text-metal-800">正器换器</p>
+                            <p class="text-[10px] text-metal-400">2 个子项</p>
+                        </div>
+                    </a>
+                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
+                        <div class="w-14 h-14 rounded-full grad-pink flex items-center justify-center text-white shadow-md">
+                            <p class="text-[11px] font-bold">AP</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[12px] font-medium text-metal-800">APPA</p>
+                            <p class="text-[10px] text-metal-400">3 个子项</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <a href="category-edit.html" class="fixed bottom-[88px] right-4 lg:bottom-24 lg:right-8 w-14 h-14 rounded-full bg-brand-500 text-white shadow-[0_8px_24px_rgba(34,197,94,0.4)] flex items-center justify-center tap-active no-underline z-30">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </a>
+        </div>
+    </main>
+
+    <div id="admin-bottom-nav"></div>
+</div>
+
+<script type="module">
+    import { mountAdminTopbar } from '/src/components/admin-topbar.js';
+    import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
+
+    mountAdminTopbar('#admin-topbar', {
+        title: '分类管理',
+        back: true,
+        onMenu: () => openActionMenu(['批量编辑', '调整顺序', '刷新']),
+        onAvatar: () => location.href = 'mine.html',
+    });
+    mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
+
+    function openActionMenu(items) {
+        const existing = document.getElementById('__action_menu__');
+        if (existing) existing.remove();
+        const menu = document.createElement('div');
+        menu.id = '__action_menu__';
+        menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
+        menu.innerHTML = `
+          <div class="absolute inset-0 bg-black/40" data-close></div>
+          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 animate-up">
+            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
+            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
+            <button class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 font-medium active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
+          </div>`;
+        document.body.appendChild(menu);
+        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
+    }
+</script>
+
+</body>
+</html>

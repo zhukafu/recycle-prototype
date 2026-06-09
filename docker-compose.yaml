@@ -1,0 +1,62 @@
+# 铝老板金属网 - 本地构建部署
+# 用法：
+#   1) 构建并启动两个容器（小程序 + 管理后台）
+#      docker compose up -d --build
+#   2) 查看运行状态
+#      docker compose ps
+#   3) 查看日志
+#      docker compose logs -f
+#   4) 停止
+#      docker compose down
+#
+# 端口：
+#   - 小程序（miniprogram）: http://localhost:8080
+#   - 管理后台（admin）    : http://localhost:8081
+
+services:
+  # ========== 小程序原型 ==========
+  miniprogram:
+    container_name: alu-miniprogram
+    image: alu-boss/miniprogram:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TARGET: mp
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    networks:
+      - alu-net
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # ========== 管理后台 ==========
+  admin:
+    container_name: alu-admin
+    image: alu-boss/admin:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TARGET: admin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    networks:
+      - alu-net
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+networks:
+  alu-net:
+    driver: bridge
+    name: alu-net

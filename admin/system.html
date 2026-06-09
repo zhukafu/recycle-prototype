@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>系统设置 - 铝老板管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: {
+                    brand: { 50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',500:'#22c55e',600:'#16a34a',700:'#15803d' },
+                    metal: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a' }
+                },
+                fontFamily: { sans: ['Noto Sans SC','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] }
+            } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .tap-active:active { transform: scale(0.97); }
+        .admin-app { min-height: 100vh; background: #f5f5f5; }
+        .admin-sticky-header { position: sticky; top: 0; z-index: 40; background: #ffffff; }
+        .admin-content { padding-bottom: 80px; }
+        .content-inner { max-width: 1200px; margin: 0 auto; }
+        .switch { position: relative; width: 42px; height: 24px; background: #cbd5e1; border-radius: 9999px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 9999px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .switch.on { background: #22c55e; }
+        .switch.on::after { transform: translateX(18px); }
+        @media (min-width: 1024px) {
+            .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
+            .content-inner { padding: 0 24px; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="admin-app">
+    <header class="admin-sticky-header">
+        <div id="admin-topbar"></div>
+    </header>
+
+    <main class="admin-content">
+        <div class="content-inner px-4 lg:px-0 py-4 space-y-3">
+
+            <!-- 系统信息 -->
+            <section class="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-[16px] p-4 text-white shadow-[0_4px_16px_rgba(59,130,246,0.25)]">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-[16px] font-bold">铝老板管理后台</h2>
+                        <p class="text-[12px] opacity-85 mt-0.5">v2.4.1 · 2025-06-09 更新</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mt-4">
+                    <div>
+                        <p class="text-[10px] opacity-80">运行状态</p>
+                        <p class="text-[14px] font-bold mt-0.5">正常</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] opacity-80">服务器</p>
+                        <p class="text-[14px] font-bold mt-0.5">华东1</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] opacity-80">在线时长</p>
+                        <p class="text-[14px] font-bold mt-0.5 font-mono">36天</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 基础设置 -->
+            <section class="bg-white rounded-[14px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <h3 class="text-[14px] font-bold text-metal-900 px-4 pt-4 pb-2">基础设置</h3>
+                <a href="#" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">站点信息</span>
+                    <span class="text-[11px] text-metal-400">已配置</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <a href="#" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">邮件通知</span>
+                    <span class="text-[11px] text-metal-400">已开启</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <a href="#" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">定时任务</span>
+                    <span class="text-[11px] text-metal-400">3个运行中</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <a href="#" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/><line x1="9" y1="15" x2="9.01" y2="15"/><line x1="15" y1="15" x2="15.01" y2="15"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">小程序配置</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </section>
+
+            <!-- 安全设置 -->
+            <section class="bg-white rounded-[14px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <h3 class="text-[14px] font-bold text-metal-900 px-4 pt-4 pb-2">安全设置</h3>
+                <div class="w-full flex items-center gap-3 px-4 py-3.5 border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">异地登录提醒</span>
+                    <div class="switch on" data-switch></div>
+                </div>
+                <div class="w-full flex items-center gap-3 px-4 py-3.5 border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">操作日志</span>
+                    <div class="switch on" data-switch></div>
+                </div>
+                <a href="user-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">账号管理</span>
+                    <span class="text-[11px] text-metal-400">12 个账号</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </section>
+
+            <!-- 数据管理 -->
+            <section class="bg-white rounded-[14px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <h3 class="text-[14px] font-bold text-metal-900 px-4 pt-4 pb-2">数据管理</h3>
+                <a href="#" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">数据备份</span>
+                    <span class="text-[11px] text-metal-400">上次 6/8 03:00</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <a href="#" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-cyan-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">日志审计</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <a href="data.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">运营报表</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </section>
+
+            <!-- 危险操作 -->
+            <section class="bg-white rounded-[14px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <h3 class="text-[14px] font-bold text-rose-600 px-4 pt-4 pb-2">危险操作</h3>
+                <a href="#" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">清空缓存</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <a href="#" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-100">
+                    <div class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+                    </div>
+                    <span class="flex-1 text-left text-[14px] text-metal-800">重置系统</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </section>
+
+            <div class="h-4"></div>
+        </div>
+    </main>
+
+    <div id="admin-bottom-nav"></div>
+</div>
+
+<script type="module">
+    import { mountAdminTopbar } from '/src/components/admin-topbar.js';
+    import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
+
+    // 系统：一级菜单，不显示返回按钮
+    mountAdminTopbar('#admin-topbar', {
+        title: '系统设置',
+        back: false,
+        onMenu: () => openActionMenu(['检查更新', '关于系统', '刷新']),
+        onAvatar: () => location.href = 'mine.html',
+    });
+    mountAdminBottomNav('#admin-bottom-nav', { active: 'system' });
+
+    // Switch 切换
+    document.querySelectorAll('[data-switch]').forEach(el => {
+        el.addEventListener('click', () => el.classList.toggle('on'));
+    });
+
+    function openActionMenu(items) {
+        const existing = document.getElementById('__action_menu__');
+        if (existing) existing.remove();
+        const menu = document.createElement('div');
+        menu.id = '__action_menu__';
+        menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
+        menu.innerHTML = `
+          <div class="absolute inset-0 bg-black/40" data-close></div>
+          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 animate-up">
+            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
+            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
+            <button class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 font-medium active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
+          </div>`;
+        document.body.appendChild(menu);
+        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
+    }
+</script>
+
+</body>
+</html>

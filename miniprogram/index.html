@@ -1,0 +1,766 @@
+<!DOCTYPE html><html lang="zh-CN" style="touch-action: manipulation;"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>铝老板金属网</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&amp;family=Noto+Serif+SC:wght@600;700;900&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+green: { brand: '#10B981', light: '#34D399', dark: '#059669', surface: '#ECFDF5' },
+orange: { brand: '#F97316', light: '#FB923C', dark: '#EA580C', surface: '#FFF7ED' },
+red: { brand: '#EF4444', light: '#F87171', dark: '#DC2626', surface: '#FEF2F2' },
+gray: { bg: '#F5F5F4', card: '#FAFAF9', border: '#E7E5E4' }
+},
+fontFamily: {
+sans: ['Noto Sans SC', 'system-ui', 'sans-serif'],
+serif: ['Noto Serif SC', 'serif']
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+@keyframes shimmer {
+0% { transform: translateX(-100%); }
+100% { transform: translateX(100%); }
+}
+.shimmer { animation: shimmer 3s infinite; }
+@keyframes float {
+0%, 100% { transform: translateY(0px); }
+50% { transform: translateY(-6px); }
+}
+.float-anim { animation: float 3s ease-in-out infinite; }
+@keyframes pulse-soft {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.7; }
+}
+.pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+@keyframes slideInUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.slide-up { animation: slideInUp 0.5s ease-out forwards; }
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+</style>
+</head>
+<body class="bg-gray-bg min-h-screen pb-20">
+
+<!-- 顶部操作栏（page-actions 组件：右上角 3 点 + 头像） -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <div class="flex items-center justify-end px-4 h-11">
+    <div id="page-actions"></div>
+  </div>
+</header>
+
+<script type="module">
+  import { mountPageActions } from '/src/components/page-actions.js';
+  mountPageActions('#page-actions', {
+    onMenu: () => console.log('[index] menu clicked'),
+    onAvatar: () => console.log('[index] avatar clicked'),
+  });
+</script>
+
+<!-- 顶部品牌区 -->
+<header class="bg-gray-bg px-4 pt-3 pb-4 relative overflow-hidden">
+<div class="flex items-start justify-between relative z-10">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-9 h-9 bg-green-brand rounded-lg flex items-center justify-center shadow-lg shadow-green-brand/20">
+<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"></path></svg>
+</div>
+<h1 class="text-[22px] font-black text-gray-900 tracking-tight leading-none" style="font-family: 'Noto Serif SC', serif;">铝老板金属网</h1>
+</div>
+<p class="text-[12.5px] text-gray-500 font-medium mt-1.5 leading-relaxed">卖货有参考不卖亏，收货有依据不踩坑。多年含银废料行情沉淀，一站查询更省心。</p>
+</div>
+<div class="w-28 h-28 relative flex-shrink-0 float-anim">
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="w-full h-full" aria-label="金属废料回收插图">
+  <defs>
+    <linearGradient id="skyBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ECFDF5"/>
+      <stop offset="100%" stop-color="#F5F5F4"/>
+    </linearGradient>
+    <linearGradient id="vest" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#F97316"/>
+    </linearGradient>
+    <linearGradient id="bin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="hat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景圆 -->
+  <circle cx="60" cy="60" r="56" fill="url(#skyBg)"/>
+  <circle cx="60" cy="60" r="56" fill="none" stroke="#10B981" stroke-width="1.5" stroke-opacity="0.15"/>
+
+  <!-- 地面阴影 -->
+  <ellipse cx="60" cy="105" rx="32" ry="3" fill="#000" fill-opacity="0.06"/>
+
+  <!-- 回收箱（左侧） -->
+  <g transform="translate(14, 60)">
+    <path d="M0 8 L4 38 L26 38 L30 8 Z" fill="url(#bin)"/>
+    <rect x="-2" y="4" width="34" height="6" rx="1.5" fill="#059669"/>
+    <!-- 回收标志 -->
+    <path d="M12 18 L16 14 L20 18 M14 22 L18 26 L22 22" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="15" y="34" text-anchor="middle" fill="#fff" font-size="6" font-weight="700" font-family="sans-serif">回收</text>
+  </g>
+
+  <!-- 工人（中间） -->
+  <g transform="translate(48, 22)">
+    <!-- 头 -->
+    <circle cx="12" cy="10" r="8" fill="#FED7AA"/>
+    <!-- 安全帽 -->
+    <path d="M2 10 Q2 1 12 1 Q22 1 22 10 Z" fill="url(#hat)"/>
+    <rect x="2" y="9" width="20" height="2.5" rx="1" fill="#D97706"/>
+    <!-- 眼睛 -->
+    <circle cx="9" cy="10" r="0.9" fill="#1F2937"/>
+    <circle cx="15" cy="10" r="0.9" fill="#1F2937"/>
+    <!-- 微笑 -->
+    <path d="M9 13 Q12 15 15 13" stroke="#1F2937" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+    <!-- 脖子 -->
+    <rect x="10" y="17" width="4" height="3" fill="#FED7AA"/>
+    <!-- 身体（反光背心） -->
+    <path d="M2 22 L22 22 L24 50 L0 50 Z" fill="url(#vest)"/>
+    <!-- 反光条 -->
+    <rect x="0" y="32" width="24" height="2.5" fill="#FEF3C7"/>
+    <rect x="0" y="42" width="24" height="2.5" fill="#FEF3C7"/>
+    <!-- 手臂（向右侧伸出拿着接触器） -->
+    <path d="M22 26 Q34 28 38 22 L40 26 Q34 32 22 32 Z" fill="url(#vest)"/>
+    <!-- 手 -->
+    <circle cx="39" cy="24" r="3" fill="#FED7AA"/>
+    <!-- 接触器（小立方体） -->
+    <g transform="translate(36, 14)">
+      <rect x="0" y="0" width="12" height="10" rx="1.5" fill="#1F2937"/>
+      <rect x="2" y="2" width="8" height="2" fill="#6B7280"/>
+      <circle cx="3" cy="7" r="0.6" fill="#F59E0B"/>
+      <circle cx="9" cy="7" r="0.6" fill="#F59E0B"/>
+    </g>
+  </g>
+
+  <!-- 散落金属件（地面） -->
+  <g transform="translate(8, 96)">
+    <rect x="0" y="0" width="6" height="4" rx="0.5" fill="#9CA3AF"/>
+    <rect x="8" y="1" width="5" height="3" rx="0.5" fill="#F59E0B"/>
+    <circle cx="18" cy="2" r="2" fill="#EF4444"/>
+    <rect x="24" y="0" width="7" height="4" rx="0.5" fill="#10B981"/>
+    <circle cx="36" cy="2" r="1.5" fill="#6B7280"/>
+    <rect x="42" y="0" width="5" height="4" rx="0.5" fill="#F97316"/>
+  </g>
+
+  <!-- 装饰：飘动的金币/碎屑 -->
+  <circle cx="92" cy="38" r="2.5" fill="#FCD34D"/>
+  <circle cx="100" cy="50" r="1.5" fill="#F59E0B"/>
+  <circle cx="88" cy="62" r="1" fill="#34D399"/>
+  <path d="M95 28 L97 26 L99 28 L97 30 Z" fill="#F59E0B" opacity="0.7"/>
+</svg>
+</div>
+</div>
+</header>
+
+<!-- 搜索栏 -->
+<form class="px-4 -mt-1 mb-4 relative z-20" onsubmit="onHomeSearchSubmit(event)">
+  <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md focus-within:border-green-brand focus-within:shadow-lg focus-within:shadow-green-brand/15 transition-all duration-200 flex items-center gap-2.5 pl-3.5 pr-1.5 py-1.5">
+    <!-- 搜索图标（聚焦时变绿） -->
+    <svg class="w-5 h-5 text-gray-400 flex-shrink-0 group-focus-within:text-green-brand transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+    </svg>
+    <!-- 输入框 -->
+    <input type="text" aria-label="搜索接触器型号" data-search-input data-search-form="home" placeholder="搜索型号 / 参数 / 回收价 / 规格 / 厂家" class="flex-1 min-w-0 text-[15px] text-gray-800 placeholder-gray-400 bg-transparent outline-none font-normal leading-none">
+    <!-- 清除按钮（仅在有内容时显示） -->
+    <button type="button" data-search-clear aria-label="清除搜索" class="hidden w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex-shrink-0 items-center justify-center hover:bg-gray-200 active:scale-90 transition">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+    <!-- 搜索按钮 -->
+    <button type="submit" class="bg-green-brand text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-green-brand/25 hover:bg-green-brand/90 hover:shadow-lg hover:shadow-green-brand/30 active:scale-95 transition-all flex-shrink-0">搜索</button>
+  </div>
+</form>
+
+<script>
+  // 首页搜索：提交后跳转到搜索结果页
+  function onHomeSearchSubmit(e) {
+    if (e) e.preventDefault();
+    const input = document.querySelector('[data-search-input]');
+    if (!input) return false;
+    const q = (input.value || '').trim();
+    if (!q) {
+      input.focus();
+      return false;
+    }
+    window.location.href = 'search-results.html?q=' + encodeURIComponent(q);
+    return false;
+  }
+
+  // 清除按钮显隐
+  (function () {
+    const input = document.querySelector('[data-search-input]');
+    const clearBtn = document.querySelector('[data-search-clear]');
+    if (!input || !clearBtn) return;
+    const sync = () => {
+      const hasValue = input.value.length > 0;
+      clearBtn.classList.toggle('hidden', !hasValue);
+      clearBtn.classList.toggle('inline-flex', hasValue);
+    };
+    input.addEventListener('input', sync);
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      input.focus();
+      sync();
+    });
+    sync();
+  })();
+</script>
+
+<!-- 功能卡片区 -->
+<div class="px-4 mb-4">
+<div class="grid grid-cols-2 gap-3">
+
+<!-- 查型号 - 红色卡片（点击跳转 contactors.html） -->
+<a href="contactors.html"
+   aria-label="查型号：跳转到接触器数据库"
+   class="group block bg-red-brand rounded-2xl p-4 relative overflow-hidden shadow-lg shadow-red-brand/15 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-red-brand outline-none transition-transform slide-up stagger-1 will-change-transform">
+  <!-- 装饰光斑（右上 + 左下） -->
+  <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-[2px] pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute -bottom-5 -left-5 w-20 h-20 bg-white/[0.07] rounded-full pointer-events-none" aria-hidden="true"></div>
+  <div class="relative z-10 flex flex-col h-full">
+    <span class="inline-flex w-fit bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-2">类型类</span>
+    <h3 class="text-white text-xl font-black mb-1">查型号</h3>
+    <p class="text-white/85 text-sm leading-snug mb-4">快速匹配检索器型号参数，精准识别含银废料规格</p>
+    <div class="mt-auto flex justify-end">
+      <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
+        <!-- 放大镜 + 列表，语义贴合"查型号" -->
+        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 11h6M8 8h4"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+</a>
+
+<!-- 看报价 + 学技术 垂直堆叠 -->
+<div class="flex flex-col gap-3">
+
+<!-- 看报价 - 绿色卡片（点击跳转 category.html 接触器类） -->
+<a href="category.html"
+   aria-label="看报价：跳转到接触器类"
+   class="bg-green-brand rounded-2xl p-3.5 relative overflow-hidden shadow-lg shadow-green-brand/15 flex-1 active:scale-[0.98] transition-transform cursor-pointer slide-up stagger-2 no-underline block">
+<div class="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-6 translate-x-6"></div>
+<div class="relative z-10 flex flex-col h-full justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<h3 class="text-white text-lg font-black">看报价</h3>
+<span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">实时星</span>
+</div>
+<p class="text-white/80 text-[11px] leading-relaxed">实时查铝合银废料回收行情，一键获取最新参考价</p>
+</div>
+<div class="flex justify-end mt-2">
+<svg class="w-8 h-8 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v8H3zm4-8h2v16H7zm4-2h2v18h-2zm4 4h2v14h-2zm4-2h2v16h-2z"></path></svg>
+</div>
+</div>
+</a>
+
+<!-- 学技术 - 橙色卡片（点击跳转 tecexc.html） -->
+<a href="tecexc.html"
+   aria-label="学技术：跳转到技术交流页面"
+   class="bg-orange-brand rounded-2xl p-3.5 relative overflow-hidden shadow-lg shadow-orange-brand/15 flex-1 active:scale-[0.98] transition-transform cursor-pointer slide-up stagger-3 no-underline block">
+<div class="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-6 translate-x-6"></div>
+<div class="relative z-10 flex flex-col h-full justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<h3 class="text-white text-lg font-black">学技术</h3>
+<span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">零基础</span>
+</div>
+<p class="text-white/80 text-[11px] leading-relaxed">拆解快T5与合刷教学，新手也能快速上手</p>
+</div>
+<div class="flex justify-end mt-2">
+<svg class="w-8 h-8 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"></path></svg>
+</div>
+</div>
+</a>
+</div>
+</div>
+</div>
+
+<!-- 轮播：技术交流文章（点击进入 tecexc.html 对应文章） -->
+<div class="px-4 mb-5 slide-up stagger-4">
+  <div class="relative overflow-hidden rounded-2xl shadow-lg shadow-green-brand/20" id="articleCarousel">
+    <div class="flex transition-transform duration-500 ease-out" data-carousel-track>
+      <!-- Slide 1：20221024期学员简介 -->
+      <a href="tecexc.html#article-1" class="block w-full flex-shrink-0 bg-gradient-to-br from-pink-500 to-rose-600 relative overflow-hidden no-underline" aria-label="查看文章：20221024期学员简介">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+        <div class="relative z-10 p-4 flex items-center justify-between min-h-[120px]">
+          <div class="flex-1 pr-3">
+            <div class="flex items-center gap-1.5 mb-2">
+              <span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">学员风采</span>
+              <span class="text-white/70 text-[10px]">2024-10-24</span>
+            </div>
+            <h3 class="text-white text-lg font-black mb-1 leading-tight">20221024期学员简介</h3>
+            <p class="text-white/85 text-[11px] leading-relaxed line-clamp-2">新一批学员结业，涵盖废铝回收、含银废料处理、接触器拆解等多个细分领域</p>
+          </div>
+          <div class="flex flex-col items-center gap-2 flex-shrink-0">
+            <div class="w-14 h-14 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <span class="text-2xl font-black text-white">1</span>
+            </div>
+          </div>
+        </div>
+      </a>
+      <!-- Slide 2：什么是三元催化 -->
+      <a href="tecexc.html#article-2" class="block w-full flex-shrink-0 bg-gradient-to-br from-orange-brand to-orange-dark relative overflow-hidden no-underline" aria-label="查看文章：什么是三元催化">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+        <div class="relative z-10 p-4 flex items-center justify-between min-h-[120px]">
+          <div class="flex-1 pr-3">
+            <div class="flex items-center gap-1.5 mb-2">
+              <span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">回收百科</span>
+              <span class="text-white/70 text-[10px]">热门文章</span>
+            </div>
+            <h3 class="text-white text-lg font-black mb-1 leading-tight">什么是三元催化</h3>
+            <p class="text-white/85 text-[11px] leading-relaxed line-clamp-2">含铂、钯、铑等贵金属，回收价值极高，详解结构、成分及回收流程</p>
+          </div>
+          <div class="flex flex-col items-center gap-2 flex-shrink-0">
+            <div class="w-14 h-14 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </a>
+      <!-- Slide 3：接触器银触点提取技术 -->
+      <a href="tecexc.html#article-4" class="block w-full flex-shrink-0 bg-gradient-to-br from-purple-500 to-violet-700 relative overflow-hidden no-underline" aria-label="查看文章：接触器银触点提取技术">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+        <div class="relative z-10 p-4 flex items-center justify-between min-h-[120px]">
+          <div class="flex-1 pr-3">
+            <div class="flex items-center gap-1.5 mb-2">
+              <span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">核心技术</span>
+              <span class="text-white/70 text-[10px]">进阶教学</span>
+            </div>
+            <h3 class="text-white text-lg font-black mb-1 leading-tight">接触器银触点提取</h3>
+            <p class="text-white/85 text-[11px] leading-relaxed line-clamp-2">物理拆解、化学溶解、电解法等，详解各种方法的优缺点及操作步骤</p>
+          </div>
+          <div class="flex flex-col items-center gap-2 flex-shrink-0">
+            <div class="w-14 h-14 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <!-- 指示器 -->
+  <div class="flex justify-center gap-1.5 mt-2.5" data-carousel-dots>
+    <div class="h-1.5 rounded-full transition-all duration-300 cursor-pointer" style="width: 20px; background: #10B981;" data-carousel-dot="0"></div>
+    <div class="h-1.5 rounded-full transition-all duration-300 cursor-pointer" style="width: 6px; background: #D6D3D1;" data-carousel-dot="1"></div>
+    <div class="h-1.5 rounded-full transition-all duration-300 cursor-pointer" style="width: 6px; background: #D6D3D1;" data-carousel-dot="2"></div>
+  </div>
+</div>
+
+<!-- 底部信息区（今日行情 + 联系我们 双 Tab） -->
+<div class="px-4 mb-4">
+<div class="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
+<!-- 标签页 -->
+<div class="flex border-b border-gray-100" role="tablist">
+  <div class="flex-1 py-3 text-center cursor-pointer transition-colors" data-tab-trigger="quotes" role="tab">
+    <span class="text-sm font-bold text-gray-900 border-b-2 border-orange-brand pb-2.5 whitespace-nowrap select-none">今日行情</span>
+  </div>
+  <div class="flex-1 py-3 text-center cursor-pointer transition-colors" data-tab-trigger="contact" role="tab">
+    <span class="text-sm font-medium text-gray-400 whitespace-nowrap select-none">联系我们</span>
+  </div>
+</div>
+
+<!-- 今日行情内容（默认显示） -->
+<div data-tab-panel="quotes" class="p-4 space-y-2">
+  <!-- 顶部提示：实时刷新 -->
+  <div class="flex items-center justify-between pb-1">
+    <div class="flex items-center gap-1.5">
+      <span class="relative flex w-2 h-2">
+        <span class="absolute inline-flex w-full h-full rounded-full bg-green-brand opacity-60 animate-ping"></span>
+        <span class="relative inline-flex w-2 h-2 rounded-full bg-green-brand"></span>
+      </span>
+      <span class="text-[11px] text-gray-500 font-medium" data-quotes-time>实时行情 · 2025-06-09 14:32</span>
+    </div>
+    <button class="text-[11px] text-orange-brand font-semibold flex items-center gap-0.5 tap-active" data-refresh>
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
+      刷新
+    </button>
+  </div>
+
+  <!-- 贵金属实时行情卡片 -->
+  <div class="grid grid-cols-2 gap-2">
+    <!-- 黄金 -->
+    <div class="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100" data-metal="au">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+          <span class="text-[11px] font-semibold text-amber-800">黄金 Au</span>
+        </div>
+        <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-0.5" data-pct>
+          <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+          <span data-pct-text>+0.32%</span>
+        </span>
+      </div>
+      <p class="text-[18px] font-black text-amber-600 font-mono leading-none" data-price>558.30</p>
+      <p class="text-[10px] text-amber-700/70 mt-1">元/克 · <span data-change>+1.78</span></p>
+    </div>
+
+    <!-- 白银 -->
+    <div class="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl p-3 border border-slate-200" data-metal="ag">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+          <span class="text-[11px] font-semibold text-slate-700">白银 Ag</span>
+        </div>
+        <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-0.5" data-pct>
+          <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+          <span data-pct-text>+1.80%</span>
+        </span>
+      </div>
+      <p class="text-[18px] font-black text-slate-700 font-mono leading-none" data-price>7.36</p>
+      <p class="text-[10px] text-slate-600/70 mt-1">元/克 · <span data-change>+0.13</span></p>
+    </div>
+
+    <!-- 铂金 -->
+    <div class="bg-gradient-to-br from-cyan-50 to-sky-50 rounded-xl p-3 border border-cyan-100" data-metal="pt">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+          <span class="text-[11px] font-semibold text-cyan-800">铂金 Pt</span>
+        </div>
+        <span class="text-[10px] text-rose-600 font-bold flex items-center gap-0.5" data-pct>
+          <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+          <span data-pct-text>-0.45%</span>
+        </span>
+      </div>
+      <p class="text-[18px] font-black text-cyan-600 font-mono leading-none" data-price>226.80</p>
+      <p class="text-[10px] text-cyan-700/70 mt-1">元/克 · <span data-change>-1.02</span></p>
+    </div>
+
+    <!-- 钯金 -->
+    <div class="bg-gradient-to-br from-fuchsia-50 to-pink-50 rounded-xl p-3 border border-fuchsia-100" data-metal="pd">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-fuchsia-500"></span>
+          <span class="text-[11px] font-semibold text-fuchsia-800">钯金 Pd</span>
+        </div>
+        <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-0.5" data-pct>
+          <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+          <span data-pct-text>+0.86%</span>
+        </span>
+      </div>
+      <p class="text-[18px] font-black text-fuchsia-600 font-mono leading-none" data-price>248.50</p>
+      <p class="text-[10px] text-fuchsia-700/70 mt-1">元/克 · <span data-change>+2.12</span></p>
+    </div>
+  </div>
+
+  <!-- 底部：更多金属快捷查看 -->
+  <a href="quote-list.html" class="block text-center py-2.5 text-[12px] text-gray-500 font-medium hover:text-orange-brand transition-colors">
+    查看全部金属行情 →
+  </a>
+</div>
+
+<!-- 联系我们内容（默认隐藏） -->
+<div data-tab-panel="contact" class="p-4 space-y-3 hidden">
+  <!-- 电话 -->
+  <div class="flex items-center justify-between py-2">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-orange-surface rounded-xl flex items-center justify-center">
+        <img src="/icons/phone.svg" alt="电话" class="w-5 h-5" style="filter: invert(58%) sepia(85%) saturate(1761%) hue-rotate(337deg) brightness(101%) contrast(101%);">
+      </div>
+      <div>
+        <p class="text-sm font-bold text-gray-900">铝老板 13217121000</p>
+      </div>
+    </div>
+    <a href="tel:13217121000" class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors no-underline">拨打</a>
+  </div>
+  <!-- 微信 -->
+  <div class="flex items-center justify-between py-2">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-green-surface rounded-xl flex items-center justify-center">
+        <img src="/icons/wechat.svg" alt="微信" class="w-5 h-5" style="filter: invert(50%) sepia(95%) saturate(485%) hue-rotate(112deg) brightness(95%) contrast(91%);">
+      </div>
+      <div>
+        <p class="text-sm font-bold text-gray-900">13217121000</p>
+      </div>
+    </div>
+    <button class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors" data-copy-wechat>复制</button>
+  </div>
+  <!-- 地址 -->
+  <div class="flex items-center justify-between py-2">
+    <a href="https://uri.amap.com/marker?position=113.9268,30.9264&name=湖北省孝感市天下循环经济产业园&src=mypage&coordinate=gaode&callnative=1" class="flex items-center gap-3 flex-1 min-w-0 no-underline active:opacity-70 transition-opacity">
+      <div class="w-9 h-9 bg-red-surface rounded-xl flex items-center justify-center flex-shrink-0">
+        <img src="/icons/location.svg" alt="地址" class="w-5 h-5" style="filter: invert(45%) sepia(85%) saturate(2476%) hue-rotate(335deg) brightness(99%) contrast(95%);">
+      </div>
+      <p class="text-sm font-bold text-gray-900 leading-snug pr-2">湖北省孝感市天下循环经济产业园</p>
+    </a>
+    <a href="https://uri.amap.com/marker?position=113.9268,30.9264&name=湖北省孝感市天下循环经济产业园&src=mypage&coordinate=gaode&callnative=1" class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors flex-shrink-0 no-underline">导航</a>
+  </div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 地图占位 -->
+<div class="px-4 mb-6">
+<a href="https://uri.amap.com/marker?position=113.9268,30.9264&name=湖北省孝感市天下循环经济产业园&src=mypage&coordinate=gaode&callnative=1" class="block no-underline active:opacity-90 transition-opacity">
+<div class="rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] h-32 bg-cover bg-center" style="background-image: url(&#39;https://ai-public.mastergo.com/gen_page/map_placeholder_1280x720.png&#39;);">
+<div class="w-full h-full bg-gradient-to-t from-black/30 to-transparent flex items-end p-3">
+<div class="flex items-center gap-2 text-white">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path></svg>
+<span class="text-xs font-medium">湖北省孝感市</span>
+</div>
+</div>
+</div>
+</a>
+</div>
+
+<!-- 底部固定导航栏（由 bottom-nav 组件注入） -->
+<div id="app-bottom-nav" data-active-nav="quotes"></div>
+
+<script>
+  // Tab 切换
+  (function () {
+    const triggers = document.querySelectorAll('[data-tab-trigger]');
+    const panels = document.querySelectorAll('[data-tab-panel]');
+    const activeClass = ['text-sm', 'font-bold', 'text-gray-900', 'border-b-2', 'border-orange-brand', 'pb-2.5', 'whitespace-nowrap', 'select-none'];
+    const inactiveClass = ['text-sm', 'font-medium', 'text-gray-400', 'whitespace-nowrap', 'select-none'];
+
+    function activate(key) {
+      triggers.forEach(t => {
+        const span = t.querySelector('span');
+        span.className = (t.dataset.tabTrigger === key ? activeClass : inactiveClass).join(' ');
+      });
+      panels.forEach(p => {
+        p.classList.toggle('hidden', p.dataset.tabPanel !== key);
+      });
+    }
+
+    triggers.forEach(t => t.addEventListener('click', () => activate(t.dataset.tabTrigger)));
+  })();
+
+  // 复制微信号
+  (function () {
+    const btn = document.querySelector('[data-copy-wechat]');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const text = '13217121000';
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = '已复制';
+          setTimeout(() => (btn.textContent = orig), 1500);
+        });
+      }
+    });
+  })();
+
+  // 行情刷新（手动 + 10 秒自动）
+  (function () {
+    const btn = document.querySelector('[data-refresh]');
+    const svg = btn?.querySelector('svg');
+    if (svg) svg.style.transition = 'transform 0.6s ease';
+
+    // 4 个金属卡片数据
+    const cards = document.querySelectorAll('[data-metal]');
+    const state = {};
+    cards.forEach(card => {
+      const key = card.dataset.metal;
+      const priceEl = card.querySelector('[data-price]');
+      const changeEl = card.querySelector('[data-change]');
+      const pctEl = card.querySelector('[data-pct]');
+      const pctTextEl = card.querySelector('[data-pct-text]');
+      const priceStr = priceEl?.textContent.trim() || '0';
+      state[key] = {
+        card, priceEl, changeEl, pctEl, pctTextEl,
+        price: parseFloat(priceStr),
+        decimals: (priceStr.split('.')[1] || '').length
+      };
+    });
+
+    // 计算涨跌 + 百分比
+    function calcChange(oldP, newP) {
+      const diff = newP - oldP;
+      const pct = oldP > 0 ? (diff / oldP) * 100 : 0;
+      const sign = diff >= 0 ? '+' : '';
+      return { diff, pct, sign, up: diff >= 0 };
+    }
+
+    // 格式化价格（保留原始小数位）
+    function formatPrice(num, decimals) {
+      return num.toFixed(decimals);
+    }
+
+    // 格式化涨跌额
+    function formatDiff(diff) {
+      const abs = Math.abs(diff);
+      // 根据绝对值决定小数位
+      if (abs >= 100) return diff.toFixed(0);
+      if (abs >= 10) return diff.toFixed(2);
+      if (abs >= 1) return diff.toFixed(2);
+      return diff.toFixed(3);
+    }
+
+    // 更新单个卡片显示
+    function updateCard(s) {
+      const { priceEl, changeEl, pctEl, pctTextEl, decimals } = s;
+      const newPrice = s.price;
+      const chg = calcChange(s._oldPrice, newPrice);
+      // 切换涨跌颜色
+      pctEl.classList.toggle('text-emerald-600', chg.up);
+      pctEl.classList.toggle('text-rose-600', !chg.up);
+      // 切换箭头
+      const arrowSvg = pctEl.querySelector('svg path');
+      if (arrowSvg) {
+        arrowSvg.setAttribute('d', chg.up ? 'M7 14l5-5 5 5z' : 'M7 10l5 5 5-5z');
+      }
+      // 更新文本
+      if (priceEl) priceEl.textContent = formatPrice(newPrice, decimals);
+      if (pctTextEl) pctTextEl.textContent = `${chg.sign}${chg.pct.toFixed(2)}%`;
+      if (changeEl) changeEl.textContent = (chg.up ? '+' : '') + formatDiff(chg.diff);
+    }
+
+    // 刷新一次：随机扰动每个金属价格
+    function tick() {
+      Object.keys(state).forEach(key => {
+        const s = state[key];
+        s._oldPrice = s.price;
+        // 随机波动 ±0.3%
+        const delta = (Math.random() - 0.5) * 0.006 * s.price;
+        s.price = s.price + delta;
+        updateCard(s);
+      });
+      // 更新时间戳
+      const timeEl = document.querySelector('[data-quotes-time]');
+      if (timeEl) {
+        const now = new Date();
+        const pad = n => n.toString().padStart(2, '0');
+        timeEl.textContent = `实时行情 · ${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      }
+    }
+
+    // 初始化：保存初始价格为 oldPrice
+    Object.values(state).forEach(s => { s._oldPrice = s.price; });
+
+    // 手动刷新按钮
+    btn?.addEventListener('click', () => {
+      if (svg) svg.style.transform = `rotate(${Date.now() % 360}deg)`;
+      setTimeout(() => { if (svg) svg.style.transform = ''; }, 800);
+      tick();
+      countdown = 10;
+    });
+
+    // 自动刷新：10 秒一次
+    let countdown = 10;
+    const timer = setInterval(() => {
+      countdown -= 1;
+      if (countdown <= 0) {
+        tick();
+        countdown = 10;
+      }
+    }, 1000);
+
+    // 页面隐藏时停止
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        clearInterval(timer);
+      } else {
+        tick();
+      }
+    });
+  })();
+
+  // 文章轮播（自动播放 + 点击指示器跳转）
+  (function () {
+    const carousel = document.getElementById('articleCarousel');
+    if (!carousel) return;
+    const track = carousel.querySelector('[data-carousel-track]');
+    const slides = track ? track.children : [];
+    const dots = document.querySelectorAll('[data-carousel-dot]');
+    if (slides.length === 0) return;
+
+    let index = 0;
+    const total = slides.length;
+    let timer = null;
+    const INTERVAL = 4000;
+
+    function go(i) {
+      index = (i + total) % total;
+      if (track) track.style.transform = `translateX(-${index * 100}%)`;
+      dots.forEach((d, k) => {
+        d.style.width = k === index ? '20px' : '6px';
+        d.style.background = k === index ? '#10B981' : '#D6D3D1';
+      });
+    }
+
+    function start() {
+      stop();
+      timer = setInterval(() => go(index + 1), INTERVAL);
+    }
+    function stop() {
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    // 指示器点击
+    dots.forEach((d, k) => d.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      go(k);
+      start(); // 重置计时
+    }));
+
+    // 触摸滑动支持
+    let startX = 0, dx = 0, isTouching = false;
+    carousel.addEventListener('touchstart', (e) => {
+      isTouching = true;
+      startX = e.touches[0].clientX;
+      dx = 0;
+      stop();
+    }, { passive: true });
+    carousel.addEventListener('touchmove', (e) => {
+      if (!isTouching) return;
+      dx = e.touches[0].clientX - startX;
+    }, { passive: true });
+    carousel.addEventListener('touchend', () => {
+      if (!isTouching) return;
+      isTouching = false;
+      if (Math.abs(dx) > 40) {
+        if (dx < 0) go(index + 1); else go(index - 1);
+      }
+      start();
+    });
+
+    // 页面隐藏时停止自动播放
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop(); else start();
+    });
+
+    go(0);
+    start();
+  })();
+</script>
+
+<script type="module">
+  import { mountBottomNav } from '/src/components/bottom-nav.js';
+  const slot = document.getElementById('app-bottom-nav');
+  mountBottomNav(slot, { active: slot.dataset.activeNav || 'quotes' });
+</script>
+
+
+</body></html>

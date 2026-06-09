@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>型号详情 - 铝老板管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: {
+                    brand: { 50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',300:'#86efac',400:'#4ade80',500:'#22c55e',600:'#16a34a',700:'#15803d' },
+                    metal: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a' }
+                },
+                fontFamily: { sans: ['Noto Sans SC','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] }
+            } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .admin-app { min-height: 100vh; background: #f5f5f5; }
+        .admin-sticky-header { position: sticky; top: 0; z-index: 40; background: #ffffff; }
+        .admin-content { padding-bottom: 80px; }
+        .content-inner { max-width: 1200px; margin: 0 auto; }
+        @media (min-width: 1024px) {
+            .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
+            .content-inner { padding: 0 24px; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="admin-app">
+    <header class="admin-sticky-header">
+        <div id="admin-topbar"></div>
+    </header>
+
+    <main class="admin-content">
+        <div class="content-inner">
+
+            <!-- 产品图片 -->
+            <div class="bg-white">
+                <div class="relative h-[260px] flex items-center justify-center bg-metal-50">
+                    <img src="/【老款】CJX2-8011 .jpg" class="object-contain w-full h-full p-6" alt="">
+                </div>
+            </div>
+
+            <!-- 基本信息 -->
+            <div class="bg-white px-4 py-4 mt-2">
+                <div class="flex items-start justify-between gap-3">
+                    <h2 class="text-[18px] font-bold text-metal-900">【新款】CJX2-8011</h2>
+                    <span class="shrink-0 bg-brand-50 text-brand-700 text-[11px] px-2 py-1 rounded-md font-medium">正泰接触器</span>
+                </div>
+                <div class="mt-3 space-y-1.5">
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-[12px] text-metal-500">回收价：</span>
+                        <span class="text-[18px] font-bold text-amber-600 font-mono">¥160.00</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-[12px] text-metal-500">银点铜回收价：</span>
+                        <span class="text-[14px] font-bold text-metal-800 font-mono">¥1395.64/公斤</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 单位重量表 -->
+            <div class="mx-4 lg:mx-0 mt-3 bg-white rounded-[14px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <div class="flex items-center gap-2 px-4 py-3 border-b border-metal-50">
+                    <div class="w-1 h-4 bg-brand-500 rounded-full"></div>
+                    <h3 class="text-[14px] font-semibold text-metal-900">单位重量</h3>
+                </div>
+                <table class="w-full text-[12px]">
+                    <thead>
+                        <tr class="bg-brand-500 text-white">
+                            <th class="py-2.5 px-3 text-left font-medium">名称</th>
+                            <th class="py-2.5 px-2 text-center font-medium">重量(g)</th>
+                            <th class="py-2.5 px-2 text-center font-medium">纯度</th>
+                            <th class="py-2.5 px-3 text-right font-medium">价值</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-metal-50">
+                            <td class="py-2.5 px-3 text-metal-800">出白银</td>
+                            <td class="py-2.5 px-2 text-center text-metal-500 font-mono">12.5000</td>
+                            <td class="py-2.5 px-2 text-center text-metal-500 font-mono">76%</td>
+                            <td class="py-2.5 px-3 text-right font-semibold text-amber-600 font-mono">¥149.15</td>
+                        </tr>
+                        <tr class="border-b border-metal-50">
+                            <td class="py-2.5 px-3 text-metal-800">出烤点铜</td>
+                            <td class="py-2.5 px-2 text-center text-metal-500 font-mono">0.0970</td>
+                            <td class="py-2.5 px-2 text-center text-metal-500 font-mono">50%</td>
+                            <td class="py-2.5 px-3 text-right font-semibold text-amber-600 font-mono">¥4.37</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2.5 px-3 text-metal-800">出漆包铜</td>
+                            <td class="py-2.5 px-2 text-center text-metal-500 font-mono">0.0900</td>
+                            <td class="py-2.5 px-2 text-center text-metal-500 font-mono">90%</td>
+                            <td class="py-2.5 px-3 text-right font-semibold text-amber-600 font-mono">¥6.48</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 详情描述 -->
+            <div class="mx-4 lg:mx-0 mt-3 bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-1 h-4 bg-brand-500 rounded-full"></div>
+                    <h3 class="text-[14px] font-semibold text-metal-900">详情</h3>
+                </div>
+                <p class="text-[12px] text-metal-600 leading-relaxed">总重1.4 银铜110 线圈90 考点12.5</p>
+            </div>
+
+            <!-- 元数据 -->
+            <div class="mx-4 lg:mx-0 mt-3 bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <h3 class="text-[14px] font-semibold text-metal-900 mb-3">元数据</h3>
+                <div class="space-y-2 text-[12px]">
+                    <div class="flex justify-between"><span class="text-metal-500">所属分类</span><span class="text-metal-800">正泰接触器</span></div>
+                    <div class="flex justify-between"><span class="text-metal-500">型号类型</span><span class="text-metal-800">交流接触器</span></div>
+                    <div class="flex justify-between"><span class="text-metal-500">最近更新</span><span class="text-metal-800">2026-06-09 14:32</span></div>
+                    <div class="flex justify-between"><span class="text-metal-500">浏览数</span><span class="text-metal-800 font-mono">1,234</span></div>
+                    <div class="flex justify-between"><span class="text-metal-500">状态</span><span class="text-brand-600 font-medium">已上架</span></div>
+                </div>
+            </div>
+
+            <div class="h-4"></div>
+        </div>
+    </main>
+
+    <div id="admin-bottom-nav"></div>
+</div>
+
+<!-- 底部操作栏 -->
+<div class="fixed bottom-[60px] left-0 right-0 bg-white border-t border-metal-100 z-30">
+    <div class="max-w-[1200px] mx-auto flex items-center h-[60px] px-4 gap-3">
+        <a href="quote-edit.html" class="flex-1 h-10 rounded-full bg-brand-500 text-white text-[14px] font-semibold flex items-center justify-center tap-active no-underline">更新报价</a>
+        <a href="catalog-edit.html" class="flex-1 h-10 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold flex items-center justify-center tap-active no-underline">编辑型号</a>
+    </div>
+</div>
+
+<script type="module">
+    import { mountAdminTopbar } from '/src/components/admin-topbar.js';
+    import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
+
+    mountAdminTopbar('#admin-topbar', {
+        title: '型号详情',
+        back: true,
+        onMenu: () => openActionMenu(['分享链接', '下架型号', '删除', '刷新']),
+        onAvatar: () => location.href = 'mine.html',
+    });
+    mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
+
+    function openActionMenu(items) {
+        const existing = document.getElementById('__action_menu__');
+        if (existing) existing.remove();
+        const menu = document.createElement('div');
+        menu.id = '__action_menu__';
+        menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
+        menu.innerHTML = `
+          <div class="absolute inset-0 bg-black/40" data-close></div>
+          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 animate-up">
+            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
+            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
+            <button class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 font-medium active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
+          </div>`;
+        document.body.appendChild(menu);
+        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
+    }
+</script>
+
+</body>
+</html>

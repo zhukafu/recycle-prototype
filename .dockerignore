@@ -1,0 +1,20 @@
+# Docker 构建忽略文件
+node_modules
+dist
+dist-mp
+dist-admin
+.git
+.gitignore
+.DS_Store
+*.log
+npm-debug.log*
+.env
+.env.local
+.vscode
+.idea
+*.md
+README.md
+docker-compose.yaml
+Dockerfile
+.dockerignore
+nginx.conf

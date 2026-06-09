@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>产品详情 - 铝老板金属网</title>
+<script src="data/contacts.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+green: { brand: '#10B981', light: '#34D399', dark: '#059669', surface: '#ECFDF5' },
+orange: { brand: '#F97316', light: '#FB923C', dark: '#EA580C', surface: '#FFF7ED' },
+red: { brand: '#EF4444', light: '#F87171', dark: '#DC2626', surface: '#FEF2F2' },
+amber: { brand: '#F59E0B', light: '#FCD34D', dark: '#D97706', surface: '#FFFBEB' },
+slate: { brand: '#64748B', light: '#94A3B8', dark: '#475569', surface: '#F8FAFC' },
+cyan: { brand: '#06B6D4', light: '#22D3EE', dark: '#0891B2', surface: '#ECFEFF' },
+gray: { bg: '#F5F5F4', card: '#FAFAF9', border: '#E7E5E4' }
+},
+fontFamily: {
+sans: ['Noto Sans SC', 'system-ui', 'sans-serif'],
+serif: ['Noto Serif SC', 'serif']
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.fade-in { animation: fadeIn 0.4s ease-out forwards; }
+@keyframes slideInUp {
+from { opacity: 0; transform: translateY(16px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.slide-up { animation: slideInUp 0.4s ease-out forwards; }
+@keyframes shimmer {
+0% { background-position: -200% 0; }
+100% { background-position: 200% 0; }
+}
+.shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); background-size: 200% 100%; animation: shimmer 1.5s linear infinite; }
+</style>
+</head>
+<body class="bg-gray-bg min-h-screen pb-32">
+
+<!-- 顶部导航 -->
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100">
+  <div class="flex items-center justify-between px-4 h-12">
+    <a href="javascript:history.back()" aria-label="返回" class="w-9 h-9 -ml-1 flex items-center justify-center rounded-full active:bg-gray-100 transition-colors">
+      <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"></path>
+      </svg>
+    </a>
+    <h1 class="text-base font-bold text-gray-900" id="pageTitle">产品详情</h1>
+    <button onclick="shareProduct()" aria-label="分享" class="w-9 h-9 -mr-1 flex items-center justify-center rounded-full active:bg-gray-100 transition-colors">
+      <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- 加载中 -->
+<div id="loading" class="px-4 py-16 text-center">
+  <div class="inline-flex items-center gap-1 text-gray-400 text-sm">
+    <span class="w-1.5 h-1.5 rounded-full bg-green-brand animate-pulse"></span>
+    <span class="w-1.5 h-1.5 rounded-full bg-green-brand animate-pulse" style="animation-delay:.2s"></span>
+    <span class="w-1.5 h-1.5 rounded-full bg-green-brand animate-pulse" style="animation-delay:.4s"></span>
+    <span class="ml-2">加载中...</span>
+  </div>
+</div>
+
+<!-- 找不到 -->
+<div id="notFound" class="px-4 py-16 text-center hidden">
+  <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+    <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"></path>
+    </svg>
+  </div>
+  <p class="text-gray-900 font-bold text-base">未找到该型号</p>
+  <a href="contactors.html" class="inline-block mt-4 text-green-brand font-semibold text-sm">返回接触器数据库 →</a>
+</div>
+
+<!-- 主内容 -->
+<main id="mainContent" class="hidden">
+
+  <!-- 产品大图（Hero） -->
+  <section class="bg-white px-4 pt-5 pb-6 fade-in">
+    <div class="w-full aspect-square bg-gray-bg rounded-2xl flex items-center justify-center relative overflow-hidden" id="imgHero">
+      <img id="imgEl" alt="产品图" class="w-full h-full object-contain p-4 fade-in" />
+      <!-- 分类色块兜底 -->
+      <div id="imgFallback" class="absolute inset-0 flex items-center justify-center text-3xl font-black opacity-15"></div>
+    </div>
+  </section>
+
+  <!-- 核心信息卡（型号 + 价格 + 库存） -->
+  <section class="bg-white px-4 py-4 border-t border-gray-100 slide-up" style="animation-delay:.05s">
+    <!-- 型号 + 标签 -->
+    <div class="flex items-start gap-2 mb-2">
+      <h2 class="flex-1 text-[22px] font-black text-gray-900 leading-tight" id="modelName">--</h2>
+      <span id="stockTag" class="text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0"></span>
+    </div>
+    <p class="text-sm text-gray-500 font-medium" id="brandSpec">--</p>
+
+    <!-- 价格区块 -->
+    <div class="mt-4 bg-gradient-to-br from-orange-surface to-amber-surface border border-orange-brand/15 rounded-2xl p-4">
+      <div class="flex items-end justify-between">
+        <div>
+          <p class="text-[10px] text-orange-dark font-bold uppercase tracking-wider mb-1">回收参考价</p>
+          <p class="text-[32px] font-black text-orange-brand font-mono leading-none" id="priceEl">¥0</p>
+          <p class="text-[10px] text-gray-500 mt-1">数据更新于 2026-06-09 · 仅供行情参考</p>
+        </div>
+        <button id="priceTrend" class="text-[10px] text-orange-dark bg-white border border-orange-brand/20 px-2 py-1 rounded-lg font-bold flex items-center gap-0.5 active:scale-95 transition">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+          +2.18%
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 关键参数 -->
+  <section class="bg-white px-4 py-4 border-t border-gray-100 slide-up" style="animation-delay:.1s">
+    <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+      <span class="w-1 h-3.5 bg-green-brand rounded-full"></span>
+      关键参数
+    </h3>
+    <div class="grid grid-cols-2 gap-2.5" id="paramGrid">
+      <!-- 由 JS 注入 -->
+    </div>
+  </section>
+
+  <!-- 含量与价值 -->
+  <section class="bg-white px-4 py-4 border-t border-gray-100 slide-up" style="animation-delay:.15s">
+    <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+      <span class="w-1 h-3.5 bg-amber-dark rounded-full"></span>
+      金属含量
+    </h3>
+    <div class="flex items-center gap-3 p-3 bg-amber-surface rounded-2xl border border-amber-brand/15">
+      <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+        <span class="text-xl">🥈</span>
+      </div>
+      <div class="flex-1">
+        <p class="text-[10px] text-amber-dark font-bold">含银量 (Ag)</p>
+        <p class="text-xl font-black text-amber-dark font-mono leading-tight" id="silverEl">--</p>
+      </div>
+      <div class="text-right">
+        <p class="text-[10px] text-gray-500">预估银价</p>
+        <p class="text-base font-black text-amber-dark font-mono" id="silverVal">¥0</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 简介说明 -->
+  <section class="bg-white px-4 py-4 border-t border-gray-100 slide-up" style="animation-delay:.2s">
+    <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+      <span class="w-1 h-3.5 bg-orange-brand rounded-full"></span>
+      产品说明
+    </h3>
+    <p class="text-[13px] text-gray-600 leading-relaxed" id="descEl">--</p>
+  </section>
+
+  <!-- 同类推荐 -->
+  <section class="bg-white px-4 py-4 border-t border-b border-gray-100 mt-2 slide-up" style="animation-delay:.25s">
+    <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+      <span class="w-1 h-3.5 bg-cyan-dark rounded-full"></span>
+      同类推荐
+    </h3>
+    <div class="space-y-2" id="relatedList"></div>
+  </section>
+
+</main>
+
+<!-- 底部固定操作栏 -->
+<footer class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 py-2.5 flex items-center gap-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
+  <a href="tel:13217121000" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm font-bold text-gray-700 bg-gray-bg rounded-xl active:scale-95 transition" aria-label="咨询电话">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"></path></svg>
+    咨询
+  </a>
+  <button onclick="inquiry()" class="flex-1 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-green-brand to-green-dark rounded-xl shadow-md shadow-green-brand/25 active:scale-95 transition">
+    在线询价
+  </button>
+  <button onclick="goPay()" class="flex-[1.4] py-2.5 text-sm font-black text-white bg-gradient-to-r from-orange-brand to-orange-dark rounded-xl shadow-md shadow-orange-brand/25 active:scale-95 transition">
+    立即交易
+  </button>
+</footer>
+
+<script>
+  // 数据从共享脚本 window._AL_PRODUCTS 读取
+  const CONTACTS = window._AL_PRODUCTS || [];
+  const CAT_IMG = window._AL_CAT_IMG || {};
+  const CAT_LABEL = window._AL_CAT_LABEL || {};
+  const CAT_COLOR = window._AL_CAT_COLOR || {};
+  const COLOR_MAP = {
+    green: { bg: 'bg-green-surface', text: 'text-green-dark' },
+    amber: { bg: 'bg-amber-surface', text: 'text-amber-dark' },
+    cyan:  { bg: 'bg-cyan-surface',  text: 'text-cyan-dark' },
+    slate: { bg: 'bg-slate-surface', text: 'text-slate-dark' },
+    purple: { bg: 'bg-purple-50', text: 'text-purple-600' },
+    gray:  { bg: 'bg-gray-100',      text: 'text-gray-700' }
+  };
+
+  // 银价（元/克）演示用
+  const SILVER_PRICE_PER_G = 5.6;
+
+  // 读取 id 参数
+  const id = new URLSearchParams(location.search).get('id');
+  const it = CONTACTS.find(x => x.id === id);
+
+  if (!it) {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('notFound').classList.remove('hidden');
+  } else {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
+    document.title = it.model + ' - 铝老板金属网';
+    document.getElementById('pageTitle').textContent = it.cat === 'contactor' ? '接触器详情' : it.cat === 'breaker' ? '断路器详情' : it.cat === 'relay' ? '继电器详情' : '按钮详情';
+
+    // 1. 图片（优先用本地的 it.img，否则用分类通用图）
+    const imgUrl = it.img || CAT_IMG[it.cat] || '';
+    const imgEl = document.getElementById('imgEl');
+    imgEl.src = imgUrl;
+    imgEl.alt = it.model;
+    const color = CAT_COLOR[it.cat] || 'gray';
+    const fb = document.getElementById('imgFallback');
+    fb.className = 'absolute inset-0 flex items-center justify-center text-3xl font-black ' + (COLOR_MAP[color]?.text || 'text-gray-400') + ' opacity-15';
+    fb.textContent = it.model;
+
+    // 2. 标题
+    document.getElementById('modelName').textContent = it.model;
+    document.getElementById('brandSpec').textContent = it.brand + ' · ' + it.spec;
+    const stockTag = document.getElementById('stockTag');
+    if (it.stock === '现货') {
+      stockTag.className = 'text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0 text-white bg-green-brand';
+    } else {
+      stockTag.className = 'text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0 text-white bg-orange-brand';
+    }
+    stockTag.textContent = it.stock;
+
+    // 3. 价格
+    document.getElementById('priceEl').textContent = it.price ? '¥' + it.price : '询价';
+
+    // 4. 关键参数
+    const params = [
+      { label: '品牌', value: it.brand },
+      { label: '分类', value: CAT_LABEL[it.cat] },
+      { label: '规格', value: it.spec, mono: true },
+      { label: '库存', value: it.stock, badge: true }
+    ];
+    document.getElementById('paramGrid').innerHTML = params.map(p => {
+      const valueCls = p.badge
+        ? (it.stock === '现货' ? 'text-green-brand' : 'text-orange-brand') + ' font-bold'
+        : (p.mono ? 'font-mono' : 'font-semibold') + ' text-gray-900';
+      return `
+        <div class="bg-gray-bg rounded-xl p-2.5">
+          <p class="text-[10px] text-gray-500 mb-0.5">${p.label}</p>
+          <p class="text-[13px] ${valueCls} truncate">${p.value}</p>
+        </div>
+      `;
+    }).join('');
+
+    // 5. 含银量
+    document.getElementById('silverEl').textContent = it.silver;
+    const silverG = parseFloat(it.silver) || 0;
+    document.getElementById('silverVal').textContent = '¥' + (silverG * SILVER_PRICE_PER_G).toFixed(2);
+
+    // 6. 描述
+    document.getElementById('descEl').textContent = it.desc || '暂无详细说明。';
+
+    // 7. 同类推荐（同分类，排除当前，最多 3 条）
+    const related = CONTACTS.filter(x => x.cat === it.cat && x.id !== it.id).slice(0, 3);
+    document.getElementById('relatedList').innerHTML = related.map(r => {
+      const c = COLOR_MAP[CAT_COLOR[r.cat]] || COLOR_MAP.gray;
+      const img = r.img || CAT_IMG[r.cat] || '';
+      return `
+        <a href="product.html?id=${r.id}" class="flex items-center gap-3 p-2 bg-gray-bg rounded-xl active:scale-[0.99] transition no-underline">
+          <div class="w-12 h-12 ${c.bg} rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <img src="${img}" alt="${r.model}" loading="lazy" class="w-full h-full object-contain" onerror="this.style.display='none'">
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[13px] font-bold text-gray-900 truncate">${r.model}</p>
+            <p class="text-[10px] text-gray-500 truncate">${r.brand} · ${r.spec}</p>
+          </div>
+          <p class="text-[13px] font-black text-orange-brand font-mono">¥${r.price}</p>
+        </a>
+      `;
+    }).join('');
+  }
+
+  // 操作
+  function inquiry() {
+    if (!it) return;
+    alert(`已提交询价：${it.model}\n我们将尽快与您联系。`);
+  }
+  function goPay() {
+    if (!it) return;
+    alert(`跳转交易：${it.model} ¥${it.price}\n演示版：实际交易流程待对接。`);
+  }
+  function shareProduct() {
+    if (!it) return;
+    const url = location.origin + location.pathname + '?id=' + it.id;
+    if (navigator.share) {
+      navigator.share({ title: it.model, text: `回收参考价 ¥${it.price} - ${it.brand} ${it.spec}`, url }).catch(() => {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => alert('链接已复制到剪贴板')).catch(() => {});
+    } else {
+      alert(url);
+    }
+  }
+</script>
+
+</body>
+</html>

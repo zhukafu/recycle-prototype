@@ -5,6 +5,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    open: '/小程序/index.html'
+    open: '/miniprogram/index.html'
   }
 })

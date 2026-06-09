@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>金属行情 - 铝老板金属网</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+green: { brand: '#10B981', light: '#34D399', dark: '#059669', surface: '#ECFDF5' },
+orange: { brand: '#F97316', light: '#FB923C', dark: '#EA580C', surface: '#FFF7ED' },
+red: { brand: '#EF4444', light: '#F87171', dark: '#DC2626', surface: '#FEF2F2' },
+amber: { brand: '#F59E0B', light: '#FCD34D', dark: '#D97706', surface: '#FFFBEB' },
+slate: { brand: '#64748B', light: '#94A3B8', dark: '#475569', surface: '#F8FAFC' },
+cyan: { brand: '#06B6D4', light: '#22D3EE', dark: '#0891B2', surface: '#ECFEFF' },
+fuchsia: { brand: '#D946EF', light: '#E879F9', dark: '#A21CAF', surface: '#FDF4FF' },
+gray: { bg: '#F5F5F4', card: '#FAFAF9', border: '#E7E5E4' }
+},
+fontFamily: {
+sans: ['Noto Sans SC', 'system-ui', 'sans-serif'],
+serif: ['Noto Serif SC', 'serif']
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+@keyframes pulse-soft {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.7; }
+}
+.pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+@keyframes shimmer {
+0% { transform: translateX(-100%); }
+100% { transform: translateX(100%); }
+}
+.shimmer-effect { position: relative; overflow: hidden; }
+.shimmer-effect::after {
+content: '';
+position: absolute;
+top: 0; left: 0; right: 0; bottom: 0;
+background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+animation: shimmer 1.5s infinite;
+}
+@keyframes slideInUp {
+from { opacity: 0; transform: translateY(12px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.slide-up { animation: slideInUp 0.4s ease-out forwards; }
+</style>
+</head>
+<body class="bg-gray-bg min-h-screen pb-20">
+
+<!-- 顶部导航栏 -->
+<nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100">
+  <div class="flex items-center justify-between px-4 h-11">
+    <!-- 返回 -->
+    <a href="index.html" class="w-8 h-8 -ml-2 flex items-center justify-center rounded-full active:bg-gray-100 transition-colors">
+      <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"></path>
+      </svg>
+    </a>
+    <!-- 标题 -->
+    <h1 class="text-base font-bold text-gray-900">金属行情</h1>
+    <!-- 右上角操作 -->
+    <div class="flex items-center" id="page-actions"></div>
+  </div>
+</nav>
+
+<script type="module">
+  import { mountPageActions } from '/src/components/page-actions.js';
+  mountPageActions('#page-actions', {
+    onMenu: () => console.log('[quote-list] menu clicked'),
+    onAvatar: () => console.log('[quote-list] avatar clicked'),
+  });
+</script>
+
+<!-- 行情概览卡片 -->
+<div class="px-4 pt-4 pb-3">
+  <div class="bg-gradient-to-br from-green-brand to-green-dark rounded-2xl p-4 text-white relative overflow-hidden shadow-lg shadow-green-brand/20">
+    <div class="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full"></div>
+    <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-white/5 rounded-full"></div>
+    <div class="relative z-10">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-1.5">
+          <span class="relative flex w-2 h-2">
+            <span class="absolute inline-flex w-full h-full rounded-full bg-white opacity-70 animate-ping"></span>
+            <span class="relative inline-flex w-2 h-2 rounded-full bg-white"></span>
+          </span>
+          <span class="text-xs text-white/90 font-medium">实时行情</span>
+        </div>
+        <button class="text-xs text-white/90 font-semibold flex items-center gap-0.5 active:opacity-60" data-refresh>
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
+          </svg>
+          刷新
+        </button>
+      </div>
+      <div class="flex items-end justify-between">
+        <div>
+          <p class="text-[11px] text-white/75">更新时间</p>
+          <p class="text-sm font-bold font-mono" id="updateTime">2026-06-09 14:32:00</p>
+        </div>
+        <div class="text-right">
+          <p class="text-[11px] text-white/75">上涨品种</p>
+          <p class="text-lg font-black"><span class="text-white">8</span><span class="text-xs text-white/70 ml-1">/ 12</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 分类切换 Tab -->
+<div class="sticky top-11 z-40 bg-gray-bg/95 backdrop-blur-sm border-b border-gray-200/60">
+  <div class="flex overflow-x-auto hide-scrollbar px-4">
+    <button class="py-3 px-3 text-sm font-bold text-green-brand border-b-2 border-green-brand whitespace-nowrap transition-colors" data-cat-trigger="precious">贵金属</button>
+    <button class="py-3 px-3 text-sm font-medium text-gray-500 whitespace-nowrap transition-colors" data-cat-trigger="nonferrous">有色金属</button>
+    <button class="py-3 px-3 text-sm font-medium text-gray-500 whitespace-nowrap transition-colors" data-cat-trigger="rare">稀有金属</button>
+    <button class="py-3 px-3 text-sm font-medium text-gray-500 whitespace-nowrap transition-colors" data-cat-trigger="ferrous">黑色金属</button>
+    <button class="py-3 px-3 text-sm font-medium text-gray-500 whitespace-nowrap transition-colors" data-cat-trigger="scrap">废料</button>
+  </div>
+</div>
+
+<!-- 行情列表 -->
+<div class="px-4 pt-3 space-y-2" id="quoteList"></div>
+
+<!-- 底部固定导航栏 -->
+<div id="app-bottom-nav" data-active-nav="quotes"></div>
+
+<script type="module">
+  import { mountBottomNav } from '/src/components/bottom-nav.js';
+  const slot = document.getElementById('app-bottom-nav');
+  mountBottomNav(slot, { active: slot.dataset.activeNav || 'quotes' });
+</script>
+
+<script>
+  // 行情数据（演示用）
+  const QUOTE_DATA = {
+    precious: [
+      { name: '黄金', code: 'Au', unit: '元/克', price: '558.30', change: '+1.78', pct: '+0.32%', up: true, color: 'amber', note: '国际金价震荡' },
+      { name: '白银', code: 'Ag', unit: '元/克', price: '7.36', change: '+0.13', pct: '+1.80%', up: true, color: 'slate', note: '工业需求强劲' },
+      { name: '铂金', code: 'Pt', unit: '元/克', price: '226.80', change: '-1.02', pct: '-0.45%', up: false, color: 'cyan', note: '汽车催化需求疲软' },
+      { name: '钯金', code: 'Pd', unit: '元/克', price: '248.50', change: '+2.12', pct: '+0.86%', up: true, color: 'fuchsia', note: '供应紧张' },
+      { name: '铑金', code: 'Rh', unit: '元/克', price: '986.00', change: '-15.50', pct: '-1.55%', up: false, color: 'rose', note: '高位回调' },
+      { name: '钌', code: 'Ru', unit: '元/克', price: '88.20', change: '+0.65', pct: '+0.74%', up: true, color: 'indigo', note: '电子工业需求' }
+    ],
+    nonferrous: [
+      { name: '紫铜', code: 'Cu', unit: '元/吨', price: '73,200', change: '+450', pct: '+0.62%', up: true, color: 'orange', note: '宏观利好' },
+      { name: '黄铜', code: 'CuZn', unit: '元/吨', price: '52,800', change: '+220', pct: '+0.42%', up: true, color: 'amber', note: '跟随铜价' },
+      { name: '铝', code: 'Al', unit: '元/吨', price: '20,650', change: '-85', pct: '-0.41%', up: false, color: 'slate', note: '库存累积' },
+      { name: '锌', code: 'Zn', unit: '元/吨', price: '23,180', change: '+95', pct: '+0.41%', up: true, color: 'cyan', note: '冶炼端限产' },
+      { name: '铅', code: 'Pb', unit: '元/吨', price: '16,950', change: '-30', pct: '-0.18%', up: false, color: 'gray', note: '需求平淡' },
+      { name: '锡', code: 'Sn', unit: '元/吨', price: '265,800', change: '+1,200', pct: '+0.45%', up: true, color: 'fuchsia', note: '电子焊料需求' }
+    ],
+    rare: [
+      { name: '钨', code: 'W', unit: '元/吨', price: '132,500', change: '+800', pct: '+0.61%', up: true, color: 'amber', note: '硬质合金需求' },
+      { name: '钼', code: 'Mo', unit: '元/吨', price: '358,000', change: '-1,500', pct: '-0.42%', up: false, color: 'orange', note: '钢厂招标价走低' },
+      { name: '锂', code: 'Li', unit: '万元/吨', price: '89.50', change: '-0.85', pct: '-0.94%', up: false, color: 'green', note: '新能源需求放缓' },
+      { name: '钴', code: 'Co', unit: '元/吨', price: '186,000', change: '+1,200', pct: '+0.65%', up: true, color: 'cyan', note: '动力电池回暖' },
+      { name: '铟', code: 'In', unit: '元/kg', price: '2,580', change: '+45', pct: '+1.78%', up: true, color: 'indigo', note: 'ITO靶材需求' },
+      { name: '锗', code: 'Ge', unit: '元/kg', price: '13,200', change: '-120', pct: '-0.90%', up: false, color: 'rose', note: '出口管制影响' }
+    ],
+    ferrous: [
+      { name: '螺纹钢', code: 'RB', unit: '元/吨', price: '3,580', change: '+12', pct: '+0.34%', up: true, color: 'slate', note: '需求季节性回暖' },
+      { name: '热卷', code: 'HC', unit: '元/吨', price: '3,720', change: '-8', pct: '-0.21%', up: false, color: 'gray', note: '库存压力' },
+      { name: '铁矿石', code: 'I', unit: '元/吨', price: '825', change: '+5', pct: '+0.61%', up: true, color: 'amber', note: '澳洲发货减少' },
+      { name: '废钢', code: 'FS', unit: '元/吨', price: '2,580', change: '+18', pct: '+0.70%', up: true, color: 'orange', note: '电炉钢厂复产' }
+    ],
+    scrap: [
+      { name: '废铜', code: 'Cu-S', unit: '元/吨', price: '68,500', change: '+300', pct: '+0.44%', up: true, color: 'orange', note: '光亮铜线参考价' },
+      { name: '废铝', code: 'Al-S', unit: '元/吨', price: '16,200', change: '-50', pct: '-0.31%', up: false, color: 'slate', note: '生铝易拉罐参考' },
+      { name: '废不锈钢', code: 'SS-S', unit: '元/吨', price: '11,800', change: '+80', pct: '+0.68%', up: true, color: 'cyan', note: '304边角料参考' },
+      { name: '含银废料', code: 'Ag-S', unit: '元/kg', price: '6.85', change: '+0.11', pct: '+1.63%', up: true, color: 'slate', note: '接触器触点参考' }
+    ]
+  };
+
+  const CAT_LABEL = {
+    precious: '贵金属',
+    nonferrous: '有色金属',
+    rare: '稀有金属',
+    ferrous: '黑色金属',
+    scrap: '废料回收'
+  };
+
+  function renderList(cat) {
+    const list = document.getElementById('quoteList');
+    const items = QUOTE_DATA[cat] || [];
+    if (items.length === 0) {
+      list.innerHTML = '<div class="text-center py-12 text-gray-400 text-sm">暂无数据</div>';
+      return;
+    }
+    list.innerHTML = items.map((it, idx) => {
+      const trendColor = it.up ? 'text-green-brand' : 'text-red-brand';
+      const arrow = it.up
+        ? '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>'
+        : '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
+      // 迷你折线（演示用：8 个点）
+      const points = it.up
+        ? '0,18 12,16 24,15 36,12 48,13 60,9 72,8 84,5'
+        : '0,5 12,8 24,9 36,11 48,10 60,14 72,15 84,18';
+      const stroke = it.up ? '#10B981' : '#EF4444';
+      return `
+        <div class="bg-white rounded-2xl p-3.5 flex items-center gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] border border-gray-100 active:scale-[0.99] transition-transform slide-up" style="animation-delay: ${idx * 0.04}s">
+          <!-- 金属标识 -->
+          <div class="w-11 h-11 rounded-xl bg-${it.color}-surface flex items-center justify-center flex-shrink-0">
+            <div class="text-center leading-none">
+              <p class="text-[10px] text-${it.color}-dark font-bold">${it.code}</p>
+            </div>
+          </div>
+          <!-- 名称 + 备注 -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-[15px] font-bold text-gray-900">${it.name}</span>
+              <span class="text-[10px] text-gray-400">${it.unit}</span>
+            </div>
+            <p class="text-[11px] text-gray-400 truncate mt-0.5">${it.note}</p>
+          </div>
+          <!-- 迷你走势图 -->
+          <div class="w-16 h-9 flex-shrink-0">
+            <svg width="64" height="36" viewBox="0 0 84 24" preserveAspectRatio="none">
+              <polyline points="${points}" fill="none" stroke="${stroke}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+            </svg>
+          </div>
+          <!-- 价格 + 涨跌幅 -->
+          <div class="text-right flex-shrink-0 min-w-[70px]">
+            <p class="text-[15px] font-black text-gray-900 font-mono leading-none">${it.price}</p>
+            <p class="text-[10px] ${trendColor} font-bold mt-1 flex items-center justify-end gap-0.5 font-mono">
+              ${arrow}${it.change}
+            </p>
+            <p class="text-[10px] ${trendColor} font-semibold font-mono">${it.pct}</p>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 分类 Tab 切换
+  (function () {
+    const triggers = document.querySelectorAll('[data-cat-trigger]');
+    const activeClass = ['py-3', 'px-3', 'text-sm', 'font-bold', 'text-green-brand', 'border-b-2', 'border-green-brand', 'whitespace-nowrap', 'transition-colors'];
+    const inactiveClass = ['py-3', 'px-3', 'text-sm', 'font-medium', 'text-gray-500', 'whitespace-nowrap', 'transition-colors'];
+
+    function activate(key) {
+      triggers.forEach(t => {
+        const isActive = t.dataset.catTrigger === key;
+        t.className = (isActive ? activeClass : inactiveClass).join(' ');
+      });
+      renderList(key);
+    }
+    triggers.forEach(t => t.addEventListener('click', () => activate(t.dataset.catTrigger)));
+  })();
+
+  // 初始化：渲染贵金属
+  renderList('precious');
+
+  // 刷新按钮 + 10 秒自动刷新
+  (function () {
+    const btn = document.querySelector('[data-refresh]');
+    const list = document.getElementById('quoteList');
+    const svg = btn?.querySelector('svg');
+    if (svg) svg.style.transition = 'transform 0.6s ease';
+
+    // 解析价格：返回数值 + 原始字符串（保留格式）
+    function parsePrice(str) {
+      const num = parseFloat(str.replace(/,/g, ''));
+      const decimals = (str.split('.')[1] || '').length;
+      const hasComma = str.includes(',');
+      return { num, decimals, hasComma };
+    }
+    // 格式化价格：按原始格式回写
+    function formatPrice(num, fmt) {
+      const fixed = num.toFixed(fmt.decimals);
+      if (fmt.hasComma) {
+        const [int, dec] = fixed.split('.');
+        return int.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (dec !== undefined ? '.' + dec : '');
+      }
+      return fixed;
+    }
+    // 计算涨跌 + 百分比
+    function calcChange(oldP, newP) {
+      const diff = newP - oldP;
+      const pct = (diff / oldP) * 100;
+      const sign = diff >= 0 ? '+' : '';
+      return {
+        diff: diff.toFixed(2),
+        pct: `${sign}${pct.toFixed(2)}%`,
+        up: diff >= 0
+      };
+    }
+
+    // 刷新一次：随机扰动每个品种价格
+    function tick() {
+      Object.keys(QUOTE_DATA).forEach(cat => {
+        QUOTE_DATA[cat].forEach(it => {
+          const fmt = parsePrice(it.price);
+          // 随机波动 ±0.3%
+          const delta = (Math.random() - 0.5) * 0.006 * fmt.num;
+          const newNum = fmt.num + delta;
+          it.price = formatPrice(newNum, fmt);
+          // 更新涨跌
+          const oldPrice = fmt.num;
+          const chg = calcChange(oldPrice, newNum);
+          it.change = chg.diff;
+          it.pct = chg.pct;
+          it.up = chg.up;
+        });
+      });
+      // 当前激活的分类重新渲染
+      const activeTrigger = document.querySelector('[data-cat-trigger].text-green-brand') ||
+                            document.querySelector('.border-b-2.border-green-brand');
+      const currentCat = activeTrigger?.dataset.catTrigger || 'precious';
+      renderList(currentCat);
+      // 更新时间戳
+      updateTimeEl();
+    }
+
+    function updateTimeEl() {
+      const el = document.getElementById('updateTime');
+      if (!el) return;
+      const now = new Date();
+      const pad = n => n.toString().padStart(2, '0');
+      el.textContent = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    }
+
+    // 手动刷新
+    btn?.addEventListener('click', () => {
+      if (list) list.classList.add('shimmer-effect');
+      if (svg) svg.style.transform = `rotate(${Date.now() % 360}deg)`;
+      setTimeout(() => {
+        if (list) list.classList.remove('shimmer-effect');
+        if (svg) svg.style.transform = '';
+        tick();
+      }, 800);
+      // 重置倒计时
+      countdown = 10;
+    });
+
+    // 自动刷新：10 秒一次
+    let countdown = 10;
+    const timer = setInterval(() => {
+      countdown -= 1;
+      if (countdown <= 0) {
+        tick();
+        countdown = 10;
+      }
+    }, 1000);
+
+    // 页面隐藏时停止定时器
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        clearInterval(timer);
+      } else {
+        // 恢复后立即刷新一次
+        tick();
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
