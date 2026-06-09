@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>铝老板金属网 - 联系我们</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              green: '#10B981',
+              'green-dark': '#059669',
+              orange: '#F97316',
+              ink: '#1F2937',
+              'ink-light': '#6B7280',
+              surface: '#F9FAFB',
+              hairline: '#E5E7EB',
+            }
+          },
+          fontFamily: {
+            sans: ['PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04); }
+    .card-shadow-hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06); }
+    .gradient-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+    .gradient-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+    .gradient-red { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
+    .gradient-teal { background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%); }
+    .upload-dashed { border: 2px dashed #D1D5DB; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen pb-20">
+
+  <!-- 顶部 Nav (固定贴顶) -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-100">
+    <div class="flex items-center justify-between px-4 h-12">
+      <div class="w-5"></div>
+      <h1 class="text-lg font-semibold text-brand-ink">联系我们</h1>
+      <!-- 右上角操作按钮（由 page-actions 组件注入） -->
+      <div id="page-actions"></div>
+    </div>
+  </nav>
+
+  <!-- 占位：抵消 fixed nav 占用的高度 -->
+  <div class="h-12 bg-white" aria-hidden="true"></div>
+
+  <!-- 绿色渐变背景区域 -->
+  <div class="gradient-green px-6 pt-8 pb-16 relative">
+    <h2 class="text-2xl font-bold text-white text-center">接触器银触点数据搜集表</h2>
+    <p class="text-sm text-white/80 text-center mt-2">上传实拍图·填报重量·快速结算</p>
+    <!-- 底部圆角过渡 -->
+    <div class="absolute bottom-0 left-0 right-0 h-8 bg-gray-50 rounded-t-3xl"></div>
+  </div>
+
+  <!-- 表单卡片（负 margin 向上覆盖） -->
+  <div class="px-4 -mt-10 relative z-10 pb-8">
+    <div class="bg-white rounded-2xl card-shadow p-5">
+      <!-- 姓名电话 -->
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-xs text-brand-ink-light mb-1.5 block">姓名</label>
+          <input type="text" placeholder="请输入姓名" class="w-full h-10 border-b border-gray-200 text-sm focus:outline-none focus:border-brand-green bg-transparent placeholder-gray-300">
+        </div>
+        <div>
+          <label class="text-xs text-brand-ink-light mb-1.5 block">电话</label>
+          <input type="tel" placeholder="请输入电话" class="w-full h-10 border-b border-gray-200 text-sm focus:outline-none focus:border-brand-green bg-transparent placeholder-gray-300">
+        </div>
+      </div>
+
+      <!-- 分隔虚线 -->
+      <div class="border-t border-dashed border-gray-200 my-4"></div>
+
+      <!-- 图片上传 -->
+      <div class="flex items-center gap-4 mb-5">
+        <div class="upload-dashed w-24 h-24 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer hover:border-brand-green transition-colors">
+          <span class="text-3xl text-gray-300">+</span>
+        </div>
+        <div class="flex-1">
+          <button class="px-5 py-2.5 border border-brand-green text-brand-green rounded-full text-sm font-medium flex items-center gap-2 hover:bg-brand-green hover:text-white transition-all">
+            <i class="fa-solid fa-plus text-xs"></i>
+            点击上传图片
+          </button>
+          <p class="text-xs text-brand-ink-light mt-2">支持 JPG、PNG 格式</p>
+        </div>
+      </div>
+
+      <!-- 重量填写标题 -->
+      <div class="flex items-center justify-center mb-4">
+        <div class="flex-1 h-px bg-gray-200"></div>
+        <span class="px-4 text-lg font-bold text-brand-ink">重量填写</span>
+        <div class="flex-1 h-px bg-gray-200"></div>
+      </div>
+
+      <!-- 重量输入网格 -->
+      <div class="grid grid-cols-3 gap-3 mb-6">
+        <div>
+          <label class="text-xs text-brand-ink-light mb-1 block">接触器总重</label>
+          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+        </div>
+        <div>
+          <label class="text-xs text-brand-ink-light mb-1 block">银点铜总重</label>
+          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+        </div>
+        <div>
+          <label class="text-xs text-brand-ink-light mb-1 block">铜板线图总重</label>
+          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+        </div>
+        <div>
+          <label class="text-xs text-brand-ink-light mb-1 block">铜板线圈总重</label>
+          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+        </div>
+        <div>
+          <label class="text-xs text-brand-ink-light mb-1 block">点块烤点重</label>
+          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+        </div>
+        <div>
+          <label class="text-xs text-brand-ink-light mb-1 block">类型选择</label>
+          <div class="relative">
+            <select class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center appearance-none focus:outline-none focus:border-brand-green bg-transparent text-brand-ink-light">
+              <option>请选择</option>
+              <option>交流接触器</option>
+              <option>直流接触器</option>
+            </select>
+            <i class="fa-solid fa-chevron-down absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+          </div>
+        </div>
+        <div class="col-span-3">
+          <label class="text-xs text-brand-ink-light mb-1 block">第五项重量</label>
+          <input type="number" placeholder="请输入第五项重量（kg）" class="w-full h-10 border border-gray-200 rounded-lg text-sm px-3 focus:outline-none focus:border-brand-green placeholder-gray-300">
+        </div>
+      </div>
+
+      <!-- 提交按钮 -->
+      <button class="w-full h-14 gradient-green text-white rounded-full text-lg font-bold shadow-lg shadow-brand-green/30 active:scale-[0.98] transition-transform">
+        提交信息审核后返现
+      </button>
+    </div>
+  </div>
+
+  <!-- 底部导航栏（由 bottom-nav 组件注入，"联系我们" 高亮） -->
+  <div id="app-bottom-nav" data-active-nav="contact"></div>
+
+  <script type="module">
+    import { mountPageActions } from '/src/components/page-actions.js';
+    import { mountBottomNav } from '/src/components/bottom-nav.js';
+    mountPageActions('#page-actions', {
+      onMenu: () => console.log('[contacts] menu clicked'),
+      onAvatar: () => console.log('[contacts] avatar clicked'),
+    });
+    mountBottomNav('#app-bottom-nav', { active: 'contact' });
+  </script>
+
+</body>
+</html>

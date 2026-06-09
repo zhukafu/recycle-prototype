@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>接触器类 - 铝老板金属网</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            green: '#10B981',
+                            'green-dark': '#059669',
+                            'green-light': '#D1FAE5',
+                            orange: '#F97316',
+                            'orange-light': '#FFF7ED',
+                            surface: '#F8FAFC',
+                            border: '#E2E8F0',
+                            muted: '#94A3B8',
+                            ink: '#1E293B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'Noto Sans SC', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        display: ['Noto Sans SC', 'DM Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', 'Noto Sans SC', system-ui, sans-serif;
+            background: #F8FAFC;
+            overscroll-behavior-y: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .card-shadow {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .card-shadow-hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .stagger-1 { animation-delay: 0.05s; }
+        .stagger-2 { animation-delay: 0.1s; }
+        .stagger-3 { animation-delay: 0.15s; }
+        .stagger-4 { animation-delay: 0.2s; }
+        .stagger-5 { animation-delay: 0.25s; }
+        .stagger-6 { animation-delay: 0.3s; }
+        .stagger-7 { animation-delay: 0.35s; }
+        .price-pulse {
+            animation: pricePulse 2s ease-in-out infinite;
+        }
+        @keyframes pricePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+        .tab-active-indicator {
+            position: relative;
+        }
+        .tab-active-indicator::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: #10B981;
+            border-radius: 2px;
+        }
+        .category-pill {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .product-card {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .product-card:active {
+            transform: scale(0.98);
+        }
+        .left-nav-item {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .left-nav-item.active {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+        }
+        .left-nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: #F97316;
+            border-radius: 0 2px 2px 0;
+        }
+        .tag-scroll {
+            scroll-snap-type: x mandatory;
+        }
+        .tag-scroll > * {
+            scroll-snap-align: start;
+        }
+        .img-skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-brand-surface min-h-screen pb-20">
+
+    <!-- Navigation Bar (固定贴顶) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-brand-border/50">
+        <div class="flex items-center justify-between px-4 h-12">
+            <button type="button"
+                    onclick="if(document.referrer){history.back()}else{location.href='index.html'}"
+                    aria-label="返回上一页"
+                    class="w-10 h-10 flex items-center justify-center -ml-2 rounded-full hover:bg-gray-50 active:bg-gray-100 active:scale-90 transition-transform">
+                <svg class="w-5 h-5 text-brand-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold text-brand-ink tracking-tight">接触器类</h1>
+            <!-- 右上角操作按钮（由 page-actions 组件注入） -->
+            <div id="page-actions"></div>
+        </div>
+    </nav>
+
+    <!-- 占位：抵消 fixed nav 占用的高度 -->
+    <div class="h-12 bg-white" aria-hidden="true"></div>
+
+    <!-- Category Filter Tags -->
+    <div class="bg-white border-b border-brand-border/50">
+        <div class="tag-scroll flex gap-2 px-4 py-3 overflow-x-auto hide-scrollbar">
+            <button class="category-pill px-4 py-1.5 rounded-full text-sm font-medium text-brand-muted bg-gray-50 border border-gray-100 whitespace-nowrap hover:bg-gray-100 transition-colors">
+                产电
+            </button>
+            <button class="category-pill px-4 py-1.5 rounded-full text-sm font-bold text-white bg-brand-green whitespace-nowrap shadow-sm shadow-brand-green/20">
+                全部
+            </button>
+            <button class="category-pill px-4 py-1.5 rounded-full text-sm font-medium text-brand-muted bg-gray-50 border border-gray-100 whitespace-nowrap hover:bg-gray-100 transition-colors">
+                CJX2
+            </button>
+            <button class="category-pill px-4 py-1.5 rounded-full text-sm font-medium text-brand-muted bg-gray-50 border border-gray-100 whitespace-nowrap hover:bg-gray-100 transition-colors">
+                J20
+            </button>
+            <button class="category-pill px-4 py-1.5 rounded-full text-sm font-medium text-brand-muted bg-gray-50 border border-gray-100 whitespace-nowrap hover:bg-gray-100 transition-colors">
+                CJ20
+            </button>
+            <button class="category-pill px-4 py-1.5 rounded-full text-sm font-medium text-brand-muted bg-gray-50 border border-gray-100 whitespace-nowrap hover:bg-gray-100 transition-colors">
+                直流
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content: Left Sidebar + Right Product List -->
+    <div class="flex" style="height: calc(100vh - 132px);">
+        
+        <!-- Left Category Navigation -->
+        <aside class="w-20 flex-shrink-0 bg-white border-r border-brand-border/40 overflow-y-auto hide-scrollbar">
+            <div class="py-2">
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">富士<br>接触器</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">三菱 士林<br>伊顿接触器</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">国产<br>接触器</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">常熟 人民<br>品牌断路器</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">熔断器<br>万能断路器</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">银触点<br>价格</span>
+                </div>
+                <div class="left-nav-item active px-2 py-3 text-center cursor-pointer rounded-lg mx-1 my-0.5">
+                    <span class="text-xs font-bold text-white leading-tight block">正泰<br>接触器</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">正泰<br>开关</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">德力西<br>接触器</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">德力西<br>开关</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">施耐德<br>接触器</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">施耐德<br>开关</span>
+                </div>
+                <div class="left-nav-item px-2 py-3 text-center cursor-pointer">
+                    <span class="text-xs font-medium text-brand-muted leading-tight block">西门子<br>接触器</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Product List -->
+        <main class="flex-1 overflow-y-auto hide-scrollbar bg-brand-surface p-3">
+            <div class="space-y-3">
+                
+                <!-- Product Card 1 -->
+                <a href="product.html" aria-label="查看【老款】CJX2-9511 详情" class="block no-underline product-card bg-white rounded-xl card-shadow p-3 flex gap-3 animate-slide-up stagger-1 opacity-0 active:bg-gray-50 active:scale-[0.99] transition-transform">
+                    <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+                        <img src="/【老款】CJX2-9511 .jpg" class="w-full h-full object-cover object-top" alt="【老款】CJX2-9511">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-0.5">
+                        <div>
+                            <h3 class="text-sm font-semibold text-brand-ink leading-snug">【老款】CJX2-9511</h3>
+                            <p class="text-xs text-brand-muted mt-1">交流接触器 · 正泰</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-xs text-brand-green font-medium">¥</span>
+                            <span class="text-xl font-bold text-brand-green price-pulse font-mono tracking-tight">190.46</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product Card 2 -->
+                <a href="product.html" aria-label="查看【新款】CJX2-9511 详情" class="block no-underline product-card bg-white rounded-xl card-shadow p-3 flex gap-3 animate-slide-up stagger-2 opacity-0 active:bg-gray-50 active:scale-[0.99] transition-transform">
+                    <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+                        <img src="/【新款】CJX2-9511 .jpg" class="w-full h-full object-cover object-top" alt="【新款】CJX2-9511">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-0.5">
+                        <div>
+                            <h3 class="text-sm font-semibold text-brand-ink leading-snug">【新款】CJX2-9511</h3>
+                            <p class="text-xs text-brand-muted mt-1">交流接触器 · 正泰</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-xs text-brand-green font-medium">¥</span>
+                            <span class="text-xl font-bold text-brand-green font-mono tracking-tight">166.64</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product Card 3 -->
+                <a href="product.html" aria-label="查看【老款】CJX2-9511 详情" class="block no-underline product-card bg-white rounded-xl card-shadow p-3 flex gap-3 animate-slide-up stagger-3 opacity-0 active:bg-gray-50 active:scale-[0.99] transition-transform">
+                    <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+                        <img src="/【老款】CJX2-9511.jpg" class="w-full h-full object-cover object-top" alt="【老款】CJX2-9511">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-0.5">
+                        <div>
+                            <h3 class="text-sm font-semibold text-brand-ink leading-snug">【老款】CJX2-9511</h3>
+                            <p class="text-xs text-brand-muted mt-1">交流接触器 · 正泰</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-xs text-brand-green font-medium">¥</span>
+                            <span class="text-xl font-bold text-brand-green font-mono tracking-tight">215.88</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product Card 4 -->
+                <a href="product.html" aria-label="查看【老款】CJX2-8011 详情" class="block no-underline product-card bg-white rounded-xl card-shadow p-3 flex gap-3 animate-slide-up stagger-4 opacity-0 active:bg-gray-50 active:scale-[0.99] transition-transform">
+                    <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+                        <img src="/【老款】CJX2-8011 .jpg" class="w-full h-full object-cover object-top" alt="【老款】CJX2-8011">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-0.5">
+                        <div>
+                            <h3 class="text-sm font-semibold text-brand-ink leading-snug">【老款】CJX2-8011</h3>
+                            <p class="text-xs text-brand-muted mt-1">交流接触器 · 正泰</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-xs text-brand-green font-medium">¥</span>
+                            <span class="text-xl font-bold text-brand-green font-mono tracking-tight">160</span>
+                            <span class="text-xs text-brand-muted ml-0.5">.00</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product Card 5 -->
+                <a href="product.html" aria-label="查看【新款22年以后】CJX2-... 详情" class="block no-underline product-card bg-white rounded-xl card-shadow p-3 flex gap-3 animate-slide-up stagger-5 opacity-0 active:bg-gray-50 active:scale-[0.99] transition-transform">
+                    <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+                        <img src="/【新款22年以后】CJX2-... .jpg" class="w-full h-full object-cover object-top" alt="【新款22年以后】CJX2-...">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-0.5">
+                        <div>
+                            <h3 class="text-sm font-semibold text-brand-ink leading-snug">【新款22年以后】CJX2-...</h3>
+                            <p class="text-xs text-brand-muted mt-1">交流接触器 · 正泰</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-xs text-brand-green font-medium">¥</span>
+                            <span class="text-xl font-bold text-brand-green font-mono tracking-tight">97.89</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product Card 6 -->
+                <a href="product.html" aria-label="查看【老款22年以前】CJX2-... 详情" class="block no-underline product-card bg-white rounded-xl card-shadow p-3 flex gap-3 animate-slide-up stagger-6 opacity-0 active:bg-gray-50 active:scale-[0.99] transition-transform">
+                    <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+                        <img src="/【老款22年以前】CJX2-... .jpg" class="w-full h-full object-cover object-top" alt="【老款22年以前】CJX2-...">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-0.5">
+                        <div>
+                            <h3 class="text-sm font-semibold text-brand-ink leading-snug">【老款22年以前】CJX2-...</h3>
+                            <p class="text-xs text-brand-muted mt-1">交流接触器 · 正泰</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-xs text-brand-green font-medium">¥</span>
+                            <span class="text-xl font-bold text-brand-green font-mono tracking-tight">122.25</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product Card 7 -->
+                <a href="product.html" aria-label="查看【铁底座】CJX2-5011 详情" class="block no-underline product-card bg-white rounded-xl card-shadow p-3 flex gap-3 animate-slide-up stagger-7 opacity-0 active:bg-gray-50 active:scale-[0.99] transition-transform">
+                    <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+                        <img src="/【铁底座】CJX2-5011 .jpg" class="w-full h-full object-cover object-top" alt="【铁底座】CJX2-5011">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-0.5">
+                        <div>
+                            <h3 class="text-sm font-semibold text-brand-ink leading-snug">【铁底座】CJX2-5011</h3>
+                            <p class="text-xs text-brand-muted mt-1">交流接触器 · 正泰</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-xs text-brand-orange font-medium">¥</span>
+                            <span class="text-xl font-bold text-brand-orange font-mono tracking-tight">询价</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Bottom Spacer -->
+                <div class="h-4"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bottom Tab Bar 挂载点（由 bottom-nav 组件注入） -->
+    <div id="app-bottom-nav" data-active-nav="quotes"></div>
+
+    <script type="module">
+      import { mountPageActions } from '/src/components/page-actions.js';
+      import { mountBottomNav } from '/src/components/bottom-nav.js';
+      mountPageActions('#page-actions', {
+        onMenu: () => console.log('[category] menu clicked'),
+        onAvatar: () => console.log('[category] avatar clicked'),
+      });
+      mountBottomNav('#app-bottom-nav', { active: 'quotes' });
+    </script>
+
+</body>
+</html>

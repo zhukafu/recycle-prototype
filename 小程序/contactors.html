@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>接触器数据库 - 铝老板金属网</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'al-green': '#10B981',
+            'al-green-dark': '#059669',
+            'al-green-light': '#D1FAE5',
+            'al-orange': '#F97316',
+            'al-orange-dark': '#EA580C',
+            'al-orange-light': '#FFEDD5',
+            'al-dark': '#1F2937',
+            'al-gray': '#6B7280',
+            'al-gray-light': '#F3F4F6',
+            'al-border': '#E5E7EB',
+            'al-blue': '#3B82F6',
+            'al-blue-dark': '#1E3A8A',
+            'al-blue-medium': '#1D4ED8',
+            'al-blue-light': '#60A5FA',
+            'al-blue-soft': '#DBEAFE',
+            'al-red': '#EF4444',
+            'al-purple': '#8B5CF6',
+            'al-teal': '#14B8A6',
+            'al-yellow': '#F59E0B',
+            'al-pink': '#EC4899',
+            'al-inactive': '#9CA3AF',
+          },
+          fontFamily: {
+            sans: ['Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 2px 16px rgba(0,0,0,0.06)',
+            'card': '0 4px 20px rgba(0,0,0,0.08)',
+            'float': '0 8px 32px rgba(0,0,0,0.12)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Noto Sans SC', sans-serif; -webkit-font-smoothing: antialiased; background: #F8FAFC; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .touch-active:active { transform: scale(0.97); transition: transform 0.1s; }
+    .gradient-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+    .gradient-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+    .gradient-blue { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+    .gradient-red { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
+    .gradient-purple { background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); }
+    .gradient-teal { background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%); }
+    .gradient-yellow { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
+    .gradient-pink { background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); }
+    .gradient-banner { background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 50%, #93C5FD 100%); }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: fadeInUp 0.5s ease-out forwards; }
+    .stagger-1 { animation-delay: 0.05s; opacity: 0; }
+    .stagger-2 { animation-delay: 0.1s; opacity: 0; }
+    .stagger-3 { animation-delay: 0.15s; opacity: 0; }
+    .stagger-4 { animation-delay: 0.2s; opacity: 0; }
+    .stagger-5 { animation-delay: 0.25s; opacity: 0; }
+    .brand-icon {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .brand-icon:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    .product-card {
+      transition: all 0.3s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    .nav-item {
+      position: relative;
+    }
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 3px;
+      background: #10B981;
+      border-radius: 2px 2px 0 0;
+    }
+    .search-focus:focus-within {
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+      border-color: #10B981;
+    }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-al-dark">
+
+  <!-- 顶部导航栏 -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-al-border/50">
+    <div class="flex items-center justify-between px-4 h-12">
+      <button type="button"
+              onclick="if(document.referrer){history.back()}else{location.href='index.html'}"
+              aria-label="返回上一页"
+              class="w-10 h-10 flex items-center justify-center -ml-2 touch-active rounded-full hover:bg-gray-50 active:scale-90 transition-transform">
+        <i class="fas fa-chevron-left text-lg text-al-dark"></i>
+      </button>
+      <h1 class="text-lg font-bold text-al-dark tracking-tight">接触器数据库</h1>
+      <!-- 右上角操作按钮（由 page-actions 组件注入） -->
+      <div id="page-actions"></div>
+    </div>
+  </header>
+
+  <script type="module">
+    import { mountPageActions } from '/src/components/page-actions.js';
+    mountPageActions('#page-actions', {
+      onMenu: () => console.log('[database] menu clicked'),
+      onAvatar: () => console.log('[database] avatar clicked'),
+    });
+  </script>
+
+  <main class="pb-24">
+
+    <!-- 搜索栏 -->
+    <section class="px-4 pt-4 pb-3 animate-in stagger-1">
+      <div class="search-focus flex items-center gap-3 bg-white rounded-2xl px-4 py-3 border border-al-border shadow-soft transition-all duration-300">
+        <i class="fas fa-search text-al-gray text-lg"></i>
+        <input 
+          type="text" 
+          placeholder="型号搜索接触器数据，每日行情" 
+          class="flex-1 text-sm text-al-dark placeholder:text-al-gray/60 bg-transparent outline-none"
+        >
+      </div>
+    </section>
+
+    <!-- 品牌/分类网格区 -->
+    <section class="px-4 py-3 animate-in stagger-2">
+      <div class="bg-white rounded-2xl shadow-soft p-4">
+        <div class="grid grid-cols-5 gap-y-5 gap-x-2">
+
+          <!-- 常见品牌 -->
+          <a href="category.html" aria-label="查看常见品牌分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-blue flex items-center justify-center shadow-lg shadow-blue-200">
+              <i class="fas fa-shield-alt text-white text-lg"></i>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">常见品牌</span>
+          </a>
+
+          <!-- 常见接触器 -->
+          <a href="category.html" aria-label="查看常见接触器分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-orange flex items-center justify-center shadow-lg shadow-orange-200">
+              <i class="fas fa-microchip text-white text-lg"></i>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">常见接触器</span>
+            <span class="text-[9px] text-al-gray -mt-1">德力器</span>
+          </a>
+
+          <!-- ΔJ8FEDI -->
+          <a href="category.html" aria-label="查看 ΔJ8FEDI 分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-teal flex items-center justify-center shadow-lg shadow-teal-200">
+              <span class="text-white text-xs font-bold">ΔJ8</span>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">ΔJ8FEDI</span>
+          </a>
+
+          <!-- 直流价器 -->
+          <a href="category.html" aria-label="查看直流价器分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-red flex items-center justify-center shadow-lg shadow-red-200">
+              <i class="fas fa-bolt text-white text-lg"></i>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">直流价器</span>
+          </a>
+
+          <!-- 触点价格 -->
+          <a href="category.html" aria-label="查看触点价格分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-purple flex items-center justify-center shadow-lg shadow-purple-200">
+              <i class="fas fa-tag text-white text-lg"></i>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">触点价格</span>
+          </a>
+
+          <!-- ZIMBR -->
+          <a href="category.html" aria-label="查看 ZIMBR 分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-yellow flex items-center justify-center shadow-lg shadow-yellow-200">
+              <span class="text-white text-xs font-bold">ZIM</span>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">ZIMBR</span>
+            <span class="text-[9px] text-al-gray -mt-1">交触器</span>
+          </a>
+
+          <!-- 正器换器 -->
+          <a href="category.html" aria-label="查看正器换器分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-green flex items-center justify-center shadow-lg shadow-green-200">
+              <i class="fas fa-check-circle text-white text-lg"></i>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">正器换器</span>
+            <span class="text-[9px] text-al-gray -mt-1">德力器</span>
+          </a>
+
+          <!-- APPA -->
+          <a href="category.html" aria-label="查看 APPA 分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-blue flex items-center justify-center shadow-lg shadow-blue-200">
+              <span class="text-white text-xs font-bold">AP</span>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">APPA</span>
+            <span class="text-[9px] text-al-gray -mt-1">接触器</span>
+          </a>
+
+          <!-- 接触触器 -->
+          <a href="category.html" aria-label="查看接触触器分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-red flex items-center justify-center shadow-lg shadow-red-200">
+              <i class="fas fa-hand-pointer text-white text-lg"></i>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">接触触器</span>
+            <span class="text-[9px] text-al-gray -mt-1">富家</span>
+          </a>
+
+          <!-- 交流接触器 -->
+          <a href="category.html" aria-label="查看交流接触器分类" class="flex flex-col items-center gap-2 cursor-pointer touch-active active:scale-95 transition-transform no-underline">
+            <div class="brand-icon w-12 h-12 rounded-full gradient-teal flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-exchange-alt text-white text-lg"></i>
+            </div>
+            <span class="text-[11px] text-al-dark font-medium text-center leading-tight">交流接触器</span>
+            <span class="text-[9px] text-al-gray -mt-1">德力西</span>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 咨询横幅 -->
+    <section class="px-4 py-2 animate-in stagger-3">
+      <div class="gradient-banner rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+        <div class="relative z-10 w-16 h-16 bg-white rounded-xl shadow-lg flex items-center justify-center shrink-0">
+          <img src="/选择接触器咨询.jpg"
+               class="w-12 h-12 object-contain" alt="接触器">
+        </div>
+        <div class="relative z-10 flex-1">
+          <h3 class="text-base font-bold text-al-blue-dark mb-1">选接触器咨询</h3>
+          <p class="text-xs text-al-blue-medium/80 leading-relaxed">不知道如何选型？咨询工控技术工程师</p>
+        </div>
+        <div class="relative z-10">
+          <i class="fas fa-chevron-right text-al-blue-light text-lg"></i>
+        </div>
+      </div>
+    </section>
+
+    <!-- 最新上架区 -->
+    <section class="px-4 py-3 animate-in stagger-4">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-bold text-al-dark">最新上架</h2>
+        <button class="flex items-center gap-1 text-sm text-al-gray touch-active">
+          <span>更多</span>
+          <i class="fas fa-chevron-right text-xs"></i>
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-3">
+        
+        <!-- 产品卡片1 -->
+        <a href="product.html" aria-label="查看 交流接触器CJX2-1210 详情" class="block product-card bg-white rounded-xl shadow-soft overflow-hidden no-underline touch-active active:scale-[0.98] transition-transform">
+          <div class="aspect-square bg-al-gray-light relative">
+            <img src="/交流接触器CJX2-1210.jpg"
+                 class="w-full h-full object-cover" alt="交流接触器">
+          </div>
+          <div class="p-3">
+            <h4 class="text-sm font-semibold text-al-dark leading-snug mb-1 line-clamp-2">交流接触器CJX2-1210</h4>
+            <p class="text-xs text-al-gray mb-2">直流接触器</p>
+            <div class="flex items-center gap-1.5 bg-al-orange-light rounded-lg px-2.5 py-1.5">
+              <i class="fas fa-lock text-al-orange text-xs"></i>
+              <span class="text-xs text-al-orange font-medium">开通会员查看</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 产品卡片2 -->
+        <a href="product.html" aria-label="查看 41标接触器 5个 详情" class="block product-card bg-white rounded-xl shadow-soft overflow-hidden no-underline touch-active active:scale-[0.98] transition-transform">
+          <div class="aspect-square bg-al-gray-light relative">
+            <img src="/41标接触器 5个.jpg"
+                 class="w-full h-full object-cover" alt="41标接触器">
+          </div>
+          <div class="p-3">
+            <h4 class="text-sm font-semibold text-al-dark leading-snug mb-1 line-clamp-2">41标接触器 5个...</h4>
+            <p class="text-xs text-al-gray mb-2">钨钢类</p>
+            <div class="flex items-center gap-1.5 bg-al-orange-light rounded-lg px-2.5 py-1.5">
+              <i class="fas fa-lock text-al-orange text-xs"></i>
+              <span class="text-xs text-al-orange font-medium">开通会员查看</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 产品卡片3 -->
+        <a href="product.html" aria-label="查看 交流接触器CJX2-1210 详情" class="block product-card bg-white rounded-xl shadow-soft overflow-hidden no-underline touch-active active:scale-[0.98] transition-transform">
+          <div class="aspect-square bg-al-gray-light relative">
+            <img src="/交流接触器.jpg"
+                 class="w-full h-full object-cover" alt="交流接触器">
+          </div>
+          <div class="p-3">
+            <h4 class="text-sm font-semibold text-al-dark leading-snug mb-1 line-clamp-2">交流接触器CJX2-1210</h4>
+            <p class="text-xs text-al-gray mb-2">钨钢类</p>
+            <div class="flex items-center gap-1.5 bg-al-orange-light rounded-lg px-2.5 py-1.5">
+              <i class="fas fa-lock text-al-orange text-xs"></i>
+              <span class="text-xs text-al-orange font-medium">开通会员查看</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 产品卡片4 -->
+        <a href="product.html" aria-label="查看 ZJW20-400A 详情" class="block product-card bg-white rounded-xl shadow-soft overflow-hidden no-underline touch-active active:scale-[0.98] transition-transform">
+          <div class="aspect-square bg-al-gray-light relative">
+            <img src="/ZJW20-400A.jpg"
+                 class="w-full h-full object-cover" alt="ZJW20-400A">
+          </div>
+          <div class="p-3">
+            <h4 class="text-sm font-semibold text-al-dark leading-snug mb-1 line-clamp-2">ZJW20-400A</h4>
+            <p class="text-xs text-al-gray mb-2">银触点价格</p>
+            <div class="flex items-center gap-1.5 bg-al-orange-light rounded-lg px-2.5 py-1.5">
+              <i class="fas fa-lock text-al-orange text-xs"></i>
+              <span class="text-xs text-al-orange font-medium">开通会员查看</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 产品卡片5 -->
+        <a href="product.html" aria-label="查看 银触点价格 断路器 详情" class="block product-card bg-white rounded-xl shadow-soft overflow-hidden no-underline touch-active active:scale-[0.98] transition-transform">
+          <div class="aspect-square bg-al-gray-light relative">
+            <img src="/银触点价格 断路器.jpg"
+                 class="w-full h-full object-cover" alt="银触点价格">
+          </div>
+          <div class="p-3">
+            <h4 class="text-sm font-semibold text-al-dark leading-snug mb-1 line-clamp-2">银触点价格 断路器</h4>
+            <p class="text-xs text-al-gray mb-2">银触点价格</p>
+            <div class="flex items-center gap-1.5 bg-al-green-light rounded-lg px-2.5 py-1.5">
+              <span class="text-xs text-al-green-dark font-medium">银触点价格</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 产品卡片6 -->
+        <a href="product.html" aria-label="查看 银触点价格 八爪 详情" class="block product-card bg-white rounded-xl shadow-soft overflow-hidden no-underline touch-active active:scale-[0.98] transition-transform">
+          <div class="aspect-square bg-al-gray-light relative">
+            <img src="/银触点价格 八爪...jpg"
+                 class="w-full h-full object-cover" alt="银触点价格">
+          </div>
+          <div class="p-3">
+            <h4 class="text-sm font-semibold text-al-dark leading-snug mb-1 line-clamp-2">银触点价格 八爪...</h4>
+            <p class="text-xs text-al-gray mb-2">银触点价格</p>
+            <div class="flex items-center gap-1.5 bg-al-orange-light rounded-lg px-2.5 py-1.5">
+              <i class="fas fa-lock text-al-orange text-xs"></i>
+              <span class="text-xs text-al-orange font-medium">开通会员查看</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 产品卡片7 -->
+        <a href="product.html" aria-label="查看 银触点价格 断路器 详情" class="block product-card bg-white rounded-xl shadow-soft overflow-hidden no-underline touch-active active:scale-[0.98] transition-transform">
+          <div class="aspect-square bg-al-gray-light relative">
+            <img src="/银触点价格 断路器-2.jpg"
+                 class="w-full h-full object-cover" alt="银触点价格">
+          </div>
+          <div class="p-3">
+            <h4 class="text-sm font-semibold text-al-dark leading-snug mb-1 line-clamp-2">银触点价格 断路器</h4>
+            <p class="text-xs text-al-gray mb-2">银触点价格</p>
+            <div class="flex items-center gap-1.5 bg-al-orange-light rounded-lg px-2.5 py-1.5">
+              <i class="fas fa-lock text-al-orange text-xs"></i>
+              <span class="text-xs text-al-orange font-medium">开通会员查看</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 产品卡片8 -->
+        <a href="product.html" aria-label="查看 交流接触器CJX1-0910 详情" class="block product-card bg-white rounded-xl shadow-soft overflow-hidden no-underline touch-active active:scale-[0.98] transition-transform">
+          <div class="aspect-square bg-al-gray-light relative">
+            <img src="/交流接触器CJX1-0910.jpg"
+                 class="w-full h-full object-cover" alt="交流接触器">
+          </div>
+          <div class="p-3">
+            <h4 class="text-sm font-semibold text-al-dark leading-snug mb-1 line-clamp-2">交流接触器CJX1-0910</h4>
+            <p class="text-xs text-al-gray mb-2">银触点价格</p>
+            <div class="flex items-center gap-1.5 bg-al-green-light rounded-lg px-2.5 py-1.5">
+              <span class="text-xs text-al-green-dark font-medium">银触点价格</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 底部固定导航栏（由 bottom-nav 组件注入） -->
+  <div id="app-bottom-nav" data-active-nav="quotes"></div>
+
+  <script type="module">
+    import { mountBottomNav } from '/src/components/bottom-nav.js';
+    const slot = document.getElementById('app-bottom-nav');
+    mountBottomNav(slot, { active: slot.dataset.activeNav || 'quotes' });
+  </script>
+
+  <style>
+    /* Tailwind CDN 对 line-clamp 工具类的兼容兜底 */
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+
+</body>
+</html>

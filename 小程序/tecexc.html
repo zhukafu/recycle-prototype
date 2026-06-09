@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>铝老板金属网 - 技术交流</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'al-green': '#10B981',
+                        'al-green-dark': '#059669',
+                        'al-orange': '#F97316',
+                        'al-dark': '#1F2937',
+                        'al-gray': '#6B7280',
+                        'al-light': '#F3F4F6',
+                        'al-blue': '#3B82F6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .gradient-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+        .gradient-pink { background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%); }
+        .gradient-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+        .gradient-violet { background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .modal-enter { transform: translateY(100%); }
+        .modal-active { transform: translateY(0); }
+        .tab-indicator { position: relative; }
+        .tab-indicator::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background: #10B981; border-radius: 2px; }
+    </style>
+</head>
+<body class="bg-al-light min-h-screen">
+
+    <!-- 顶部 Nav (固定贴顶) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass h-12 flex items-center justify-center border-b border-gray-100">
+        <h1 class="text-lg font-bold text-al-dark">技术交流</h1>
+        <!-- 右上角操作按钮（由 page-actions 组件注入） -->
+        <div class="absolute right-3" id="page-actions"></div>
+    </nav>
+
+    <!-- 占位：抵消 fixed nav 占用的高度 -->
+    <div class="h-12" aria-hidden="true"></div>
+
+    <!-- 主内容区 -->
+    <main class="px-4 pt-6 space-y-4">
+
+        <!-- 通知栏 -->
+        <div class="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm" onclick="openDetailModal('通知公告', '关于IOS用户充值问题的说明：近期部分IOS用户反馈充值异常，我们已紧急修复。如有问题请联系客服。')">
+            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-bell text-al-blue"></i>
+            </div>
+            <p class="text-sm text-al-dark font-medium flex-1 truncate">关于IOS用户充值问题</p>
+            <i class="fas fa-chevron-right text-al-gray text-xs"></i>
+        </div>
+
+        <!-- 卡片区域 -->
+        <div class="grid grid-cols-3 gap-3">
+            <!-- 关于铝老板 -->
+            <div class="col-span-1 row-span-2 gradient-blue rounded-2xl p-5 flex flex-col justify-between text-white relative overflow-hidden shadow-md" onclick="openDetailModal('关于铝老板', '铝老板金属网是专业的金属废料回收服务平台，致力于为广大回收商、加工厂提供准确的接触器型号查询、实时回收报价、专业技术指导等一站式服务。')">
+                <div>
+                    <h3 class="text-lg font-bold">关于铝老板</h3>
+                    <p class="text-xs text-blue-100 mt-1">About Us</p>
+                </div>
+                <div class="self-end">
+                    <i class="fas fa-arrow-right text-white/60"></i>
+                </div>
+            </div>
+            <!-- 行业资讯 -->
+            <div class="col-span-2 bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm" onclick="openDetailModal('行业资讯', '最新金属回收行业动态：2024年铝价持续上涨，含银废料回收市场活跃。建议关注国际大宗商品走势，把握最佳出货时机。')">
+                <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-newspaper text-al-orange text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-al-dark">行业资讯</h4>
+                    <p class="text-xs text-al-gray mt-0.5">最新行业动态</p>
+                </div>
+                <i class="fas fa-chevron-right text-al-gray text-xs ml-auto"></i>
+            </div>
+            <!-- 回收知识 -->
+            <div class="col-span-2 bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm" onclick="openDetailModal('回收知识', '金属废料分类指南：铝合金按系列分为1系纯铝、2系硬铝、3系防锈铝、5系铝镁合金、6系铝镁硅合金、7系超硬铝。不同系列回收价格差异较大。')">
+                <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-book-open text-al-green text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-al-dark">回收知识</h4>
+                    <p class="text-xs text-al-gray mt-0.5">专业回收技巧</p>
+                </div>
+                <i class="fas fa-chevron-right text-al-gray text-xs ml-auto"></i>
+            </div>
+        </div>
+
+        <!-- 推广横幅 -->
+        <div class="bg-white rounded-2xl p-4 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <i class="fas fa-rocket text-white text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-al-dark">三元催化全新小程序</p>
+                    <p class="text-xs text-al-gray">震撼上线！</p>
+                </div>
+            </div>
+            <button class="bg-al-blue text-white text-xs px-4 py-2 rounded-full font-medium">查看</button>
+        </div>
+
+        <!-- 标签页切换 -->
+        <div class="flex items-center gap-8 px-2">
+            <button class="text-sm text-al-gray font-medium pb-2">新闻</button>
+            <button class="text-sm text-al-dark font-bold pb-2 tab-indicator">行业知识</button>
+        </div>
+
+        <!-- 内容列表 -->
+        <div class="space-y-3">
+            <!-- 条目1 -->
+            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm" onclick="openDetailModal('20221024期学员简介', '本期学员来自全国各地，涵盖废铝回收、含银废料处理、接触器拆解等多个细分领域。通过系统培训，学员们掌握了先进的分拣技术和市场分析方法。')">
+                <div class="w-12 h-12 rounded-xl gradient-pink flex items-center justify-center text-white font-bold text-lg flex-shrink-0">1</div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-sm font-bold text-al-dark truncate">20221024期学员简介</h4>
+                    <p class="text-xs text-al-gray mt-1 truncate">新一批学员结业，掌握核心技能</p>
+                </div>
+                <i class="fas fa-chevron-right text-al-gray text-xs"></i>
+            </div>
+            <!-- 条目2 -->
+            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm" onclick="openDetailModal('什么是三元催化', '三元催化器是汽车尾气净化装置，含有铂、钯、铑等贵金属。回收价值极高，但需专业拆解和提炼技术。本文详细介绍三元催化的结构、成分及回收流程。')">
+                <div class="w-12 h-12 rounded-xl gradient-orange flex items-center justify-center text-white font-bold text-lg flex-shrink-0">2</div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-sm font-bold text-al-dark truncate">什么是三元催化</h4>
+                    <p class="text-xs text-al-gray mt-1 truncate">汽车尾气净化装置的回收价值</p>
+                </div>
+                <i class="fas fa-chevron-right text-al-gray text-xs"></i>
+            </div>
+            <!-- 条目3 -->
+            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm" onclick="openDetailModal('铝合金废料分类指南', '铝合金废料按合金成分分为多个系列：1系（纯铝）、2系（硬铝/航空铝）、3系（防锈铝）、5系（铝镁合金）、6系（铝镁硅合金）、7系（超硬铝）。不同系列价格差异大，准确分类是盈利关键。')">
+                <div class="w-12 h-12 rounded-xl gradient-green flex items-center justify-center text-white font-bold text-lg flex-shrink-0">3</div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-sm font-bold text-al-dark truncate">铝合金废料分类指南</h4>
+                    <p class="text-xs text-al-gray mt-1 truncate">掌握分类技巧，提升回收利润</p>
+                </div>
+                <i class="fas fa-chevron-right text-al-gray text-xs"></i>
+            </div>
+            <!-- 条目4 -->
+            <div class="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm" onclick="openDetailModal('接触器银触点提取技术', '接触器中的银触点是高价值回收物。提取技术包括：物理拆解法、化学溶解法、电解法等。本文详解各种方法的优缺点、操作步骤及安全注意事项。')">
+                <div class="w-12 h-12 rounded-xl gradient-violet flex items-center justify-center text-white font-bold text-lg flex-shrink-0">4</div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-sm font-bold text-al-dark truncate">接触器银触点提取技术</h4>
+                    <p class="text-xs text-al-gray mt-1 truncate">高价值贵金属回收核心技术</p>
+                </div>
+                <i class="fas fa-chevron-right text-al-gray text-xs"></i>
+            </div>
+        </div>
+
+        <div class="h-4"></div>
+    </main>
+
+    <!-- 详情模态框 -->
+    <div id="detailModal" class="fixed inset-0 z-[100] hidden">
+        <!-- 遮罩 -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeDetailModal()"></div>
+        <!-- 底部面板 -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[24px] max-h-[85vh] flex flex-col modal-enter transition-transform duration-300" id="modalPanel">
+            <!-- 标题栏 -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-100">
+                <h3 class="text-base font-bold text-al-dark" id="modalTitle">标题</h3>
+                <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                    <i class="fas fa-times text-al-gray text-sm"></i>
+                </button>
+            </div>
+            <!-- 内容区 -->
+            <div class="flex-1 overflow-y-auto p-4 hide-scrollbar">
+                <p class="text-sm text-al-dark leading-relaxed" id="modalContent">内容</p>
+                <!-- 评论区 -->
+                <div class="mt-6 pt-4 border-t border-gray-100">
+                    <h4 class="text-sm font-bold text-al-dark mb-3">评论</h4>
+                    <div class="space-y-3" id="commentList">
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-al-green flex items-center justify-center text-white text-xs font-bold">张</div>
+                            <div>
+                                <p class="text-xs text-al-gray">张师傅</p>
+                                <p class="text-sm text-al-dark mt-0.5">学到了很多，感谢分享！</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-24"></div>
+            </div>
+            <!-- 评论输入 -->
+            <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-3 flex gap-2">
+                <input type="text" id="commentInput" placeholder="写评论..." class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm outline-none">
+                <button onclick="submitComment()" class="bg-al-green text-white px-5 py-2 rounded-full text-sm font-medium">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航栏（由 bottom-nav 组件注入，"技术交流" 高亮） -->
+    <div id="app-bottom-nav" data-active-nav="forum"></div>
+
+    <script type="module">
+        import { mountPageActions } from '/src/components/page-actions.js';
+        import { mountBottomNav } from '/src/components/bottom-nav.js';
+        mountPageActions('#page-actions', {
+            onMenu: () => console.log('[tecexc] menu clicked'),
+            onAvatar: () => console.log('[tecexc] avatar clicked'),
+        });
+        mountBottomNav('#app-bottom-nav', { active: 'forum' });
+    </script>
+
+    <script>
+        function openDetailModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalContent').textContent = content;
+            const modal = document.getElementById('detailModal');
+            const panel = document.getElementById('modalPanel');
+            modal.classList.remove('hidden');
+            setTimeout(() => panel.classList.add('modal-active'), 10);
+        }
+
+        function closeDetailModal() {
+            const panel = document.getElementById('modalPanel');
+            panel.classList.remove('modal-active');
+            setTimeout(() => document.getElementById('detailModal').classList.add('hidden'), 300);
+        }
+
+        function submitComment() {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            if (!text) return;
+            const list = document.getElementById('commentList');
+            const div = document.createElement('div');
+            div.className = 'flex gap-3 animate-pulse';
+            div.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-al-orange flex items-center justify-center text-white text-xs font-bold">我</div>
+                <div>
+                    <p class="text-xs text-al-gray">我</p>
+                    <p class="text-sm text-al-dark mt-0.5">${text}</p>
+                </div>
+            `;
+            list.appendChild(div);
+            input.value = '';
+            setTimeout(() => div.classList.remove('animate-pulse'), 500);
+        }
+    </script>
+</body>
+</html>

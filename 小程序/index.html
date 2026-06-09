@@ -1,0 +1,351 @@
+<!DOCTYPE html><html lang="zh-CN" style="touch-action: manipulation;"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>铝老板金属网</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&amp;family=Noto+Serif+SC:wght@600;700;900&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+green: { brand: '#10B981', light: '#34D399', dark: '#059669', surface: '#ECFDF5' },
+orange: { brand: '#F97316', light: '#FB923C', dark: '#EA580C', surface: '#FFF7ED' },
+red: { brand: '#EF4444', light: '#F87171', dark: '#DC2626', surface: '#FEF2F2' },
+gray: { bg: '#F5F5F4', card: '#FAFAF9', border: '#E7E5E4' }
+},
+fontFamily: {
+sans: ['Noto Sans SC', 'system-ui', 'sans-serif'],
+serif: ['Noto Serif SC', 'serif']
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+@keyframes shimmer {
+0% { transform: translateX(-100%); }
+100% { transform: translateX(100%); }
+}
+.shimmer { animation: shimmer 3s infinite; }
+@keyframes float {
+0%, 100% { transform: translateY(0px); }
+50% { transform: translateY(-6px); }
+}
+.float-anim { animation: float 3s ease-in-out infinite; }
+@keyframes pulse-soft {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.7; }
+}
+.pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+@keyframes slideInUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.slide-up { animation: slideInUp 0.5s ease-out forwards; }
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+</style>
+</head>
+<body class="bg-gray-bg min-h-screen pb-20">
+
+<!-- 顶部操作栏（page-actions 组件：右上角 3 点 + 头像） -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <div class="flex items-center justify-end px-4 h-11">
+    <div id="page-actions"></div>
+  </div>
+</header>
+
+<script type="module">
+  import { mountPageActions } from '/src/components/page-actions.js';
+  mountPageActions('#page-actions', {
+    onMenu: () => console.log('[index] menu clicked'),
+    onAvatar: () => console.log('[index] avatar clicked'),
+  });
+</script>
+
+<!-- 顶部品牌区 -->
+<header class="bg-white px-4 pt-3 pb-4 relative overflow-hidden">
+<div class="flex items-start justify-between relative z-10">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-9 h-9 bg-green-brand rounded-lg flex items-center justify-center shadow-lg shadow-green-brand/20">
+<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"></path></svg>
+</div>
+<h1 class="text-[22px] font-black text-gray-900 tracking-tight leading-none" style="font-family: &#39;Noto Serif SC&#39;, serif;">铝老板金属网</h1>
+</div>
+<p class="text-sm text-gray-500 font-medium mt-1.5">接触器型号 / 数据 / 回收价查询</p>
+</div>
+<div class="w-28 h-28 relative flex-shrink-0 float-anim">
+<img src="/工人图片.jpg" alt="工人插图" class="w-full h-full object-contain"/>
+</div>
+</div>
+</header>
+
+<!-- 搜索栏 -->
+<form class="px-4 -mt-1 mb-4 relative z-20" onsubmit="event.preventDefault()">
+  <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md focus-within:border-green-brand focus-within:shadow-lg focus-within:shadow-green-brand/15 transition-all duration-200 flex items-center gap-2.5 pl-3.5 pr-1.5 py-1.5">
+    <!-- 搜索图标（聚焦时变绿） -->
+    <svg class="w-5 h-5 text-gray-400 flex-shrink-0 group-focus-within:text-green-brand transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+    </svg>
+    <!-- 输入框 -->
+    <input type="text" aria-label="搜索接触器型号" data-search-input placeholder="搜索型号 / 参数 / 回收价 / 规格 / 厂家" class="flex-1 min-w-0 text-[15px] text-gray-800 placeholder-gray-400 bg-transparent outline-none font-normal leading-none">
+    <!-- 清除按钮（仅在有内容时显示） -->
+    <button type="button" data-search-clear aria-label="清除搜索" class="hidden w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex-shrink-0 items-center justify-center hover:bg-gray-200 active:scale-90 transition">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+    <!-- 搜索按钮 -->
+    <button type="submit" class="bg-green-brand text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-green-brand/25 hover:bg-green-brand/90 hover:shadow-lg hover:shadow-green-brand/30 active:scale-95 transition-all flex-shrink-0">搜索</button>
+  </div>
+</form>
+
+<script>
+  // 清除按钮显隐
+  (function () {
+    const input = document.querySelector('[data-search-input]');
+    const clearBtn = document.querySelector('[data-search-clear]');
+    if (!input || !clearBtn) return;
+    const sync = () => {
+      const hasValue = input.value.length > 0;
+      clearBtn.classList.toggle('hidden', !hasValue);
+      clearBtn.classList.toggle('inline-flex', hasValue);
+    };
+    input.addEventListener('input', sync);
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      input.focus();
+      sync();
+    });
+    sync();
+  })();
+</script>
+
+<!-- 功能卡片区 -->
+<div class="px-4 mb-4">
+<div class="grid grid-cols-2 gap-3">
+
+<!-- 查型号 - 红色卡片（点击跳转 contactors.html） -->
+<a href="contactors.html"
+   aria-label="查型号：跳转到接触器数据库"
+   class="group block bg-red-brand rounded-2xl p-4 relative overflow-hidden shadow-lg shadow-red-brand/15 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-red-brand outline-none transition-transform slide-up stagger-1 will-change-transform">
+  <!-- 装饰光斑（右上 + 左下） -->
+  <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-[2px] pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute -bottom-5 -left-5 w-20 h-20 bg-white/[0.07] rounded-full pointer-events-none" aria-hidden="true"></div>
+  <div class="relative z-10 flex flex-col h-full">
+    <span class="inline-flex w-fit bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-2">类型类</span>
+    <h3 class="text-white text-xl font-black mb-1">查型号</h3>
+    <p class="text-white/85 text-sm leading-snug mb-4">快速匹配检索器型号参数，精准识别含银废料规格</p>
+    <div class="mt-auto flex justify-end">
+      <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
+        <!-- 放大镜 + 列表，语义贴合"查型号" -->
+        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 11h6M8 8h4"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+</a>
+
+<!-- 看报价 + 学技术 垂直堆叠 -->
+<div class="flex flex-col gap-3">
+
+<!-- 看报价 - 绿色卡片 -->
+<div class="bg-green-brand rounded-2xl p-3.5 relative overflow-hidden shadow-lg shadow-green-brand/15 flex-1 active:scale-[0.98] transition-transform cursor-pointer slide-up stagger-2">
+<div class="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-6 translate-x-6"></div>
+<div class="relative z-10 flex flex-col h-full justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<h3 class="text-white text-lg font-black">看报价</h3>
+<span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">实时星</span>
+</div>
+<p class="text-white/80 text-[11px] leading-relaxed">实时查铝合银废料回收行情，一键获取最新参考价</p>
+</div>
+<div class="flex justify-end mt-2">
+<svg class="w-8 h-8 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v8H3zm4-8h2v16H7zm4-2h2v18h-2zm4 4h2v14h-2zm4-2h2v16h-2z"></path></svg>
+</div>
+</div>
+</div>
+
+<!-- 学技术 - 橙色卡片 -->
+<div class="bg-orange-brand rounded-2xl p-3.5 relative overflow-hidden shadow-lg shadow-orange-brand/15 flex-1 active:scale-[0.98] transition-transform cursor-pointer slide-up stagger-3">
+<div class="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-6 translate-x-6"></div>
+<div class="relative z-10 flex flex-col h-full justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<h3 class="text-white text-lg font-black">学技术</h3>
+<span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">零基础</span>
+</div>
+<p class="text-white/80 text-[11px] leading-relaxed">拆解快T5与合刷教学，新手也能快速上手</p>
+</div>
+<div class="flex justify-end mt-2">
+<svg class="w-8 h-8 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"></path></svg>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 轮播广告横幅 -->
+<div class="px-4 mb-5 slide-up stagger-4">
+<div class="bg-green-brand rounded-2xl overflow-hidden shadow-lg shadow-green-brand/20 relative">
+<div class="absolute inset-0 bg-[url(&#39;data:image/svg+xml,%3Csvg width=\&#39;60\&#39; height=\&#39;60\&#39; viewBox=\&#39;0 0 60 60\&#39; xmlns=\&#39;http://www.w3.org/2000/svg\&#39;%3E%3Cg fill=\&#39;none\&#39; fill-rule=\&#39;evenodd\&#39;%3E%3Cg fill=\&#39;%23ffffff\&#39; fill-opacity=\&#39;0.06\&#39;%3E%3Cpath d=\&#39;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\&#39;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&#39;)] opacity-50"></div>
+<div class="relative z-10 p-4 flex items-center justify-between">
+<div class="flex-1">
+<div class="flex items-center gap-1.5 mb-2">
+<div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+<svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+</div>
+<span class="text-white/80 text-xs font-medium">磁器街区</span>
+</div>
+<h3 class="text-white text-xl font-black mb-1">铝老板金属网</h3>
+<div class="inline-flex items-center gap-1 bg-black/20 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
+<span>快来 LOOK LOOK</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"></path></svg>
+</div>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center pulse-soft">
+<svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+</div>
+<div class="bg-orange-brand text-white text-[10px] font-bold px-2 py-0.5 rounded-full">现金即收</div>
+</div>
+</div>
+</div>
+<div class="flex justify-center gap-1.5 mt-2">
+<div class="w-5 h-1.5 bg-green-brand rounded-full"></div>
+<div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
+<div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
+</div>
+</div>
+
+<!-- 快捷导航图标区 -->
+<div class="px-4 mb-5">
+<div class="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-100 p-5">
+<div class="grid grid-cols-4 gap-4">
+<!-- 今日行情 -->
+<div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
+<div class="w-14 h-14 bg-green-surface rounded-2xl flex items-center justify-center shadow-sm">
+<svg class="w-7 h-7 text-green-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"></path></svg>
+</div>
+<span class="text-xs font-semibold text-gray-700">今日行情</span>
+</div>
+<!-- 技术交流 -->
+<div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
+<div class="w-14 h-14 bg-orange-surface rounded-2xl flex items-center justify-center shadow-sm">
+<svg class="w-7 h-7 text-orange-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"></path></svg>
+</div>
+<span class="text-xs font-semibold text-gray-700">技术交流</span>
+</div>
+<!-- 数据库 -->
+<div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
+<div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center shadow-sm">
+<svg class="w-7 h-7 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"></path></svg>
+</div>
+<span class="text-xs font-semibold text-gray-700">数据库</span>
+</div>
+<!-- 联系我们 -->
+<div class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
+<div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center shadow-sm">
+<svg class="w-7 h-7 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"></path></svg>
+</div>
+<span class="text-xs font-semibold text-gray-700">联系我们</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 底部联系信息区 -->
+<div class="px-4 mb-4">
+<div class="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
+<!-- 标签页 -->
+<div class="flex border-b border-gray-100">
+  <div class="flex-1 py-3 text-center">
+    <span class="text-sm font-bold text-gray-900 border-b-2 border-orange-brand pb-2.5 whitespace-nowrap select-none">今日行情</span>
+  </div>
+  <div class="flex-1 py-3 text-center">
+    <span title="电脑部（线下）" class="text-[13px] font-medium text-gray-400 whitespace-nowrap select-none">电脑部（线下）</span>
+  </div>
+  <div class="flex-1 py-3 text-center">
+    <span class="text-sm font-medium text-gray-400 whitespace-nowrap select-none">数据库</span>
+  </div>
+  <div class="flex-1 py-3 text-center">
+    <span class="text-sm font-medium text-gray-400 whitespace-nowrap select-none">联系我们</span>
+  </div>
+</div>
+<!-- 联系内容 -->
+<div class="p-4 space-y-3">
+<!-- 电话 -->
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 bg-orange-surface rounded-xl flex items-center justify-center">
+<svg class="w-4.5 h-4.5 text-orange-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"></path></svg>
+</div>
+<div>
+<p class="text-sm font-bold text-gray-900">铝老板 13217121000</p>
+</div>
+</div>
+<button class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors">拨打</button>
+</div>
+<!-- 微信 -->
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 bg-green-surface rounded-xl flex items-center justify-center">
+<svg class="w-4.5 h-4.5 text-green-brand" fill="currentColor" viewBox="0 0 24 24"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 01-.023-.156.49.49 0 01.201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89c-.135-.01-.27-.027-.407-.03zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.969-.982z"></path></svg>
+</div>
+<div>
+<p class="text-sm font-bold text-gray-900">13217121000</p>
+</div>
+</div>
+<button class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors">复制</button>
+</div>
+<!-- 地址 -->
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 bg-red-surface rounded-xl flex items-center justify-center">
+<svg class="w-4.5 h-4.5 text-red-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"></path></svg>
+</div>
+<div class="flex-1 pr-2">
+<p class="text-sm font-bold text-gray-900 leading-snug">湖北省孝感市天下循环经济产业园</p>
+</div>
+</div>
+<button class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors flex-shrink-0">导航</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 地图占位 -->
+<div class="px-4 mb-6">
+<div class="rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] h-32 bg-cover bg-center" style="background-image: url(&#39;https://ai-public.mastergo.com/gen_page/map_placeholder_1280x720.png&#39;);">
+<div class="w-full h-full bg-gradient-to-t from-black/30 to-transparent flex items-end p-3">
+<div class="flex items-center gap-2 text-white">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path></svg>
+<span class="text-xs font-medium">湖北省孝感市</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 底部固定导航栏（由 bottom-nav 组件注入） -->
+<div id="app-bottom-nav" data-active-nav="quotes"></div>
+
+<script type="module">
+  import { mountBottomNav } from '/src/components/bottom-nav.js';
+  const slot = document.getElementById('app-bottom-nav');
+  mountBottomNav(slot, { active: slot.dataset.activeNav || 'quotes' });
+</script>
+
+
+</body></html>
