@@ -58,8 +58,10 @@ to { opacity: 1; transform: translateY(0); }
 
 <!-- 顶部操作栏（page-actions 组件：右上角 3 点 + 头像） -->
 <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
-  <div class="flex items-center justify-end px-4 h-11">
-    <div id="page-actions"></div>
+  <div class="grid grid-cols-3 items-center px-4 h-11">
+    <div></div>
+    <h1 class="text-lg font-semibold text-brand-ink text-center">今日行情</h1>
+    <div id="page-actions" class="justify-self-end"></div>
   </div>
 </header>
 
