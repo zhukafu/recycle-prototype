@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>客服会话 - 铝老板金属网</title>
+  <script src="data/site-config.js"></script>
+  <style>
+    /* =====================================================
+     *  微信客服会话页面（iOS WeChat 1:1 还原）
+     *  - 用于 _AL_openWechat() 唤起失败 / 桌面端 / 跨域时的承载页
+     *  - 视觉上模拟微信 iOS 客户端的客服会话
+     *  - 提供快速提问、复制微信号、拨打电话等兜底操作
+     * ===================================================== */
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      background: #ededed;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ===== iOS 状态栏 ===== */
+    .ios-status {
+      height: 44px;
+      background: #ededed;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #000;
+      letter-spacing: -0.2px;
+      flex-shrink: 0;
+    }
+    .ios-status .right {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .ios-status svg { display: block; }
+
+    /* ===== 微信导航栏 ===== */
+    .wx-nav {
+      height: 44px;
+      background: #ededed;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      position: relative;
+      flex-shrink: 0;
+      border-bottom: 0.5px solid rgba(0,0,0,0.08);
+    }
+    .wx-nav__back, .wx-nav__menu {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #000;
+    }
+    .wx-nav__back:active, .wx-nav__menu:active { opacity: 0.5; }
+    .wx-nav__title {
+      flex: 1;
+      text-align: center;
+      line-height: 1.2;
+      min-width: 0;
+    }
+    .wx-nav__title h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .wx-nav__title h1 .arrow {
+      font-size: 14px;
+      color: #b2b2b2;
+      margin-left: 2px;
+    }
+    .wx-nav__title p {
+      margin: 0;
+      font-size: 11px;
+      color: #888;
+      font-weight: 400;
+      margin-top: 1px;
+    }
+
+    /* ===== 会话区 ===== */
+    .conversation {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .conversation::-webkit-scrollbar { display: none; }
+    .conversation { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* 时间分隔 */
+    .time-sep {
+      text-align: center;
+      font-size: 11px;
+      color: #b2b2b2;
+      margin: 8px 0 10px;
+      letter-spacing: 0.2px;
+    }
+
+    /* 系统自动回复（仿微信的 "X 为您服务" 灰色条） */
+    .sys-msg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 5px 12px;
+      margin: 6px 12px;
+      background: rgba(0,0,0,0.06);
+      border-radius: 4px;
+      font-size: 12px;
+      color: #888;
+    }
+    .sys-msg .dot {
+      width: 4px;
+      height: 4px;
+      background: #b2b2b2;
+      border-radius: 50%;
+    }
+
+    /* 客服消息气泡 */
+    .msg-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 6px 12px;
+      margin: 4px 0;
+    }
+    .msg-row.from-cs { justify-content: flex-start; }
+    .msg-row.from-user { justify-content: flex-end; }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      overflow: hidden;
+    }
+    .avatar.user {
+      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    }
+    .bubble {
+      max-width: 70%;
+      padding: 9px 12px;
+      background: #fff;
+      border-radius: 4px;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #000;
+      word-break: break-word;
+      position: relative;
+    }
+    .msg-row.from-user .bubble {
+      background: #95EC69;
+    }
+    .msg-row.from-cs .bubble::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 12px;
+      width: 0;
+      height: 0;
+      border: 5px solid transparent;
+      border-right-color: #fff;
+    }
+    .msg-row.from-user .bubble::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: 12px;
+      width: 0;
+      height: 0;
+      border: 5px solid transparent;
+      border-left-color: #95EC69;
+    }
+
+    /* 品牌信息卡 */
+    .brand-card {
+      background: #fff;
+      border-radius: 4px;
+      padding: 14px 12px 12px;
+      max-width: 76%;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .brand-card__head {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .brand-card__head .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 16px;
+      box-shadow: 0 2px 6px rgba(16,185,129,0.25);
+    }
+    .brand-card__head .meta { flex: 1; min-width: 0; }
+    .brand-card__head .name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #000;
+    }
+    .brand-card__head .tag {
+      display: inline-block;
+      font-size: 10px;
+      color: #576b95;
+      background: rgba(87,107,149,0.1);
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-top: 3px;
+    }
+    .brand-card__body {
+      color: #555;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .brand-card__body b { color: #000; }
+
+    /* 快捷入口 */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 8px 0 4px;
+    }
+    .quick-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 0.5px solid rgba(0,0,0,0.06);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #000;
+      cursor: pointer;
+      text-align: left;
+    }
+    .quick-btn:active { background: #f5f5f5; }
+    .quick-btn .ico {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: rgba(16,185,129,0.1);
+      color: #10B981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .quick-btn .ico.blue   { background: rgba(59,130,246,0.1);  color: #3B82F6; }
+    .quick-btn .ico.orange { background: rgba(249,115,22,0.1);  color: #F97316; }
+    .quick-btn .ico.purple { background: rgba(139,92,246,0.1);  color: #8B5CF6; }
+    .quick-btn .ico.amber  { background: rgba(245,158,11,0.1);  color: #F59E0B; }
+    .quick-btn .ico.pink   { background: rgba(236,72,153,0.1);  color: #EC4899; }
+    .quick-btn .ico.cyan   { background: rgba(6,182,212,0.1);   color: #06B6D4; }
+
+    /* 联系方式卡 */
+    .contact-card {
+      background: #fff;
+      border-radius: 4px;
+      max-width: 76%;
+      overflow: hidden;
+    }
+    /* 联系方式卡 */
+    .contact-card {
+      background: #fff;
+      border-radius: 10px;
+      max-width: 78%;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .contact-card .row {
+      display: flex;
+      align-items: center;
+      padding: 11px 13px;
+      gap: 11px;
+      border-bottom: 0.5px solid rgba(0,0,0,0.06);
+    }
+    .contact-card .row:last-child { border-bottom: none; }
+    .contact-card .left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .contact-card .left .ico {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+    .contact-card .left .ico.green  { background: linear-gradient(135deg, #07C160 0%, #06AD56 100%); }
+    .contact-card .left .ico.orange { background: linear-gradient(135deg, #FA9D3B 0%, #FF8800 100%); }
+    .contact-card .left .ico.red    { background: linear-gradient(135deg, #FA5151 0%, #E04141 100%); }
+    .contact-card .left .text {
+      flex: 1;
+      min-width: 0;
+    }
+    .contact-card .left .text .t1 {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 2px;
+      letter-spacing: 0.2px;
+    }
+    .contact-card .left .text .t2 {
+      font-size: 14px;
+      color: #1a1a1a;
+      font-weight: 600;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+    .contact-card .row.address .left .text .t2 {
+      font-size: 12.5px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+    }
+    .contact-card .op {
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: 500;
+      color: #576b95;
+      background: rgba(87,107,149,0.08);
+      border: none;
+      border-radius: 12px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background-color .15s, transform .1s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .contact-card .op:active {
+      background: rgba(87,107,149,0.18);
+      transform: scale(0.94);
+    }
+    .contact-card .op.copied {
+      color: #07C160;
+      background: rgba(7,193,96,0.1);
+    }
+
+    /* 提示条 */
+    .tip-bar {
+      margin: 14px 12px 0;
+      padding: 8px 12px;
+      background: rgba(255,180,0,0.12);
+      border-radius: 4px;
+      font-size: 12px;
+      color: #b07510;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    /* 底部工具栏 */
+    .wx-toolbar {
+      background: #f7f7f7;
+      border-top: 0.5px solid rgba(0,0,0,0.08);
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .wx-toolbar .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .wx-toolbar .icon-btn:active { opacity: 0.5; }
+    .wx-toolbar .input {
+      flex: 1;
+      height: 36px;
+      background: #fff;
+      border-radius: 6px;
+      border: 0.5px solid rgba(0,0,0,0.05);
+      padding: 0 12px;
+      font-size: 15px;
+      color: #000;
+      outline: none;
+      font-family: inherit;
+    }
+    .wx-toolbar .input::placeholder { color: #b2b2b2; }
+
+    /* 菜单弹层 */
+    .menu-pop {
+      position: absolute;
+      top: 44px;
+      right: 8px;
+      background: rgba(40,40,40,0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 8px;
+      padding: 6px 0;
+      min-width: 140px;
+      z-index: 100;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      display: none;
+    }
+    .menu-pop.open { display: block; }
+    .menu-pop button {
+      display: block;
+      width: 100%;
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .menu-pop button:active { background: rgba(255,255,255,0.08); }
+    .menu-pop .divider { height: 0.5px; background: rgba(255,255,255,0.1); margin: 4px 0; }
+
+    /* "回到首页" 浮按钮 */
+    .fab-home {
+      position: absolute;
+      right: 12px;
+      bottom: 76px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 50;
+    }
+    .fab-home:active { transform: scale(0.92); }
+
+    /* "复制" 反馈 */
+    .copy-toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.78);
+      color: #fff;
+      font-size: 14px;
+      padding: 10px 18px;
+      border-radius: 6px;
+      z-index: 200;
+      animation: fadeToast 1.5s ease-out;
+      pointer-events: none;
+    }
+    @keyframes fadeToast {
+      0% { opacity: 0; transform: translate(-50%, -45%); }
+      15%, 75% { opacity: 1; transform: translate(-50%, -50%); }
+      100% { opacity: 0; transform: translate(-50%, -55%); }
+    }
+
+    /* 桌面端背景 */
+    @media (min-width: 481px) {
+      body {
+        max-width: 420px;
+        height: 860px;
+        max-height: 100vh;
+        margin: 0 auto;
+        border-left: 1px solid rgba(0,0,0,0.06);
+        border-right: 1px solid rgba(0,0,0,0.06);
+        box-shadow: 0 0 40px rgba(0,0,0,0.08);
+      }
+      html { background: #ededed; }
+      body { margin-top: 0; }
+    }
+    @media (max-width: 480px) {
+      @media (min-height: 700px) {
+        body { margin-top: 0; }
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- iOS 状态栏 -->
+  <div class="ios-status">
+    <span>18:07</span>
+    <div class="right">
+      <!-- 信号 -->
+      <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0"  y="7" width="3" height="4" rx="0.5" fill="#000"/><rect x="5"  y="5" width="3" height="6" rx="0.5" fill="#000"/><rect x="10" y="2" width="3" height="9" rx="0.5" fill="#000"/><rect x="15" y="0" width="2" height="11" rx="0.5" fill="#000"/></svg>
+      <!-- WiFi -->
+      <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 0C4.6 0 2 1.1 0 2.9l1.4 1.4C3 2.9 5.1 2 7.5 2s4.5.9 6.1 2.3L15 2.9C13 1.1 10.4 0 7.5 0zm0 4c-1.9 0-3.6.7-4.9 1.9L4 7.3C5 6.5 6.2 6 7.5 6s2.5.5 3.5 1.3l1.4-1.4C11.1 4.7 9.4 4 7.5 4zm0 4c-.8 0-1.5.3-2 .8L7.5 11l2-2.2c-.5-.5-1.2-.8-2-.8z" fill="#000"/></svg>
+      <!-- 电池 -->
+      <svg width="27" height="12" viewBox="0 0 27 12"><rect x="0" y="1" width="22" height="10" rx="2.5" fill="none" stroke="#000" stroke-opacity="0.4"/><rect x="23" y="4" width="2" height="4" rx="1" fill="#000" fill-opacity="0.4"/><rect x="1.5" y="2.5" width="17" height="7" rx="1.2" fill="#000"/></svg>
+    </div>
+  </div>
+
+  <!-- 微信导航栏 -->
+  <header class="wx-nav">
+    <button class="wx-nav__back" onclick="goBack()" aria-label="返回">
+      <svg width="12" height="22" viewBox="0 0 12 22" fill="none"><path d="M11 1L2 11l9 10" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="wx-nav__title" onclick="showToast('账号资料（演示）')">
+      <h1>铝老板金属网<span class="arrow">›</span></h1>
+      <p>客服会话</p>
+    </div>
+    <button class="wx-nav__menu" onclick="toggleMenu()" aria-label="更多">
+      <svg width="22" height="6" viewBox="0 0 22 6" fill="#000"><circle cx="3" cy="3" r="2"/><circle cx="11" cy="3" r="2"/><circle cx="19" cy="3" r="2"/></svg>
+    </button>
+
+    <!-- 右上角菜单 -->
+    <div class="menu-pop" id="menuPop">
+      <button onclick="copyWechat()">复制微信号</button>
+      <button onclick="goHome()">回到铝老板</button>
+      <div class="divider"></div>
+      <button onclick="toggleMenu()">取消</button>
+    </div>
+  </header>
+
+  <!-- 会话区 -->
+  <main class="conversation" id="conversation">
+
+    <div class="time-sep">星期六 17:58</div>
+    <div class="sys-msg">
+      <span>铝老板客服 为您服务</span>
+      <span class="dot"></span>
+      <span>对方已开启「客服助手」</span>
+    </div>
+
+    <div class="time-sep">18:06</div>
+    <div class="sys-msg">
+      <span>铝老板客服 为您服务</span>
+    </div>
+
+    <!-- 客服欢迎语 + 品牌卡 -->
+    <div class="msg-row from-cs">
+      <div class="avatar">铝</div>
+      <div class="bubble">您好，欢迎咨询<b>铝老板金属网</b> 👋<br>客服小铝为您服务，请描述您的需求</div>
+    </div>
+
+    <div class="msg-row from-cs">
+      <div class="avatar">铝</div>
+      <div class="brand-card">
+        <div class="brand-card__head">
+          <div class="logo">铝</div>
+          <div class="meta">
+            <div class="name">铝老板金属网</div>
+            <span class="tag">公众号</span>
+          </div>
+        </div>
+        <div class="brand-card__body">
+          12 年专注<b>接触器银触点 / 含银焊料 / 感光材料 / 三元催化器</b>回收<br>
+          每日更新白银 T+D、铂、钯、铑实时报价<br>
+          全国 5000+ 回收从业者在用
+        </div>
+      </div>
+    </div>
+
+    <!-- 联系方式卡 -->
+    <div class="msg-row from-cs">
+      <div class="avatar">铝</div>
+      <div class="contact-card">
+        <div class="row">
+          <div class="left">
+            <div class="ico green">💚</div>
+            <div class="text">
+              <div class="t1">微信号</div>
+              <div class="t2" id="wxIdText">13217121000</div>
+            </div>
+          </div>
+          <button class="op" id="copyWxOp" onclick="copyWechat()">复制</button>
+        </div>
+        <div class="row">
+          <div class="left">
+            <div class="ico orange">📞</div>
+            <div class="text">
+              <div class="t1">客服电话</div>
+              <div class="t2" id="phoneText">13217121000</div>
+            </div>
+          </div>
+          <a class="op" id="callOp" href="tel:13217121000">拨打</a>
+        </div>
+        <div class="row address">
+          <div class="left">
+            <div class="ico red">📍</div>
+            <div class="text">
+              <div class="t1">公司地址</div>
+              <div class="t2" style="font-size: 12px; font-family: inherit;">湖北省孝感市天下循环经济产业园</div>
+            </div>
+          </div>
+          <a class="op" id="mapOp" href="https://uri.amap.com/marker?position=113.9268,30.9264&name=湖北省孝感市天下循环经济产业园&src=mypage&coordinate=gaode&callnative=1" target="_blank">导航</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-bar">
+      微信内长按微信号 2 秒可快速复制 / 添加
+    </div>
+
+  </main>
+
+  <!-- 底部工具栏 -->
+  <footer class="wx-toolbar">
+    <button class="icon-btn" aria-label="语音">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+    <input class="input" id="msgInput" type="text" placeholder="发消息..." onkeydown="onInputKey(event)">
+    <button class="icon-btn" aria-label="表情" onclick="showToast('表情面板（演示）')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="更多" onclick="showToast('功能面板（演示）')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    </button>
+  </footer>
+
+  <script>
+    /* =====================================================
+     *  微信客服页面交互
+     *  - 从 _AL_SITE 同步联系方式（兜底用 window._AL_SITE 或 13217121000）
+     *  - 提供"快捷入口自动回复 / 复制微信号 / 拨打电话 / 回到首页"等兜底动作
+     * ===================================================== */
+    (function () {
+      // 1) 用 _AL_SITE 同步联系方式显示
+      var S = window._AL_SITE || {};
+      var phone = S.phone || '13217121000';
+      var wechat = S.wechat || '13217121000';
+      var brandName = (S.brandName || '铝老板金属网').replace(/金属网$/, '');
+
+      var phoneEl = document.getElementById('phoneText');
+      var wxEl = document.getElementById('wxIdText');
+      var callOp = document.getElementById('callOp');
+      if (phoneEl) phoneEl.textContent = phone;
+      if (wxEl) wxEl.textContent = wechat;
+      if (callOp) callOp.setAttribute('href', 'tel:' + phone);
+
+      // 2) 自动滚动到底部
+      var conv = document.getElementById('conversation');
+      setTimeout(function () { conv.scrollTop = conv.scrollHeight; }, 50);
+
+      // 3) 菜单外点击关闭
+      document.addEventListener('click', function (e) {
+        var pop = document.getElementById('menuPop');
+        if (!pop) return;
+        if (!e.target.closest('.wx-nav__menu') && !e.target.closest('.menu-pop')) {
+          pop.classList.remove('open');
+        }
+      });
+    })();
+
+    /* ===== 全局函数（HTML onclick 调用） ===== */
+    function goBack() {
+      if (history.length > 1) history.back();
+      else location.href = 'index.html';
+    }
+
+    function goHome() {
+      if (window._AL_navigate) window._AL_navigate('index.html');
+      else location.href = 'index.html';
+    }
+
+    function toggleMenu() {
+      var pop = document.getElementById('menuPop');
+      if (pop) pop.classList.toggle('open');
+    }
+
+    function showToast(msg) {
+      var t = document.createElement('div');
+      t.className = 'copy-toast';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(function () { t.remove(); }, 1500);
+    }
+
+    function copyWechat() {
+      var wechat = (window._AL_SITE && window._AL_SITE.wechat) || '13217121000';
+      var btn = document.getElementById('copyWxOp');
+      var done = function () {
+        if (btn) {
+          var orig = btn.textContent;
+          btn.textContent = '已复制';
+          btn.classList.add('copied');
+          setTimeout(function () { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+        }
+        showToast('微信号已复制：' + wechat);
+        toggleMenu();
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(wechat).then(done).catch(function () { fallback(); });
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = wechat;
+        ta.style.cssText = 'position:fixed;left:-9999px;opacity:0;';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        ta.remove();
+        done();
+      }
+    }
+
+    function copyPhone() {
+      var phone = (window._AL_SITE && window._AL_SITE.phone) || '13217121000';
+      var ta = document.createElement('textarea');
+      ta.value = phone;
+      ta.style.cssText = 'position:fixed;left:-9999px;opacity:0;';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      showToast('电话已复制：' + phone);
+    }
+
+    /* ===== 快捷入口自动对话 ===== */
+    var REPLY_MAP = {
+      '查询回收报价':   '请告诉我您要回收的<b>产品型号</b>（如 CJX2-9511），或描述实物特征，我为您匹配当前参考报价。',
+      '产品型号查询':   '您可以直接在「铝老板金属网」首页搜索型号，或发送实物照片给我识别 🤳',
+      '线下培训':       '目前长期开展拆解、检测、报价核心技能培训。请留下您的<b>所在城市 + 联系方式</b>，我们安排专人对接。',
+      '人工客服':       '正在为您转接专属顾问... <br>工作时间：周一至周日 9:00-21:00<br>非工作时间留言后我们会在 1 小时内回复 ✅'
+    };
+
+    function replyWith(text) {
+      // 1) 显示用户消息
+      appendUserMsg(text);
+      // 2) 显示客服自动回复
+      setTimeout(function () {
+        var reply = REPLY_MAP[text] || ('收到您的提问："' + text + '"，请稍等，小铝马上为您查询 👀');
+        appendCsMsg(reply);
+      }, 600);
+    }
+
+    function onInputKey(e) {
+      if (e.key === 'Enter' && e.target.value.trim()) {
+        var text = e.target.value.trim();
+        e.target.value = '';
+        appendUserMsg(text);
+        setTimeout(function () {
+          appendCsMsg('感谢您的留言 ✅ 小铝已收到，将在 1 小时内为您回复。<br>着急可拨打 ' + ((window._AL_SITE && window._AL_SITE.phone) || '13217121000'));
+        }, 700);
+      }
+    }
+
+    function appendUserMsg(text) {
+      var conv = document.getElementById('conversation');
+      var row = document.createElement('div');
+      row.className = 'msg-row from-user';
+      row.innerHTML = '<div class="bubble"></div><div class="avatar user">您</div>';
+      row.querySelector('.bubble').textContent = text;
+      conv.appendChild(row);
+      conv.scrollTop = conv.scrollHeight;
+    }
+
+    function appendCsMsg(html) {
+      var conv = document.getElementById('conversation');
+      var row = document.createElement('div');
+      row.className = 'msg-row from-cs';
+      row.innerHTML = '<div class="avatar">铝</div><div class="bubble"></div>';
+      row.querySelector('.bubble').innerHTML = html;
+      conv.appendChild(row);
+      conv.scrollTop = conv.scrollHeight;
+    }
+  </script>
+</body>
+</html>

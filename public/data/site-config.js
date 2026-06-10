@@ -21,6 +21,163 @@
     amapCoord:'113.9268,30.9264',
   });
 
+  /* ========== 1.5 用户态 & 权限检查 ========== */
+  // 未登录、未会员：价格 / 含银量等敏感数据全部隐藏，显示「开通会员查看」
+  // 后续对接真实登录态时，把 isLoggedIn / isMember 改成从后端接口 / URL token 读取
+  window._AL_USER = Object.assign(window._AL_USER || {}, {
+    isLoggedIn:        false,
+    isMember:          false,
+    nickname:          '',         // 用户昵称（localStorage 持久化）
+    avatar:            '',         // 用户头像 base64 / URL
+    loginAt:           0,          // 登录时间戳
+    memberPackage:     '',         // 套餐 id
+    memberPackageName: '',         // 套餐名
+    memberExpireAt:    0,          // 会员到期时间戳（0 = 永久）
+  });
+
+  // 资料用 localStorage（关浏览器不丢，模拟真实登录态）
+  // 会话标志用 sessionStorage（关浏览器即重置，避免残留）
+  try {
+    const profile = localStorage.getItem('_AL_USER_PROFILE');
+    if (profile) {
+      const obj = JSON.parse(profile);
+      if (obj && typeof obj === 'object') {
+        window._AL_USER = Object.assign(window._AL_USER, obj);
+      }
+    }
+  } catch (e) { /* localStorage 不可用 */ }
+
+  // 权限检查
+  //   level: 'public'（默认）| 'login'（需登录）| 'member'（需开通会员）
+  window._AL_canView = function (level) {
+    if (!level || level === 'public') return true;
+    if (level === 'login')  return !!window._AL_USER.isLoggedIn;
+    if (level === 'member') return !!(window._AL_USER.isLoggedIn && window._AL_USER.isMember && (window._AL_USER.memberExpireAt === 0 || window._AL_USER.memberExpireAt > Date.now()));
+    return true;
+  };
+
+  /* ========== 1.6 登录守卫 ========== */
+  // 智能跳转：
+  //   - 未登录 → login.html?return=<current>
+  //   - 已登录但未会员 → vip-center.html
+  //   - 已会员 → 留在原页
+  window._AL_requireMember = function (returnUrl) {
+    if (!window._AL_USER.isLoggedIn) {
+      const ret = returnUrl || (location.pathname + location.search);
+      if (window._AL_navigate) window._AL_navigate('login.html?return=' + encodeURIComponent(ret));
+      else location.href = 'login.html?return=' + encodeURIComponent(ret);
+      return false;
+    }
+    if (!window._AL_canView('member')) {
+      if (window._AL_navigate) window._AL_navigate('vip-center.html');
+      else location.href = 'vip-center.html';
+      return false;
+    }
+    return true;
+  };
+
+  // 锁标点击的统一处理：
+  //   - 未登录   → login.html?return=<当前页>&target=vip-center.html
+  //   - 已登录未会员 → vip-center.html?return=<当前页>（订阅完直接回到原页）
+  //   - 已会员    → 留在原页（理论上不会出现）
+  // target 链：login.html (注册/登录) → target=vip-center.html (订阅) → return=<原页> (返回)
+  // 循环防护：进入 login 流程前打 sessionStorage 标记，避免「vip-center 返回 → login 自动跳回 vip-center」死循环
+  window._AL_lockClick = function (e, productId) {
+    e && e.preventDefault();
+    e && e.stopPropagation();
+    const ret = (location.pathname + location.search) || 'index.html';
+    if (!window._AL_USER || !window._AL_USER.isLoggedIn) {
+      try { sessionStorage.setItem('_AL_loginAutoRedirected', '1'); } catch (err) {}
+      const url = 'login.html?return=' + encodeURIComponent(ret) + '&target=vip-center.html';
+      if (window._AL_navigate) window._AL_navigate(url);
+      else location.href = url;
+    } else if (!window._AL_canView('member')) {
+      const url = 'vip-center.html?return=' + encodeURIComponent(ret);
+      if (window._AL_navigate) window._AL_navigate(url);
+      else location.href = url;
+    }
+    // 已会员 → 不做任何事（让外层 <a> / 业务逻辑自行处理）
+  };
+
+  // 「开通会员查看」徽章 HTML（全站统一，低调锁标样式）
+  //   size:     'sm' | 'md'   默认 sm
+  //   iconOnly: true            只显示锁标图标（不显示文字），用于狭窄单元格
+  // 设计：淡橙底 + 橙色字 + 锁图标，柔和不抢戏，但点击有响应反馈
+  // 内置点击拦截：阻止冒泡到外层 <a>，调用 _AL_lockClick 智能跳转（未登录→login，已登录→vip-center）
+  window._AL_lockBadge = function (text, size, iconOnly) {
+    const t = text || '开通会员查看';
+    const isSm = size !== 'md';
+    const pad   = iconOnly ? 'p-1.5' : (isSm ? 'px-2.5 py-1.5' : 'px-3 py-2');
+    const iconC = isSm ? 'w-3 h-3'       : 'w-3.5 h-3.5';
+    const txtC  = isSm ? 'text-xs'       : 'text-sm';
+    const wrapCls = iconOnly
+      ? 'inline-flex items-center justify-center bg-al-orange-light rounded-lg cursor-pointer active:scale-95 transition ' + pad
+      : 'inline-flex items-center gap-1.5 bg-al-orange-light rounded-lg cursor-pointer hover:bg-al-orange-light/80 active:scale-95 transition ' + pad;
+    return (
+      '<span class="' + wrapCls + '" ' +
+              'onclick="event.preventDefault();event.stopPropagation();window._AL_lockClick&&_AL_lockClick(event)" ' +
+              'title="点击登录 / 开通会员">' +
+        '<i class="fas fa-lock text-al-orange ' + iconC + ' inline-flex items-center justify-center flex-shrink-0 leading-none"></i>' +
+        (iconOnly ? '' : '<span class="' + txtC + ' text-al-orange font-medium leading-none whitespace-nowrap">' + t + '</span>') +
+      '</span>'
+    );
+  };
+
+  // 调试用：手动切换登录态（开发期间在 DevTools console 调用）
+  //   _AL_login(false)   登录但未开通会员
+  //   _AL_login(true)    登录 + 会员
+  //   _AL_logout()       退出
+  window._AL_login = function (asMember) {
+    window._AL_USER.isLoggedIn = true;
+    window._AL_USER.isMember   = !!asMember;
+    if (asMember && !window._AL_USER.memberExpireAt) {
+      window._AL_USER.memberExpireAt = Date.now() + 30 * 24 * 60 * 60 * 1000;  // 默认 30 天
+    }
+    window._AL_saveProfile();
+    if (window._AL_toast) _AL_toast(asMember ? '已登录，已开通会员' : '已登录，未开通会员', 1500);
+  };
+  window._AL_logout = function () {
+    window._AL_USER.isLoggedIn     = false;
+    window._AL_USER.isMember       = false;
+    window._AL_USER.nickname       = '';
+    window._AL_USER.avatar         = '';
+    window._AL_USER.loginAt        = 0;
+    window._AL_USER.memberPackage  = '';
+    window._AL_USER.memberExpireAt = 0;
+    try { localStorage.removeItem('_AL_USER_PROFILE'); } catch (e) {}
+    try { sessionStorage.removeItem('_AL_USER'); } catch (e) {}
+    if (window._AL_toast) _AL_toast('已退出登录', 1200);
+  };
+
+  // 持久化用户资料到 localStorage
+  window._AL_saveProfile = function () {
+    try {
+      const toSave = {
+        isLoggedIn:        window._AL_USER.isLoggedIn,
+        isMember:          window._AL_USER.isMember,
+        nickname:          window._AL_USER.nickname,
+        avatar:            window._AL_USER.avatar,
+        loginAt:           window._AL_USER.loginAt,
+        memberPackage:     window._AL_USER.memberPackage,
+        memberPackageName: window._AL_USER.memberPackageName,
+        memberExpireAt:    window._AL_USER.memberExpireAt,
+      };
+      localStorage.setItem('_AL_USER_PROFILE', JSON.stringify(toSave));
+    } catch (e) { /* localStorage 不可用 */ }
+  };
+
+  // 会员套餐定义（vip-center.html 和 wechat-pay.html 共享）
+  window._AL_PACKAGES = [
+    { id: 'trial',  name: '体验版',              desc: '基础报价权益',         days: 1,    price: '6.60',   tag: 'TRIAL' },
+    { id: 'basic',  name: '全品类初级',          desc: '基础报价权益',         days: 30,   price: '68.00',  tag: 'BASIC', featured: false },
+    { id: 'std30',  name: '全品类高级 30 天',    desc: '尊享全部特权',         days: 30,   price: '328.00', tag: 'STD'    },
+    { id: 'std1y',  name: '全品类高级一年',      desc: '送 2 个月，可看拆解数据', days: 365,  price: '1688.00', tag: 'STD', featured: true },
+    { id: 'basic1y',name: '初级年会员',          desc: '只能看报价',           days: 365,  price: '488.00', tag: 'BASIC'  }
+  ];
+  window._AL_getPackage = function (id) {
+    return (window._AL_PACKAGES || []).find(p => p.id === id) || null;
+  };
+
   /* ========== 2. tel: 链接 ========== */
   window._AL_telLink = function (phone) {
     return 'tel:' + (phone || window._AL_SITE.phone);
@@ -33,39 +190,33 @@
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
     const isInWechat = /MicroMessenger/i.test(ua);
 
-    // 已经在微信里：直接复制 + 提示用户去搜索
+    // 1. 已经在微信里：直接跳到 wechat-cs.html 承载页（带"复制微信号"提示）
     if (isInWechat) {
-      _AL_copyToClipboard(id).then(function () {
-        _AL_toast('微信号已复制，请到微信中搜索', 2200);
-      });
+      if (window._AL_navigate) window._AL_navigate('wechat-cs.html');
+      else window.location.href = 'wechat-cs.html';
       return;
     }
 
-    // 移动端：尝试 weixin:// 唤起，800ms 内未离开则降级为弹层
+    // 2. 移动端：先尝试 weixin:// 唤起，失败则跳 wechat-cs.html
     if (isMobile) {
       _AL_toast('正在打开微信…', 1500);
       const t0 = Date.now();
-      // 用隐藏 iframe 唤起（部分浏览器拦截 location.href 的 deeplink）
       const iframe = document.createElement('iframe');
       iframe.style.cssText = 'position:fixed;left:-9999px;width:1px;height:1px;opacity:0;';
       iframe.src = 'weixin://';
       document.body.appendChild(iframe);
       setTimeout(function () {
         iframe.remove();
-        // 浏览器支持时已经离开了页面；没离开说明唤起失败
-        if (Date.now() - t0 < 1500) {
-          _AL_showWechatModal(id);
+        // 唤起成功时浏览器已经离开页面；未离开则跳承载页
+        if (Date.now() - t0 < 1500 && document.visibilityState === 'visible') {
+          if (window._AL_navigate) window._AL_navigate('wechat-cs.html');
+          else window.location.href = 'wechat-cs.html';
         }
       }, 800);
-      // 兜底：1500ms 后强制弹层（防止 iframe 唤起成功但页面未跳转）
-      setTimeout(function () {
-        if (Date.now() - t0 < 1700 && document.visibilityState === 'visible') {
-          _AL_showWechatModal(id);
-        }
-      }, 1500);
     } else {
-      // 桌面端：直接弹层
-      _AL_showWechatModal(id);
+      // 3. 桌面端：直接跳承载页
+      if (window._AL_navigate) window._AL_navigate('wechat-cs.html');
+      else window.location.href = 'wechat-cs.html';
     }
   };
 

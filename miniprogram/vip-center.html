@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VIP 会员中心 - 铝老板金属网</title>
+  <link href="/lib/fonts/fonts-mp-main.css" rel="stylesheet">
+  <link rel="stylesheet" href="/lib/font-awesome/6.4.0/css/all.min.css">
+  <script src="/lib/tailwind/tailwind.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'al-green':       '#10B981',
+            'al-green-dark':  '#059669',
+            'al-green-light': '#D1FAE5',
+            'al-orange':      '#F97316',
+            'al-orange-dark': '#EA580C',
+            'al-orange-light':'#FFEDD5',
+            'al-dark':        '#1F2937',
+            'al-gray':        '#6B7280',
+            'al-gray-light':  '#F3F4F6',
+            'al-border':      '#E5E7EB',
+            'al-gold':        '#D97706',
+            'al-gold-light':  '#FEF3C7',
+          },
+          fontFamily: {
+            sans: ['Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft':  '0 2px 16px rgba(0,0,0,0.06)',
+            'card':  '0 4px 20px rgba(0,0,0,0.08)',
+            'float': '0 8px 32px rgba(0,0,0,0.12)',
+            'gold':  '0 0 0 2px #F59E0B, 0 4px 16px rgba(245, 158, 11, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Noto Sans SC', sans-serif; -webkit-font-smoothing: antialiased; background: #F8FAFC; }
+    .gradient-gold { background: linear-gradient(135deg, #1F1F1F 0%, #2D2D2D 50%, #1A1A1A 100%); }
+    .gradient-pay { background: linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #92400E 100%); }
+    .gradient-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+    .package-card { transition: all 0.2s ease; }
+    .package-card.selected { box-shadow: 0 0 0 2px #F59E0B, 0 4px 16px rgba(245, 158, 11, 0.25); }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-up { animation: slideUp 0.4s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .star-twinkle { animation: spin 8s linear infinite; }
+  </style>
+</head>
+<body class="bg-al-gray-light min-h-screen pb-24">
+
+  <!-- 顶部导航 -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-al-border/50">
+    <div class="flex items-center h-12 px-4">
+      <button onclick="goBack()" aria-label="返回"
+              class="w-10 h-10 flex items-center justify-center -ml-2 rounded-full active:bg-al-gray-light transition">
+        <svg class="w-5 h-5 text-al-dark" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="flex-1 text-center text-base font-bold text-al-dark pr-10">VIP 会员中心</h1>
+    </div>
+  </nav>
+
+  <main class="pt-12">
+
+    <!-- VIP 卡片（深色金属质感） -->
+    <section class="px-4 pt-3 slide-up">
+      <div class="relative gradient-gold rounded-2xl p-5 overflow-hidden">
+        <!-- 装饰星 -->
+        <div class="absolute -top-4 -right-4 w-32 h-32 star-twinkle pointer-events-none opacity-90">
+          <svg viewBox="0 0 100 100" class="w-full h-full">
+            <defs>
+              <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FCD34D"/>
+                <stop offset="100%" stop-color="#92400E"/>
+              </linearGradient>
+            </defs>
+            <path fill="url(#g1)" d="M50 5 L60 40 L95 50 L60 60 L50 95 L40 60 L5 50 L40 40 Z"/>
+            <circle cx="20" cy="20" r="2" fill="#FCD34D"/>
+            <circle cx="80" cy="30" r="1.5" fill="#FCD34D"/>
+            <circle cx="75" cy="75" r="2" fill="#FCD34D"/>
+            <circle cx="25" cy="80" r="1.5" fill="#FCD34D"/>
+          </svg>
+        </div>
+
+        <div class="relative flex items-center gap-3">
+          <!-- 头像 -->
+          <div id="userAvatar" class="w-14 h-14 rounded-full bg-gradient-to-br from-al-gold-light to-al-gold border-2 border-al-gold-light/40 flex items-center justify-center overflow-hidden shrink-0">
+            <i class="fas fa-user text-xl text-white/80"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h2 id="userNickname" class="text-base font-black text-white truncate">游客</h2>
+              <span id="memberBadge" class="text-[10px] font-bold text-al-gold bg-al-gold-light px-2 py-0.5 rounded-full">普通用户</span>
+            </div>
+            <p class="text-[11px] text-white/70 truncate">尊享报价 · 专属标识 · 优先客服</p>
+          </div>
+        </div>
+
+        <!-- 会员到期时间 -->
+        <div id="memberStatus" class="hidden mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-white/80">
+          <span>会员到期时间</span>
+          <span id="memberExpireText" class="font-bold text-al-gold-light">--</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 会员特权 -->
+    <section class="px-4 mt-4 slide-up" style="animation-delay:.05s">
+      <div class="bg-white rounded-2xl p-4 shadow-soft">
+        <h3 class="text-sm font-bold text-al-dark mb-3 flex items-center gap-1.5">
+          <i class="fas fa-crown text-al-gold"></i>
+          会员特权
+        </h3>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="text-center">
+            <div class="w-10 h-10 mx-auto rounded-xl bg-al-green-light flex items-center justify-center mb-1.5">
+              <i class="fas fa-yen-sign text-al-green-dark"></i>
+            </div>
+            <p class="text-[11px] text-al-dark font-medium">实时报价</p>
+          </div>
+          <div class="text-center">
+            <div class="w-10 h-10 mx-auto rounded-xl bg-al-orange-light flex items-center justify-center mb-1.5">
+              <i class="fas fa-database text-al-orange"></i>
+            </div>
+            <p class="text-[11px] text-al-dark font-medium">完整数据</p>
+          </div>
+          <div class="text-center">
+            <div class="w-10 h-10 mx-auto rounded-xl bg-al-gold-light flex items-center justify-center mb-1.5">
+              <i class="fas fa-headset text-al-gold"></i>
+            </div>
+            <p class="text-[11px] text-al-dark font-medium">优先客服</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 选择套餐 -->
+    <section class="px-4 mt-4 slide-up" style="animation-delay:.1s">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-base font-bold text-al-dark flex items-center gap-1.5">
+          <i class="fas fa-gem text-al-gold text-base"></i>
+          选择会员套餐
+        </h3>
+        <span class="text-[11px] text-al-gray flex items-center gap-1">
+          <i class="fas fa-shield-halved text-al-green"></i>
+          安全支付
+        </span>
+      </div>
+      <div id="packageGrid" class="grid grid-cols-2 gap-3">
+        <!-- 由 JS 渲染 -->
+      </div>
+    </section>
+
+    <!-- 服务说明 -->
+    <section class="px-4 mt-4 slide-up" style="animation-delay:.15s">
+      <div class="bg-white rounded-2xl p-4 shadow-soft">
+        <h3 class="text-sm font-bold text-al-dark mb-2 flex items-center gap-1.5">
+          <i class="fas fa-circle-info text-al-blue"></i>
+          服务说明
+        </h3>
+        <ul class="text-[12px] text-al-gray leading-relaxed space-y-1.5">
+          <li>· 会员开通后立即生效，到期时间见套餐说明</li>
+          <li>· 会员仅限本人使用，不得转借、转让</li>
+          <li>· 支付完成后可在"会员中心"查看订单</li>
+          <li>· 如有问题请联系客服：<a href="tel:13217121000" class="text-al-green font-medium">13217121000</a></li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 底部支付栏 -->
+  <footer class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-al-border px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center gap-3">
+    <div class="flex-1">
+      <p class="text-[11px] text-al-gray">应付</p>
+      <p class="text-xl font-black text-al-orange font-mono leading-tight">¥<span id="payAmount">68</span></p>
+    </div>
+    <button id="payBtn" onclick="onPay()"
+            class="flex-[1.4] h-12 gradient-orange text-white text-base font-bold rounded-2xl shadow-card active:scale-[0.98] transition flex items-center justify-center gap-2">
+      <i class="fab fa-weixin text-lg"></i>
+      立即开通
+    </button>
+  </footer>
+
+  <!-- 支付成功提示 -->
+  <div id="successToast" class="fixed inset-0 z-[300] hidden items-center justify-center p-5 pointer-events-none">
+    <div class="bg-white rounded-2xl p-6 shadow-float flex flex-col items-center gap-3 max-w-xs pointer-events-auto">
+      <div class="w-16 h-16 rounded-full bg-al-green-light flex items-center justify-center">
+        <i class="fas fa-check text-3xl text-al-green"></i>
+      </div>
+      <p class="text-base font-bold text-al-dark">开通成功</p>
+      <p class="text-[12px] text-al-gray text-center">您已成功开通 <span id="successPkgName" class="text-al-orange font-medium">--</span></p>
+    </div>
+  </div>
+
+  <script src="/data/site-config.js"></script>
+  <script>
+    /* ========== 守卫：未登录跳 login.html（必须放在 site-config.js 之后） ========== */
+    if (!window._AL_USER || !window._AL_USER.isLoggedIn) {
+      const ret = location.pathname + (location.search || '');
+      location.replace('login.html?return=' + encodeURIComponent(ret));
+    }
+
+    /* ========== 状态：当前选中套餐 ========== */
+    let selectedPkgId = 'basic';
+    // URL 参数：return = 订阅完成后要回的页（如产品详情页）；paid=1 + pkg = 支付成功回调
+    const urlParams = new URLSearchParams(location.search);
+    const urlPaid   = urlParams.get('paid');
+    const urlPkg    = urlParams.get('pkg');
+    const urlReturn = urlParams.get('return');
+    const safeHtml  = (s) => /^[a-zA-Z0-9_./-]+\.html(\?.*)?$/.test(s || '');
+    const go = (url) => {
+      if (window._AL_navigate) window._AL_navigate(url);
+      else location.href = url;
+    };
+    if (urlPaid === '1' && urlPkg) {
+      const pkg = window._AL_getPackage(urlPkg);
+      if (pkg) {
+        // 显示成功提示
+        const t = document.getElementById('successToast');
+        document.getElementById('successPkgName').textContent = pkg.name;
+        t.classList.remove('hidden');
+        t.classList.add('flex');
+        setTimeout(function () {
+          t.classList.add('hidden');
+          t.classList.remove('flex');
+          // 清掉 paid / pkg 参数（保留 return 暂存，避免 toast 跳走时丢上下文）
+          const tail = safeHtml(urlReturn) ? '?return=' + encodeURIComponent(urlReturn) : '';
+          history.replaceState(null, '', 'vip-center.html' + tail);
+        }, 2200);
+        // 订阅成功：优先按 return 返回原页；兜底 → mine.html
+        setTimeout(function () {
+          if (safeHtml(urlReturn)) return go(urlReturn);
+          return go('mine.html');
+        }, 2400);
+      }
+    }
+
+    /* ========== 渲染：用户信息 ========== */
+    function renderUserInfo() {
+      const u = window._AL_USER || {};
+      const avatarEl = document.getElementById('userAvatar');
+      if (u.avatar) {
+        avatarEl.innerHTML = '<img src="' + u.avatar + '" class="w-full h-full object-cover">';
+      } else {
+        const initial = (u.nickname || '游').charAt(0);
+        avatarEl.innerHTML = '<span class="text-xl font-black text-white">' + initial + '</span>';
+      }
+      document.getElementById('userNickname').textContent = u.nickname || '未设置昵称';
+
+      // 会员状态
+      const isMember = u.isMember && (!u.memberExpireAt || u.memberExpireAt > Date.now());
+      const badge = document.getElementById('memberBadge');
+      const status = document.getElementById('memberStatus');
+      if (isMember) {
+        badge.textContent = 'VIP 会员';
+        badge.className = 'text-[10px] font-bold text-white bg-gradient-to-r from-al-gold to-al-orange px-2 py-0.5 rounded-full';
+        if (u.memberExpireAt) {
+          const d = new Date(u.memberExpireAt);
+          document.getElementById('memberExpireText').textContent =
+            d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' 到期';
+          status.classList.remove('hidden');
+        }
+      } else {
+        badge.textContent = '普通用户';
+      }
+    }
+
+    /* ========== 渲染：套餐列表 ========== */
+    function renderPackages() {
+      const grid = document.getElementById('packageGrid');
+      const pkgs = window._AL_PACKAGES || [];
+      grid.innerHTML = pkgs.map(p => {
+        const isSel = p.id === selectedPkgId;
+        const isFeatured = p.featured;
+        const cls = [
+          'package-card relative bg-white rounded-2xl p-3.5 cursor-pointer active:scale-[0.98] transition border-2',
+          isSel ? 'selected border-al-gold' : 'border-al-border',
+          isFeatured ? 'bg-gradient-to-br from-al-gold-light to-white' : ''
+        ].join(' ');
+        return (
+          '<div class="' + cls + '" data-pkg="' + p.id + '" onclick="selectPkg(\'' + p.id + '\')">' +
+            // 选中标识
+            (isSel
+              ? '<div class="absolute top-2 right-2 w-5 h-5 rounded-full gradient-orange flex items-center justify-center">' +
+                '<i class="fas fa-check text-[10px] text-white"></i>' +
+              '</div>'
+              : '') +
+            // 角标
+            (isFeatured
+              ? '<div class="absolute -top-1.5 -right-1.5 px-2 py-0.5 gradient-orange text-white text-[9px] font-bold rounded-full shadow-card">推荐</div>'
+              : '') +
+            '<h4 class="text-[13px] font-bold text-al-dark leading-snug mb-1.5 line-clamp-2 min-h-[34px]">' + p.name + '</h4>' +
+            '<div class="flex items-baseline gap-0.5 mb-2">' +
+              '<span class="text-xs text-al-orange font-medium">¥</span>' +
+              '<span class="text-2xl font-black text-al-orange font-mono leading-none">' + p.price + '</span>' +
+            '</div>' +
+            '<p class="text-[10px] text-al-gray leading-relaxed mb-1.5 line-clamp-2 min-h-[28px]">' + p.desc + '</p>' +
+            '<p class="text-[10px] text-al-gray font-medium pt-1.5 border-t border-al-border">' +
+              (p.tag === 'STD' ? '尊享全部特权' : p.tag === 'BASIC' ? '基础报价权益' : '基础报价权益') +
+              '（' + (p.days >= 365 ? Math.round(p.days/30) + ' 个月' : p.days + ' 天') + '）' +
+            '</p>' +
+          '</div>'
+        );
+      }).join('');
+      updatePayBtn();
+    }
+
+    /* ========== 切换套餐 ========== */
+    function selectPkg(id) {
+      selectedPkgId = id;
+      renderPackages();
+    }
+
+    /* ========== 更新支付按钮 ========== */
+    function updatePayBtn() {
+      const pkg = window._AL_getPackage(selectedPkgId);
+      if (pkg) {
+        document.getElementById('payAmount').textContent = pkg.price;
+      }
+    }
+
+    /* ========== 去支付 ========== */
+    function onPay() {
+      const u = window._AL_USER || {};
+      if (!u.isLoggedIn) {
+        _AL_toast && _AL_toast('请先登录', 1500);
+        setTimeout(function () {
+          location.href = 'login.html?return=vip-center.html';
+        }, 800);
+        return;
+      }
+      const pkg = window._AL_getPackage(selectedPkgId);
+      if (!pkg) return;
+      // 透传 return，让支付成功回到原页（而不是只回到 vip-center）
+      const retTail = safeHtml(urlReturn)
+        ? '&return=' + encodeURIComponent(urlReturn)
+        : '';
+      if (window._AL_navigate) {
+        window._AL_navigate('wechat-pay.html?pkg=' + pkg.id + retTail);
+      } else {
+        location.href = 'wechat-pay.html?pkg=' + pkg.id + retTail;
+      }
+    }
+
+    /* ========== 返回 ========== */
+    function goBack() {
+      if (document.referrer && document.referrer.indexOf(location.host) !== -1) {
+        history.back();
+      } else {
+        if (window._AL_navigate) window._AL_navigate('index.html');
+        else location.href = 'index.html';
+      }
+    }
+
+    /* ========== 初始化 ========== */
+    renderUserInfo();
+    renderPackages();
+  </script>
+
+</body>
+</html>

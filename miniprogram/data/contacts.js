@@ -40,9 +40,16 @@
     { id: 'c3', cat: 'contactor', model: '【老款】CJX2-9511', brand: '正泰', spec: 'AC380V 95A 工厂库存', silver: '9.0g', price: '215.88', stock: '现货', tag: '老款高银',
       img: '/【老款】CJX2-9511.jpg',
       desc: '正泰老款 CJX2-9511 工厂库存版本，含银量更高（9.0g），触点厚实、线圈铜质好，回收价最可观。' },
-    { id: 'c4', cat: 'contactor', model: '【老款】CJX2-8011', brand: '正泰', spec: 'AC380V 80A 老款', silver: '6.0g', price: '160.00', stock: '现货', tag: '老款',
+    { id: 'c4', cat: 'contactor', model: '【老款】CJX2-8011', brand: '正泰', spec: 'AC380V 80A 老款', silver: '12.5g', price: '160.00', stock: '现货', tag: '老款',
       img: '/【老款】CJX2-8011 .jpg',
-      desc: '正泰老款 CJX2-8011 交流接触器，AC380V/80A，老款经典规格，常见于大功率电机启停柜。' },
+      desc: '正泰老款 CJX2-8011 交流接触器，AC380V/80A，老款经典规格，常见于大功率电机启停柜。',
+      // 参照图片手工填的精确数据，覆盖 enrichProduct 自动推算
+      silverCopperPrice: '1395.64',
+      unitWeight: [
+        { name: '出白银',   weight: '12.5000', purity: '76.00%', value: '149.15' },
+        { name: '出烤点铜', weight: '0.0970',  purity: '50.00%', value: '4.37' },
+        { name: '出漆包铜', weight: '0.0900',  purity: '90.00%', value: '6.48' }
+      ] },
     { id: 'c5', cat: 'contactor', model: '【新款22年以后】CJX2-...', brand: '正泰', spec: '2022 年后新款系列', silver: '5.5g', price: '97.89', stock: '现货', tag: '22款',
       img: '/【新款22年以后】CJX2-... .jpg',
       desc: '正泰 2022 年以后新款接触器，新工艺、新结构，触点含银量相对减少，更适合自动化设备大批量采购。' },
@@ -189,6 +196,29 @@
   const byId = new Map();
   existing.forEach(p => byId.set(p.id, p));
   PRODUCTS.forEach(p => byId.set(p.id, p));
+
+  // 自动补全：银点铜回收价 / 单位重量（每件产品的拆解材料组分表）
+  //   - 已有 silverCopperPrice / unitWeight 的产品（c4 参照图片）跳过
+  //   - 否则根据 silver 含银量推算，确保所有产品都有完整的核心参数
+  function enrichProduct(p) {
+    if (p.silverCopperPrice && Array.isArray(p.unitWeight) && p.unitWeight.length) return p;
+    const silverG = parseFloat(p.silver) || 0;
+    // 银点铜回收价（元/公斤）：银含量越高 → 单价越高
+    //   公式：base = silverG * 100 + 600
+    p.silverCopperPrice = (silverG * 100 + 600).toFixed(2);
+    // 单位重量表：每件产品的拆解材料组分（重量 g / 纯度 / 估算价值 ¥）
+    //   数据参照图片版（c4 12.5g 出白银，0.0970 烤点铜，0.0900 漆包铜）的真实比例
+    const silverUnit   = silverG;                     // 出白银
+    const copperKaodian = silverUnit * 0.0078;        // 出烤点铜
+    const copperQibao   = silverUnit * 0.0072;        // 出漆包铜
+    p.unitWeight = [
+      { name: '出白银',   weight: silverUnit.toFixed(4),          purity: '76.00%', value: (silverUnit   * 11.93).toFixed(2) },
+      { name: '出烤点铜', weight: copperKaodian.toFixed(4),       purity: '50.00%', value: (copperKaodian * 45.00).toFixed(2) },
+      { name: '出漆包铜', weight: copperQibao.toFixed(4),         purity: '90.00%', value: (copperQibao   * 72.00).toFixed(2) }
+    ];
+    return p;
+  }
+  byId.forEach((p, id) => byId.set(id, enrichProduct(p)));
   window._AL_PRODUCTS = Array.from(byId.values());
 
   // 工具方法：按 id 取单品

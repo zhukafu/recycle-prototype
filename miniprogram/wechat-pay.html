@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>微信支付 - 铝老板金属网</title>
+  <link href="/lib/fonts/fonts-mp-main.css" rel="stylesheet">
+  <link rel="stylesheet" href="/lib/font-awesome/6.4.0/css/all.min.css">
+  <script src="/lib/tailwind/tailwind.js"></script>
+  <script src="/data/site-config.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'al-green':       '#10B981',
+            'al-green-dark':  '#059669',
+            'al-green-light': '#D1FAE5',
+            'al-orange':      '#F97316',
+            'al-orange-dark': '#EA580C',
+            'al-orange-light':'#FFEDD5',
+            'al-dark':        '#1F2937',
+            'al-gray':        '#6B7280',
+            'al-gray-light':  '#F3F4F6',
+            'al-border':      '#E5E7EB',
+            'al-gold':        '#D97706',
+            'al-gold-light':  '#FEF3C7',
+          },
+          fontFamily: {
+            sans: ['Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft':  '0 2px 16px rgba(0,0,0,0.06)',
+            'card':  '0 4px 20px rgba(0,0,0,0.08)',
+            'float': '0 8px 32px rgba(0,0,0,0.12)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Noto Sans SC', sans-serif; -webkit-font-smoothing: antialiased; background: #888; overflow: hidden; }
+    .pay-green { background: #07C160; }
+    .pay-green:active { background: #06AD56; }
+    .modal-shadow { box-shadow: 0 -8px 32px rgba(0,0,0,0.18); }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .slide-up { animation: slideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+    .overlay-in { animation: overlayIn 0.3s ease-out forwards; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 0.8s linear infinite; }
+    @keyframes fadeOut { to { opacity: 0; } }
+    .fade-out { animation: fadeOut 0.3s ease-out forwards; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- 半透明遮罩 -->
+  <div id="overlay" class="fixed inset-0 z-40 bg-black/40 overlay-in"></div>
+
+  <!-- 支付弹层 -->
+  <div class="fixed inset-x-0 bottom-0 z-50 slide-up">
+    <div class="bg-white rounded-t-3xl modal-shadow overflow-hidden">
+
+      <!-- 顶部操作栏 -->
+      <header class="flex items-center justify-between px-5 pt-4 pb-2">
+        <button onclick="closePay()" aria-label="关闭" class="w-8 h-8 flex items-center justify-center -ml-2 rounded-full active:bg-al-gray-light">
+          <i class="fas fa-times text-al-dark text-lg"></i>
+        </button>
+        <button onclick="usePassword()" class="text-sm text-al-blue font-medium">使用密码</button>
+      </header>
+
+      <!-- 商品信息 -->
+      <section class="px-5 pb-4 text-center">
+        <p class="text-sm text-al-gray mb-2" id="merchantName">铝老板金属网</p>
+        <div class="flex items-baseline justify-center gap-1">
+          <span class="text-base text-al-dark font-medium">¥</span>
+          <span id="payPrice" class="text-4xl font-black text-al-dark font-mono">6.60</span>
+        </div>
+      </section>
+
+      <div class="h-px bg-al-border"></div>
+
+      <!-- 付款方式 -->
+      <section class="px-5 py-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-bold text-al-dark">付款方式</h3>
+          <button class="text-xs text-al-blue font-medium flex items-center gap-0.5">
+            更改
+            <i class="fas fa-chevron-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- 零钱（默认选中） -->
+        <label class="flex items-center gap-3 py-2.5 cursor-pointer">
+          <input type="radio" name="payMethod" value="balance" checked class="w-4 h-4 accent-al-green">
+          <div class="w-7 h-7 rounded-full bg-al-gold-light flex items-center justify-center shrink-0">
+            <i class="fas fa-coins text-al-gold text-sm"></i>
+          </div>
+          <span class="flex-1 text-sm text-al-dark font-medium">零钱</span>
+          <span id="balanceHint" class="text-xs text-al-gray">余额 ¥<span id="balanceVal">328.50</span></span>
+        </label>
+
+        <!-- 银行卡优惠 -->
+        <label class="flex items-center gap-3 py-2.5 cursor-pointer mt-1">
+          <input type="radio" name="payMethod" value="card" class="w-4 h-4 accent-al-green">
+          <div class="w-7 h-7 rounded-full bg-al-blue-light flex items-center justify-center shrink-0">
+            <i class="fas fa-credit-card text-al-blue text-sm"></i>
+          </div>
+          <span class="flex-1 text-sm text-al-dark">使用南京银行储蓄卡(4434) 优惠 5 元</span>
+          <span class="text-xs text-al-blue font-medium">使用</span>
+        </label>
+      </section>
+
+      <div class="h-px bg-al-border"></div>
+
+      <!-- 支付按钮 -->
+      <section class="px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+        <button id="payBtn" onclick="confirmPay()"
+                class="w-full h-12 pay-green text-white text-base font-bold rounded-xl active:scale-[0.98] transition flex items-center justify-center gap-2">
+          支付
+        </button>
+        <p class="text-[10px] text-al-gray text-center mt-2 leading-relaxed">
+          支付即视为同意
+          <a href="javascript:void(0)" class="text-al-blue">《会员服务协议》</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- 支付中遮罩 -->
+  <div id="payingMask" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl p-6 flex flex-col items-center gap-3 shadow-float">
+      <div class="w-10 h-10 border-4 border-al-gray-light border-t-al-green rounded-full spin"></div>
+      <p class="text-sm text-al-dark font-medium">支付中...</p>
+    </div>
+  </div>
+
+  <script>
+    /* ========== 守卫：未登录跳 login（site-config.js 已在 <head> 中加载） ========== */
+    if (!window._AL_USER || !window._AL_USER.isLoggedIn) {
+      location.replace('login.html?return=' + encodeURIComponent(location.pathname + location.search));
+    }
+
+    /* ========== URL 参数解析 ========== */
+  const urlParams = new URLSearchParams(location.search);
+  const pkgId  = urlParams.get('pkg') || 'trial';
+  const pkgRet = urlParams.get('return');  // 来源页地址，支付完成后回跳
+  const pkg    = window._AL_getPackage(pkgId);
+
+    /* ========== 渲染金额 + 商品名 ========== */
+    if (pkg) {
+      document.getElementById('payPrice').textContent = pkg.price;
+      document.getElementById('merchantName').textContent = '铝老板金属网 · ' + pkg.name;
+    }
+
+    /* ========== 关闭 ========== */
+    function closePay() {
+      // 触发整体淡出
+      const overlay = document.getElementById('overlay');
+      const modal = document.querySelector('.fixed.inset-x-0.bottom-0');
+      if (modal) modal.style.animation = 'slideUp 0.3s reverse forwards';
+      overlay.classList.add('fade-out');
+      setTimeout(function () {
+        history.back();
+      }, 280);
+    }
+
+    /* ========== 使用密码（mock：直接走 confirmPay） ========== */
+    function usePassword() {
+      _AL_toast && _AL_toast('使用密码支付（演示版直接走快捷支付）', 1200);
+    }
+
+    /* ========== 确认支付 ========== */
+    let payStarted = false;
+    function confirmPay() {
+      if (payStarted) return;
+      payStarted = true;
+      if (!pkg) {
+        _AL_toast && _AL_toast('套餐信息错误', 1500);
+        return;
+      }
+      const btn = document.getElementById('payBtn');
+      const mask = document.getElementById('payingMask');
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+      mask.classList.remove('hidden');
+      mask.classList.add('flex');
+
+      // mock 网络延迟
+      setTimeout(function () {
+        mask.classList.add('hidden');
+        mask.classList.remove('flex');
+        // 写入会员状态
+        const u = window._AL_USER;
+        u.isMember          = true;
+        u.memberPackage     = pkg.id;
+        u.memberPackageName = pkg.name;
+        u.memberExpireAt    = pkg.days >= 365
+          ? Date.now() + pkg.days * 24 * 60 * 60 * 1000
+          : Date.now() + pkg.days * 24 * 60 * 60 * 1000;
+        window._AL_saveProfile();
+        // 跳回 vip-center，触发成功提示；透传 return，让 vip-center 在订阅成功后再回到原页
+        const retTail = /^[a-zA-Z0-9_./-]+\.html(\?.*)?$/.test(pkgRet)
+          ? '&return=' + encodeURIComponent(pkgRet)
+          : '';
+        if (window._AL_navigate) {
+          window._AL_navigate('vip-center.html?paid=1&pkg=' + pkg.id + retTail);
+        } else {
+          location.href = 'vip-center.html?paid=1&pkg=' + pkg.id + retTail;
+        }
+      }, 1800);
+    }
+
+    /* ========== 切换支付方式时，更新余额显示 ========== */
+    document.querySelectorAll('input[name="payMethod"]').forEach(el => {
+      el.addEventListener('change', function () {
+        const hint = document.getElementById('balanceHint');
+        if (this.value === 'card') {
+          // 用银行卡：应付金额 - 5
+          const priceNum = parseFloat(pkg ? pkg.price : 0);
+          const newPrice = Math.max(0, priceNum - 5);
+          document.getElementById('payPrice').textContent = newPrice.toFixed(2);
+          hint.innerHTML = '<span class="text-al-blue font-medium">已减 5 元</span>';
+        } else {
+          document.getElementById('payPrice').textContent = pkg ? pkg.price : '0.00';
+          hint.innerHTML = '余额 ¥<span id="balanceVal">328.50</span>';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

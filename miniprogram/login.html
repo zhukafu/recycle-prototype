@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>登录 - 铝老板金属网</title>
+  <link href="/lib/fonts/fonts-mp-main.css" rel="stylesheet">
+  <link rel="stylesheet" href="/lib/font-awesome/6.4.0/css/all.min.css">
+  <script src="/lib/tailwind/tailwind.js"></script>
+  <script src="/data/site-config.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'al-green':       '#10B981',
+            'al-green-dark':  '#059669',
+            'al-green-light': '#D1FAE5',
+            'al-orange':      '#F97316',
+            'al-orange-dark': '#EA580C',
+            'al-orange-light':'#FFEDD5',
+            'al-dark':        '#1F2937',
+            'al-gray':        '#6B7280',
+            'al-gray-light':  '#F3F4F6',
+            'al-border':      '#E5E7EB',
+            'al-blue':        '#3B82F6',
+            'al-blue-light':  '#DBEAFE',
+          },
+          fontFamily: {
+            sans: ['Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft':  '0 2px 16px rgba(0,0,0,0.06)',
+            'card':  '0 4px 20px rgba(0,0,0,0.08)',
+            'float': '0 8px 32px rgba(0,0,0,0.12)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Noto Sans SC', sans-serif; -webkit-font-smoothing: antialiased; background: #F8FAFC; }
+    .gradient-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+    .gradient-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+    .gradient-gold { background: linear-gradient(135deg, #FCD34D 0%, #D97706 50%, #92400E 100%); }
+    .input-focus:focus { border-color: #10B981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+  </style>
+</head>
+<body class="bg-al-gray-light min-h-screen">
+
+  <!-- 顶部导航 -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-al-border/50">
+    <div class="flex items-center h-12 px-4">
+      <button onclick="goBack()" aria-label="返回"
+              class="w-10 h-10 flex items-center justify-center -ml-2 rounded-full active:bg-al-gray-light transition">
+        <svg class="w-5 h-5 text-al-dark" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="flex-1 text-center text-base font-bold text-al-dark">登录 / 注册</h1>
+      <!-- 右上角操作按钮（由 page-actions 组件注入：3 点菜单 + 头像入口） -->
+      <div id="page-actions" class="-mr-2"></div>
+    </div>
+  </nav>
+
+  <main class="pt-12 pb-20 px-4">
+
+    <!-- 品牌头部 -->
+    <section class="pt-10 pb-6 text-center fade-in">
+      <div class="inline-flex items-center justify-center w-20 h-20 gradient-green rounded-3xl shadow-card mb-4">
+        <span class="text-3xl font-black text-white">铝</span>
+      </div>
+      <h2 class="text-2xl font-black text-al-dark mb-1">铝老板金属网</h2>
+      <p class="text-sm text-al-gray">含银废料 · 贵金属回收 · 行情报价</p>
+    </section>
+
+    <!-- 登录表单 -->
+    <section class="bg-white rounded-2xl shadow-soft p-5 mb-4 fade-in" style="animation-delay:.05s">
+      <h3 class="text-base font-bold text-al-dark mb-4 flex items-center gap-1.5">
+        <span class="w-1 h-3.5 bg-al-green rounded-full"></span>
+        用户信息
+      </h3>
+
+      <!-- 头像选择 -->
+      <div class="mb-4">
+        <label class="text-xs text-al-gray mb-2 block">点击更换头像</label>
+        <div class="flex items-center gap-4">
+          <label for="avatarInput" class="relative cursor-pointer group">
+            <div id="avatarPreview" class="w-16 h-16 rounded-full bg-al-green-light flex items-center justify-center overflow-hidden border-2 border-al-border group-hover:border-al-green transition">
+              <i class="fas fa-user text-2xl text-al-gray"></i>
+            </div>
+            <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-al-green rounded-full flex items-center justify-center border-2 border-white">
+              <i class="fas fa-camera text-[10px] text-white"></i>
+            </div>
+            <input id="avatarInput" type="file" accept="image/*" class="hidden" onchange="onAvatarChange(event)">
+          </label>
+          <div class="flex-1">
+            <p class="text-[13px] text-al-dark font-medium">上传您的头像</p>
+            <p class="text-[11px] text-al-gray mt-0.5">支持 JPG/PNG，建议 200×200 以上</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 昵称输入 -->
+      <div class="mb-4">
+        <label for="nicknameInput" class="text-xs text-al-gray mb-2 block">昵称 <span class="text-al-orange">*</span></label>
+        <input id="nicknameInput" type="text" maxlength="20" placeholder="请输入您的昵称"
+               class="w-full h-11 px-4 rounded-xl border border-al-border text-sm text-al-dark placeholder-al-gray input-focus transition outline-none">
+        <p class="text-[11px] text-al-gray mt-1">最多 20 个字符</p>
+      </div>
+
+      <!-- 手机号（可选） -->
+      <div class="mb-2">
+        <label for="phoneInput" class="text-xs text-al-gray mb-2 block">手机号（选填）</label>
+        <input id="phoneInput" type="tel" inputmode="numeric" maxlength="11" placeholder="便于联系，不强制填写"
+               class="w-full h-11 px-4 rounded-xl border border-al-border text-sm text-al-dark placeholder-al-gray input-focus transition outline-none">
+      </div>
+    </section>
+
+    <!-- 服务协议 -->
+    <label class="flex items-start gap-2 mb-6 px-1 cursor-pointer">
+      <input id="agreeCheck" type="checkbox" checked class="mt-0.5 w-4 h-4 accent-al-green shrink-0">
+      <span class="text-[12px] text-al-gray leading-relaxed">
+        我已阅读并同意
+        <a href="javascript:void(0)" onclick="showAgreement('user')" class="text-al-green font-medium">《用户协议》</a>
+        和
+        <a href="javascript:void(0)" onclick="showAgreement('privacy')" class="text-al-green font-medium">《隐私政策》</a>
+      </span>
+    </label>
+
+    <!-- 提交按钮 -->
+    <button id="submitBtn" onclick="onSubmit()"
+            class="w-full h-12 gradient-green text-white text-base font-bold rounded-2xl shadow-card active:scale-[0.98] transition disabled:opacity-50 disabled:cursor-not-allowed">
+      提交注册
+    </button>
+
+    <!-- 一键登录（mock） -->
+    <button onclick="onMockLogin()"
+            class="w-full h-12 mt-3 bg-white border border-al-border text-al-dark text-sm font-medium rounded-2xl active:scale-[0.98] active:bg-al-gray-light transition flex items-center justify-center gap-2">
+      <i class="fab fa-weixin text-al-green text-lg"></i>
+      微信一键登录（体验）
+    </button>
+
+    <p class="text-[11px] text-al-gray text-center mt-4 leading-relaxed">
+      登录即视为同意铝老板金属网<br>为回收从业者提供专业的行情与工具服务
+    </p>
+  </main>
+
+  <!-- 协议弹层 -->
+  <div id="agreementModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-5" onclick="if(event.target===this)closeAgreement()">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-md max-h-[80vh] bg-white rounded-2xl overflow-hidden flex flex-col">
+      <header class="flex items-center justify-between px-5 py-4 border-b border-al-border">
+        <h3 id="agreementTitle" class="text-base font-bold text-al-dark">用户协议</h3>
+        <button onclick="closeAgreement()" class="w-8 h-8 flex items-center justify-center -mr-2 rounded-full active:bg-al-gray-light">
+          <i class="fas fa-times text-al-gray"></i>
+        </button>
+      </header>
+      <div id="agreementContent" class="flex-1 overflow-y-auto px-5 py-4 text-[13px] text-al-dark leading-relaxed space-y-3">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========== 智能路由：已登录用户直接跳走（避免重复看到登录页） ==========
+       URL 参数约定：
+         - return  最终返回页（如 product.html?id=c1 / article.html?id=42）
+         - target  意图页（如 vip-center.html，登录后先去订阅，再到 return）
+       决策表：
+         已登录 + 会员  + return    → return
+         已登录 + 会员  + 无 return → index.html
+         已登录 + 非会员 + target + return → target?return=<return>
+         已登录 + 非会员 + target   → target（默认订阅页）
+         已登录 + 非会员 + 无 target + return → return
+         已登录 + 非会员 + 无任何参数 → vip-center.html
+         未登录                       → 展示注册表单（onSubmit 处理）
+       循环防护：sessionStorage 单次会话闸门 + history.pushState 兜底，
+       避免「vip-center 返回 → login（自动跳 target）→ vip-center」的死循环。
+    */
+    (function autoRedirectLoggedIn() {
+      const params = new URLSearchParams(location.search);
+      const ret    = params.get('return');
+      const target = params.get('target');
+      const safeHtml = (s) => /^[a-zA-Z0-9_./-]+\.html(\?.*)?$/.test(s || '');
+
+      if (!window._AL_USER || !window._AL_USER.isLoggedIn) return; // 未登录：保留表单
+
+      // —— 循环防护 ①：sessionStorage 单次会话闸门 ——
+      // 本次会话内已经走过一次「已登录自动跳走」流程，则保留表单让用户主动操作
+      if (sessionStorage.getItem('_AL_loginAutoRedirected') === '1') {
+        return;
+      }
+
+      const isMember = !!(window._AL_canView && window._AL_canView('member'));
+
+      // 隐藏表单，避免已登录用户看到一闪
+      const formSections = document.querySelectorAll('main > section, main > label, main > button, main > p');
+      formSections.forEach(el => { el.style.visibility = 'hidden'; });
+
+      // 跳走前先打标记
+      sessionStorage.setItem('_AL_loginAutoRedirected', '1');
+
+      const go = (url) => {
+        if (window._AL_navigate) {
+          window._AL_navigate(url);
+        } else {
+          // —— 循环防护 ②：用 pushState 把当前 entry 替换为落地页，
+          // 这样即便外部历史栈仍带 target 参数，浏览器返回时也只回到 login 之前的页 ——
+          try { history.replaceState(null, '', url); } catch (e) {}
+          location.replace(url);
+        }
+      };
+
+      setTimeout(function () {
+        if (isMember) {
+          // 已是会员 → 直接回到 return
+          if (safeHtml(ret)) return go(ret);
+          return go('index.html');
+        }
+        // 非会员：先跳 target（带 return）做订阅
+        if (safeHtml(target)) {
+          const tail = safeHtml(ret) ? ('?return=' + encodeURIComponent(ret)) : '';
+          return go(target + tail);
+        }
+        if (safeHtml(ret)) return go(ret);
+        return go('vip-center.html');
+      }, 30);
+    })();
+  </script>
+  <script>
+    /* ========== 头像处理 ========== */
+    function onAvatarChange(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        _AL_toast && _AL_toast('图片不能超过 5MB', 1500);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const dataUrl = ev.target.result;
+        const preview = document.getElementById('avatarPreview');
+        preview.innerHTML = '<img src="' + dataUrl + '" class="w-full h-full object-cover">';
+        // 暂存到 data 属性
+        preview.dataset.src = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    /* ========== 提交注册 ========== */
+    function onSubmit() {
+      const btn = document.getElementById('submitBtn');
+      const nickname = (document.getElementById('nicknameInput').value || '').trim();
+      const phone    = (document.getElementById('phoneInput').value || '').trim();
+      const agree    = document.getElementById('agreeCheck').checked;
+      const avatar   = document.getElementById('avatarPreview').dataset.src || '';
+
+      if (!nickname) {
+        _AL_toast && _AL_toast('请输入昵称', 1500);
+        document.getElementById('nicknameInput').focus();
+        return;
+      }
+      if (nickname.length < 2) {
+        _AL_toast && _AL_toast('昵称至少 2 个字符', 1500);
+        return;
+      }
+      if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
+        _AL_toast && _AL_toast('手机号格式不正确', 1500);
+        document.getElementById('phoneInput').focus();
+        return;
+      }
+      if (!agree) {
+        _AL_toast && _AL_toast('请先同意用户协议和隐私政策', 1500);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '注册中…';
+
+      setTimeout(function () {
+        // 写用户态
+        window._AL_USER.isLoggedIn = true;
+        window._AL_USER.nickname   = nickname;
+        window._AL_USER.avatar     = avatar;
+        window._AL_USER.loginAt    = Date.now();
+        // 会员状态保持不变（可能之前开通过）
+        window._AL_saveProfile();
+        // 循环防护：注册成功后标记本会话已登录，避免「vip-center 返回 → login」再被 autoRedirect 拉回去
+        try { sessionStorage.setItem('_AL_loginAutoRedirected', '1'); } catch (e) {}
+        _AL_toast && _AL_toast('注册成功！正在进入会员中心…', 1500);
+
+        // 解析 URL：return = 最终返回页；target = 意图页（如订阅页）
+        const params = new URLSearchParams(location.search);
+        const ret    = params.get('return');
+        const target = params.get('target');
+        const safeHtml = (s) => /^[a-zA-Z0-9_./-]+\.html(\?.*)?$/.test(s || '');
+
+        const go = (url) => {
+          if (window._AL_navigate) window._AL_navigate(url);
+          else location.href = url;
+        };
+
+        setTimeout(function () {
+          // 1) 有 target：登录后先跳 target（带 return 透传），等订阅/业务流程走完再回 return
+          if (safeHtml(target)) {
+            const tail = safeHtml(ret) ? ('?return=' + encodeURIComponent(ret)) : '';
+            return go(target + tail);
+          }
+          // 2) 仅 return（如评论登录）：登录后直接回 return
+          if (safeHtml(ret)) return go(ret);
+          // 3) 兜底：vip-center.html
+          return go('vip-center.html');
+        }, 600);
+      }, 700);
+    }
+
+    /* ========== 一键登录（mock） ========== */
+    function onMockLogin() {
+      const mockNames = ['回收达人', '银触点老张', '金属小王', '佛山李老板', '环保先锋'];
+      const mockName  = mockNames[Math.floor(Math.random() * mockNames.length)];
+
+      document.getElementById('nicknameInput').value = mockName;
+      // 用 SVG 内联生成彩色头像作为 mock 头像
+      const colors = ['#10B981','#F97316','#3B82F6','#8B5CF6','#EC4899'];
+      const bg     = colors[Math.floor(Math.random() * colors.length)];
+      const initial = mockName.charAt(0);
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">' +
+        '<rect width="80" height="80" fill="' + bg + '"/>' +
+        '<text x="50%" y="55%" text-anchor="middle" font-size="36" font-weight="700" fill="white" font-family="sans-serif">' + initial + '</text>' +
+        '</svg>';
+      const svgDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+      const preview = document.getElementById('avatarPreview');
+      preview.innerHTML = '<img src="' + svgDataUrl + '" class="w-full h-full object-cover">';
+      preview.dataset.src = svgDataUrl;
+
+      _AL_toast && _AL_toast('已模拟生成头像和昵称，请点「提交注册」', 1800);
+    }
+
+    /* ========== 返回 ========== */
+    function goBack() {
+      if (document.referrer && document.referrer.indexOf(location.host) !== -1) {
+        history.back();
+      } else {
+        if (window._AL_navigate) window._AL_navigate('index.html');
+        else location.href = 'index.html';
+      }
+    }
+
+    /* ========== 协议弹层 ========== */
+    function showAgreement(type) {
+      const title = type === 'user' ? '用户协议' : '隐私政策';
+      const content = type === 'user' ? USER_AGREEMENT : PRIVACY_POLICY;
+      document.getElementById('agreementTitle').textContent = title;
+      document.getElementById('agreementContent').innerHTML = content;
+      document.getElementById('agreementModal').classList.remove('hidden');
+      document.getElementById('agreementModal').classList.add('flex');
+    }
+    function closeAgreement() {
+      document.getElementById('agreementModal').classList.add('hidden');
+      document.getElementById('agreementModal').classList.remove('flex');
+    }
+
+    const USER_AGREEMENT = `
+      <p>欢迎使用铝老板金属网（以下简称"本平台"）。在您注册成为本平台用户前，请仔细阅读以下条款：</p>
+      <h4 class="font-bold text-al-dark mt-3">一、服务内容</h4>
+      <p>本平台为含银废料、贵金属回收行业的从业者提供：实时行情报价、产品数据库、在线客服、行业资讯等服务。免费用户可浏览基础内容，开通会员后可查看完整回收价、含银量等敏感数据。</p>
+      <h4 class="font-bold text-al-dark mt-3">二、用户行为规范</h4>
+      <p>用户应遵守国家法律法规，不得利用本平台发布虚假信息、侵犯他人合法权益或从事任何违法活动。</p>
+      <h4 class="font-bold text-al-dark mt-3">三、账号管理</h4>
+      <p>用户应妥善保管账号信息，因账号被盗用或转借造成的损失由用户自行承担。</p>
+      <h4 class="font-bold text-al-dark mt-3">四、知识产权</h4>
+      <p>本平台所有内容（包括但不限于文字、图片、代码）的版权归本平台所有，未经许可不得转载。</p>
+    `;
+    const PRIVACY_POLICY = `
+      <p>本平台重视用户隐私，承诺按照本政策保护您的个人信息：</p>
+      <h4 class="font-bold text-al-dark mt-3">一、信息收集</h4>
+      <p>注册时收集：昵称、头像（可选）、手机号（选填）。使用过程中收集：浏览记录、设备信息（用于服务优化）。</p>
+      <h4 class="font-bold text-al-dark mt-3">二、信息使用</h4>
+      <p>收集的信息仅用于：账号识别、服务推送、客服联系。不会用于商业广告投放。</p>
+      <h4 class="font-bold text-al-dark mt-3">三、信息共享</h4>
+      <p>除法律法规要求外，不会向任何第三方共享您的个人信息。</p>
+      <h4 class="font-bold text-al-dark mt-3">四、信息存储</h4>
+      <p>用户信息存储于本地浏览器（localStorage / sessionStorage），不会上传至服务器。您可随时清除浏览器数据以删除账号信息。</p>
+    `;
+  </script>
+
+  <!-- 挂载顶部右侧操作按钮组件（3点菜单 + 头像入口），与全站其他页面保持一致 -->
+  <script type="module">
+    import { mountPageActions } from '/src/components/page-actions.js';
+    mountPageActions('#page-actions', {
+      onMenu: () => console.log('[login] menu clicked'),
+      onAvatar: () => console.log('[login] avatar clicked'),
+    });
+  </script>
+
+</body>
+</html>

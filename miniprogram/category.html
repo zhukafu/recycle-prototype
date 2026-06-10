@@ -8,6 +8,7 @@
     <link href="/lib/fonts/fonts-mp-category.css" rel="stylesheet">
     <link rel="stylesheet" href="/lib/font-awesome/6.5.1/css/all.min.css">
     <script src="/data/contacts.js"></script>
+    <script src="/data/site-config.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -23,7 +24,11 @@
                             border: '#E2E8F0',
                             muted: '#94A3B8',
                             ink: '#1E293B'
-                        }
+                        },
+                        // 同步 contactors.html 的 al-* 调色板，确保 _AL_lockBadge 全站样式一致
+                        'al-orange': '#F97316',
+                        'al-orange-dark': '#EA580C',
+                        'al-orange-light': '#FFEDD5'
                     },
                     fontFamily: {
                         sans: ['DM Sans', 'Noto Sans SC', 'system-ui', 'sans-serif'],
@@ -274,10 +279,19 @@
             const catLabel = (window._AL_CAT_LABEL || {})[it.cat] || '产品';
             const hasPrice = it.price && it.price !== '';
             const isMember = it.stock === '会员';
-            const priceCls = isMember ? 'text-brand-orange' : 'text-brand-green';
-            const priceHtml = hasPrice
-              ? `<span class="text-xs ${priceCls} font-medium">¥</span><span class="text-xl font-bold ${priceCls} price-pulse font-mono tracking-tight">${it.price}</span>`
-              : `<span class="text-xs ${priceCls} font-medium">¥</span><span class="text-xl font-bold ${priceCls} font-mono tracking-tight">${isMember ? '会员查看' : '询价'}</span>`;
+            // 未登录 / 未会员 → 价格敏感数据全部隐藏
+            const canViewMember = (window._AL_canView && window._AL_canView('member'));
+            let priceHtml;
+            if (canViewMember) {
+              const priceCls = isMember ? 'text-brand-orange' : 'text-brand-green';
+              priceHtml = hasPrice
+                ? `<span class="text-xs ${priceCls} font-medium">¥</span><span class="text-xl font-bold ${priceCls} price-pulse font-mono tracking-tight">${it.price}</span>`
+                : `<span class="text-xs ${priceCls} font-medium">¥</span><span class="text-xl font-bold ${priceCls} font-mono tracking-tight">${isMember ? '会员查看' : '询价'}</span>`;
+            } else {
+              // 脱敏：显示统一的开通会员徽章（sm 尺寸）
+              priceHtml = (window._AL_lockBadge && window._AL_lockBadge('开通会员查看', 'sm')) ||
+                `<span class="text-sm text-brand-orange font-medium">🔒 开通会员</span>`;
+            }
             return `
               <a href="product.html?id=${it.id}" aria-label="查看 ${it.model} 详情" class="block no-underline product-card bg-white rounded-xl card-shadow p-3 flex gap-3 active:bg-gray-50 active:scale-[0.99] transition-transform" style="animation: slideUp 0.35s ${Math.min(idx * 0.04, 0.3)}s ease-out backwards">
                 <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
