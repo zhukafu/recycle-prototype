@@ -277,21 +277,12 @@
           listEl.innerHTML = filtered.map((it, idx) => {
             const imgUrl = it.img || (window._AL_CAT_IMG || {})[it.cat] || '';
             const catLabel = (window._AL_CAT_LABEL || {})[it.cat] || '产品';
-            const hasPrice = it.price && it.price !== '';
-            const isMember = it.stock === '会员';
-            // 未登录 / 未会员 → 价格敏感数据全部隐藏
-            const canViewMember = (window._AL_canView && window._AL_canView('member'));
-            let priceHtml;
-            if (canViewMember) {
-              const priceCls = 'text-brand-orange';
-              priceHtml = hasPrice
-                ? `<span class="text-xs ${priceCls} font-medium">¥</span><span class="text-xl font-bold ${priceCls} price-pulse font-mono tracking-tight">${it.price}</span>`
-                : `<span class="text-xs ${priceCls} font-medium">¥</span><span class="text-xl font-bold ${priceCls} font-mono tracking-tight">${isMember ? '会员查看' : '询价'}</span>`;
-            } else {
-              // 脱敏：显示统一的开通会员徽章（sm 尺寸）
-              priceHtml = (window._AL_lockBadge && window._AL_lockBadge('开通会员查看', 'sm')) ||
-                `<span class="text-sm text-brand-orange font-medium">🔒 开通会员</span>`;
-            }
+            // 分类列表只展示回收参考价；无可用价格时回退到会员提示。
+            const displayPrice = it.price || it.silverCopperPrice || '';
+            const priceHtml = displayPrice
+              ? `<span class="text-xs text-brand-orange font-medium">¥</span><span class="text-xl font-bold text-brand-orange price-pulse font-mono tracking-tight">${displayPrice}</span>`
+              : ((window._AL_lockBadge && window._AL_lockBadge('开通会员查看', 'sm')) ||
+                `<span class="text-sm text-brand-orange font-medium">开通会员查看</span>`);
             return `
               <a href="product.html?id=${it.id}" aria-label="查看 ${it.model} 详情" class="block no-underline product-card bg-white rounded-xl card-shadow p-3 flex gap-3 active:bg-gray-50 active:scale-[0.99] transition-transform" style="animation: slideUp 0.35s ${Math.min(idx * 0.04, 0.3)}s ease-out backwards">
                 <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
