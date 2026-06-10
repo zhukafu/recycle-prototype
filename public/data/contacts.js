@@ -61,7 +61,7 @@
       silverCopperPrice: '118.50',
       unitWeight: [{name:'银触点',weight:'7.0g',purity:'82%',value:'39.20'},{name:'铜线圈',weight:'145g',purity:'99%',value:'10.73'},{name:'铜排',weight:'32g',purity:'98%',value:'2.37'}],
       desc: '正泰 2022 年以前老款接触器，含银量较高，是回收商重点关注的对象，市场流通量大。' },
-    { id: 'c7', cat: 'contactor', model: '【铁底座】CJX2-5011', brand: '正泰', spec: 'AC380V 50A 铁底座', silver: '4.0g', price: '', stock: '询价', tag: '铁底座',
+    { id: 'c7', cat: 'contactor', model: '【铁底座】CJX2-5011', brand: '正泰', spec: 'AC380V 50A 铁底座', silver: '4.0g', price: '85.00', stock: '现货', tag: '铁底座',
       img: '/【铁底座】CJX2-5011 .jpg',
       silverCopperPrice: '82.50',
       unitWeight: [{name:'银触点',weight:'4.0g',purity:'80%',value:'22.40'},{name:'铜线圈',weight:'95g',purity:'99%',value:'7.03'},{name:'铜排',weight:'22g',purity:'98%',value:'1.63'}],

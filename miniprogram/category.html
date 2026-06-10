@@ -283,7 +283,7 @@
             const canViewMember = (window._AL_canView && window._AL_canView('member'));
             let priceHtml;
             if (canViewMember) {
-              const priceCls = isMember ? 'text-brand-orange' : 'text-brand-green';
+              const priceCls = 'text-brand-orange';
               priceHtml = hasPrice
                 ? `<span class="text-xs ${priceCls} font-medium">¥</span><span class="text-xl font-bold ${priceCls} price-pulse font-mono tracking-tight">${it.price}</span>`
                 : `<span class="text-xs ${priceCls} font-medium">¥</span><span class="text-xl font-bold ${priceCls} font-mono tracking-tight">${isMember ? '会员查看' : '询价'}</span>`;
