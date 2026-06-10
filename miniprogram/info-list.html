@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>资讯 - 铝老板金属网</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="data/articles.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            green: '#10B981',
+                            'green-dark': '#059669',
+                            'green-light': '#D1FAE5',
+                            orange: '#F97316',
+                            'orange-light': '#FFF7ED',
+                            surface: '#F8FAFC',
+                            border: '#E2E8F0',
+                            muted: '#94A3B8',
+                            ink: '#1E293B',
+                            'ink-light': '#64748B',
+                            'gray-light': '#F1F5F9'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'Noto Sans SC', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', 'Noto Sans SC', system-ui, sans-serif;
+            background: #F8FAFC;
+            overscroll-behavior-y: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+    </style>
+</head>
+<body class="bg-brand-surface min-h-screen pb-20">
+
+    <!-- 顶部导航 -->
+    <nav class="sticky top-0 z-50 glass border-b border-gray-100">
+        <div class="grid grid-cols-3 items-center px-4 h-11">
+            <button onclick="history.back()" aria-label="返回" class="w-9 h-9 -ml-2 flex items-center justify-center rounded-full hover:bg-gray-100 active:scale-90 transition-transform">
+                <svg class="w-5 h-5 text-brand-ink" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <h1 id="pageTitle" class="text-lg font-semibold text-brand-ink text-center">行业资讯</h1>
+            <div class="justify-self-end" id="page-actions"></div>
+        </div>
+        <!-- 排序筛选 -->
+        <div class="px-4 pb-3 pt-1 flex items-center gap-2 overflow-x-auto hide-scrollbar" data-sort-tabs>
+            <button data-sort="latest" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-green text-white shadow-sm shadow-brand-green/20 whitespace-nowrap flex-shrink-0">最新</button>
+            <button data-sort="hot" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-brand-ink-light bg-white border border-gray-100 whitespace-nowrap flex-shrink-0">最热</button>
+            <button data-sort="recommend" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-brand-ink-light bg-white border border-gray-100 whitespace-nowrap flex-shrink-0">推荐</button>
+        </div>
+    </nav>
+
+    <!-- 列表 -->
+    <main id="list" class="px-4 pt-3 space-y-2.5"></main>
+
+    <!-- 加载更多占位 -->
+    <div id="loadingMore" class="text-center text-xs text-brand-ink-light py-4 hidden">
+        <i class="fas fa-spinner fa-spin mr-1"></i> 加载中...
+    </div>
+    <div id="endHint" class="text-center text-xs text-brand-muted py-6 hidden">— 没有更多了 —</div>
+
+    <script>
+      (function () {
+        const params = new URLSearchParams(location.search);
+        const cat = params.get('type') === 'knowledge' ? 'knowledge' : 'news';
+        const articles = (window._AL_ARTICLES.getList(cat) || []).slice();
+
+        // 设置标题
+        document.getElementById('pageTitle').textContent = cat === 'knowledge' ? '回收知识' : '行业资讯';
+        document.title = (cat === 'knowledge' ? '回收知识' : '行业资讯') + ' - 铝老板金属网';
+
+        // 排序
+        let sort = 'latest';
+        function applySort() {
+          if (sort === 'hot') return articles.slice().sort((a, b) => b.views - a.views);
+          if (sort === 'recommend') return articles.slice().sort((a, b) => b.likes - a.likes);
+          return articles.slice().sort((a, b) => b.date.localeCompare(a.date));
+        }
+
+        // 渲染单条
+        function renderItem(it, idx) {
+          const isFirst = idx === 0;
+          return `
+            <a href="info-detail.html?id=${it.id}" class="block bg-white rounded-2xl p-4 shadow-sm hover:shadow-md active:scale-[0.99] transition-all no-underline animate-slide-up" style="animation-delay: ${Math.min(idx * 0.04, 0.4)}s">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl ${cat === 'knowledge' ? 'bg-green-50' : 'bg-orange-50'} flex items-center justify-center flex-shrink-0">
+                  <i class="fas ${cat === 'knowledge' ? 'fa-book-open text-brand-green' : 'fa-newspaper text-brand-orange'} text-base"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5 mb-1">
+                    ${isFirst ? '<span class="text-[9px] bg-red-500 text-white px-1.5 py-0.5 rounded font-bold">HOT</span>' : ''}
+                    <span class="text-[9px] bg-gray-100 text-brand-ink-light px-1.5 py-0.5 rounded font-medium">${it.tag}</span>
+                  </div>
+                  <h3 class="text-[15px] font-bold text-brand-ink leading-snug line-clamp-2 mb-1">${it.title}</h3>
+                  <p class="text-[12px] text-brand-ink-light leading-relaxed line-clamp-2 mb-2">${it.summary}</p>
+                  <div class="flex items-center gap-3 text-[11px] text-brand-muted">
+                    <span><i class="far fa-user mr-0.5"></i>${it.author}</span>
+                    <span><i class="far fa-clock mr-0.5"></i>${it.date}</span>
+                    <span class="ml-auto flex items-center gap-2">
+                      <span><i class="far fa-eye mr-0.5"></i>${formatNum(it.views)}</span>
+                      <span><i class="far fa-comment mr-0.5"></i>${(window._AL_ARTICLES.getComments(it.id) || []).length}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          `;
+        }
+        function formatNum(n) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n; }
+
+        function render() {
+          const list = document.getElementById('list');
+          const data = applySort();
+          if (!data.length) {
+            list.innerHTML = '<div class="text-center py-16 text-brand-muted text-sm">暂无内容</div>';
+            return;
+          }
+          list.innerHTML = data.map(renderItem).join('');
+        }
+
+        // 排序切换
+        document.querySelectorAll('[data-sort]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            sort = btn.getAttribute('data-sort');
+            document.querySelectorAll('[data-sort]').forEach(b => {
+              if (b === btn) {
+                b.className = 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-green text-white shadow-sm shadow-brand-green/20 whitespace-nowrap flex-shrink-0';
+              } else {
+                b.className = 'px-3.5 py-1.5 rounded-full text-xs font-medium text-brand-ink-light bg-white border border-gray-100 whitespace-nowrap flex-shrink-0';
+              }
+            });
+            render();
+          });
+        });
+
+        // 首次渲染
+        render();
+      })();
+    </script>
+
+    <script type="module">
+        import { mountPageActions } from '/src/components/page-actions.js';
+        mountPageActions('#page-actions', {
+            onMenu: () => console.log('[info-list] menu clicked'),
+            onAvatar: () => location.href = 'mine.html',
+        });
+    </script>
+</body>
+</html>

@@ -40,6 +40,14 @@
     .gradient-red { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
     .gradient-teal { background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%); }
     .upload-dashed { border: 2px dashed #D1D5DB; }
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen pb-20">
@@ -84,17 +92,21 @@
       <div class="border-t border-dashed border-gray-200 my-4"></div>
 
       <!-- 图片上传 -->
-      <div class="flex items-center gap-4 mb-5">
-        <div class="upload-dashed w-24 h-24 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer hover:border-brand-green transition-colors">
-          <span class="text-3xl text-gray-300">+</span>
+      <div data-upload-area class="mb-5">
+        <!-- 大型拖拽 + 点击上传区（删除原方框和按钮） -->
+        <div data-upload-trigger class="upload-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-brand-green hover:bg-green-50/40 active:scale-[0.99] transition-all min-h-[120px]">
+          <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
+            <svg class="w-6 h-6 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"></path></svg>
+          </div>
+          <div class="text-center">
+            <p class="text-sm font-semibold text-brand-ink">点击或拖拽图片到此处上传</p>
+            <p class="text-[11px] text-brand-ink-light mt-1">支持 JPG、PNG 格式 · 单张 ≤ 5MB · 最多 6 张 · 可多选</p>
+          </div>
         </div>
-        <div class="flex-1">
-          <button class="px-5 py-2.5 border border-brand-green text-brand-green rounded-full text-sm font-medium flex items-center gap-2 hover:bg-brand-green hover:text-white transition-all">
-            <i class="fa-solid fa-plus text-xs"></i>
-            点击上传图片
-          </button>
-          <p class="text-xs text-brand-ink-light mt-2">支持 JPG、PNG 格式</p>
-        </div>
+        <!-- 隐藏的多选 file input（multiple 支持一次选多张） -->
+        <input data-file-input type="file" accept="image/*" multiple class="hidden">
+        <!-- 缩略图预览网格（4 列，更紧凑展示） -->
+        <div data-preview-grid class="hidden grid-cols-4 gap-2 mt-3"></div>
       </div>
 
       <!-- 重量填写标题 -->
@@ -128,13 +140,29 @@
         </div>
         <div>
           <label class="text-xs text-brand-ink-light mb-1 block">类型选择</label>
-          <div class="relative">
-            <select class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center appearance-none focus:outline-none focus:border-brand-green bg-transparent text-brand-ink-light">
-              <option>请选择</option>
-              <option>交流接触器</option>
-              <option>直流接触器</option>
-            </select>
-            <i class="fa-solid fa-chevron-down absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+          <!-- 卡片式单选选择器（替代原生 select） -->
+          <div class="grid grid-cols-3 gap-2" data-type-picker>
+            <label class="cursor-pointer">
+              <input type="radio" name="contactType" value="交流接触器" class="peer hidden">
+              <div class="peer-checked:border-brand-green peer-checked:bg-green-50 peer-checked:[&_.opt-icon]:bg-brand-green peer-checked:[&_.opt-icon]:text-white peer-checked:[&_.opt-label]:text-brand-green border-2 border-gray-200 rounded-xl py-2.5 flex flex-col items-center gap-1 hover:border-gray-300 active:scale-95 transition-all">
+                <div class="opt-icon w-7 h-7 rounded-lg bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-black transition-colors">交</div>
+                <span class="opt-label text-[11px] font-semibold text-gray-500 transition-colors">交流</span>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="contactType" value="直流接触器" class="peer hidden">
+              <div class="peer-checked:border-brand-orange peer-checked:bg-orange-50 peer-checked:[&_.opt-icon]:bg-brand-orange peer-checked:[&_.opt-icon]:text-white peer-checked:[&_.opt-label]:text-brand-orange border-2 border-gray-200 rounded-xl py-2.5 flex flex-col items-center gap-1 hover:border-gray-300 active:scale-95 transition-all">
+                <div class="opt-icon w-7 h-7 rounded-lg bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-black transition-colors">直</div>
+                <span class="opt-label text-[11px] font-semibold text-gray-500 transition-colors">直流</span>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="contactType" value="电容接触器" class="peer hidden">
+              <div class="peer-checked:border-brand-teal peer-checked:bg-teal-50 peer-checked:[&_.opt-icon]:bg-brand-teal peer-checked:[&_.opt-icon]:text-white peer-checked:[&_.opt-label]:text-brand-teal border-2 border-gray-200 rounded-xl py-2.5 flex flex-col items-center gap-1 hover:border-gray-300 active:scale-95 transition-all">
+                <div class="opt-icon w-7 h-7 rounded-lg bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-black transition-colors">容</div>
+                <span class="opt-label text-[11px] font-semibold text-gray-500 transition-colors">电容</span>
+              </div>
+            </label>
           </div>
         </div>
         <div class="col-span-3">
@@ -144,8 +172,42 @@
       </div>
 
       <!-- 提交按钮 -->
-      <button class="w-full h-14 gradient-green text-white rounded-full text-lg font-bold shadow-lg shadow-brand-green/30 active:scale-[0.98] transition-transform">
+      <button data-submit class="w-full h-14 gradient-green text-white rounded-full text-lg font-bold shadow-lg shadow-brand-green/30 active:scale-[0.98] transition-transform">
         提交信息审核后返现
+      </button>
+    </div>
+  </div>
+
+  <!-- 提交成功提示弹层 -->
+  <div data-success-modal class="fixed inset-0 z-[100] flex items-center justify-center px-6 hidden" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+    <!-- 遮罩 -->
+    <div data-modal-overlay class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <!-- 弹层卡片 -->
+    <div data-modal-card class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 text-center transform scale-90 opacity-0 transition-all duration-300">
+      <!-- 大对勾图标（带光晕动画） -->
+      <div class="relative w-20 h-20 mx-auto mb-4">
+        <div class="absolute inset-0 rounded-full bg-brand-green/20 animate-ping"></div>
+        <div class="absolute inset-0 rounded-full bg-brand-green/10"></div>
+        <div class="relative w-full h-full rounded-full gradient-green flex items-center justify-center shadow-lg shadow-brand-green/30">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" style="stroke-dasharray: 30; stroke-dashoffset: 30; animation: drawCheck 0.5s 0.15s ease-out forwards;" />
+          </svg>
+        </div>
+      </div>
+      <!-- 标题 -->
+      <h2 id="successTitle" class="text-xl font-bold text-brand-ink mb-1.5">提交成功</h2>
+      <p class="text-sm text-brand-ink-light leading-relaxed">我们将在 <span class="text-brand-green font-bold">1 个工作日</span> 内完成审核<br>审核结果会通过短信通知您</p>
+      <!-- 进度条 -->
+      <div class="mt-5 h-1 bg-gray-100 rounded-full overflow-hidden">
+        <div data-progress-bar class="h-full gradient-green rounded-full" style="width: 100%;"></div>
+      </div>
+      <!-- 倒计时文字 -->
+      <p class="text-xs text-brand-ink-light mt-3">
+        <span data-countdown>3</span> 秒后自动返回联系我们
+      </p>
+      <!-- 手动返回按钮 -->
+      <button data-go-back class="mt-4 w-full h-11 gradient-green text-white rounded-full text-sm font-bold active:scale-[0.98] transition-transform shadow-md shadow-brand-green/20">
+        立即返回
       </button>
     </div>
   </div>
@@ -161,6 +223,232 @@
       onAvatar: () => console.log('[contacts] avatar clicked'),
     });
     mountBottomNav('#app-bottom-nav', { active: 'contact' });
+
+    // ============== 提交信息成功弹层 + 自动返回 ==============
+    (function () {
+      const submitBtn = document.querySelector('[data-submit]');
+      const modal = document.querySelector('[data-success-modal]');
+      const card = document.querySelector('[data-modal-card]');
+      const countdownEl = document.querySelector('[data-countdown]');
+      const progressBar = document.querySelector('[data-progress-bar]');
+      const goBackBtn = document.querySelector('[data-go-back]');
+      if (!submitBtn || !modal || !card) return;
+
+      const COUNTDOWN_SECONDS = 3;
+      let timer = null;
+
+      // 关闭弹层并跳转回 index.html（首页默认显示"联系我们" tab 通过 localStorage 记忆）
+      function goBackToHome() {
+        if (timer) { clearInterval(timer); timer = null; }
+        // 跳回首页（首页的"今日行情/联系我们" 双 Tab 区域默认显示 行情，用户在底部导航再次点"联系我们"即可）
+        window.location.href = 'index.html';
+      }
+
+      // 打开弹层
+      function openModal() {
+        modal.classList.remove('hidden');
+        // 触发动画（scale 90 → 100, opacity 0 → 1）
+        requestAnimationFrame(() => {
+          card.classList.remove('scale-90', 'opacity-0');
+          card.classList.add('scale-100', 'opacity-100');
+        });
+        // 进度条动画（3 秒从 100% 缩到 0%）
+        progressBar.style.transition = `width ${COUNTDOWN_SECONDS}s linear`;
+        progressBar.style.width = '0%';
+        // 启动倒计时
+        let remaining = COUNTDOWN_SECONDS;
+        countdownEl.textContent = remaining;
+        timer = setInterval(() => {
+          remaining -= 1;
+          if (remaining <= 0) {
+            clearInterval(timer);
+            timer = null;
+            countdownEl.textContent = 0;
+            goBackToHome();
+          } else {
+            countdownEl.textContent = remaining;
+          }
+        }, 1000);
+      }
+
+      submitBtn.addEventListener('click', openModal);
+      goBackBtn.addEventListener('click', goBackToHome);
+
+      // 点击遮罩也立即返回（友好体验）
+      const overlay = document.querySelector('[data-modal-overlay]');
+      if (overlay) overlay.addEventListener('click', goBackToHome);
+    })();
+
+    // ============== 图片上传 + 预览 + 删除（多选 + 拖拽） ==============
+    (function () {
+      const area = document.querySelector('[data-upload-area]');
+      const triggers = document.querySelectorAll('[data-upload-trigger]');
+      const fileInput = document.querySelector('[data-file-input]');
+      const grid = document.querySelector('[data-preview-grid]');
+      if (!area || !fileInput || !grid) return;
+
+      const MAX_FILES = 6;
+      const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+      const PALETTE = [
+        'from-yellow-100 to-amber-200',
+        'from-blue-100 to-sky-200',
+        'from-green-100 to-emerald-200',
+        'from-red-100 to-rose-200',
+        'from-purple-100 to-fuchsia-200',
+        'from-orange-100 to-yellow-200'
+      ];
+      let images = []; // [{id, name, dataUrl, size}]
+
+      function uid() { return Math.random().toString(36).slice(2, 9); }
+      function fmtSize(b) { return b < 1024 ? b + 'B' : (b / 1024).toFixed(1) + 'KB'; }
+
+      function toast(msg, type) {
+        const old = document.querySelector('[data-toast]');
+        if (old) old.remove();
+        const t = document.createElement('div');
+        t.dataset.toast = '';
+        const isErr = type === 'error';
+        t.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[200] px-4 py-2.5 rounded-full text-sm font-medium shadow-lg transition-all duration-300 ${isErr ? 'bg-red-500 text-white' : 'bg-brand-green text-white'}`;
+        t.textContent = msg;
+        t.style.transform = 'translateX(-50%) translateY(-20px)';
+        t.style.opacity = '0';
+        document.body.appendChild(t);
+        requestAnimationFrame(() => {
+          t.style.transform = 'translateX(-50%) translateY(0)';
+          t.style.opacity = '1';
+        });
+        setTimeout(() => {
+          t.style.transform = 'translateX(-50%) translateY(-20px)';
+          t.style.opacity = '0';
+          setTimeout(() => t.remove(), 300);
+        }, 2500);
+      }
+
+      function render() {
+        if (!images.length) {
+          grid.classList.add('hidden');
+          grid.classList.remove('grid');
+          grid.innerHTML = '';
+          return;
+        }
+        grid.classList.remove('hidden');
+        grid.classList.add('grid');
+        const cells = images.map((it, idx) => {
+          const palette = PALETTE[idx % PALETTE.length];
+          return `
+            <div class="relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br ${palette} animate-fadeIn group" title="${it.name}">
+              <img src="${it.dataUrl}" class="w-full h-full object-cover" alt="${it.name}">
+              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1">
+                <p class="text-[10px] text-white truncate font-medium">${it.name}</p>
+              </div>
+              <button data-remove="${it.id}" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center active:scale-90 transition-transform opacity-0 group-hover:opacity-100" aria-label="删除图片">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+              <span class="absolute top-1 left-1 px-1.5 py-0.5 rounded-full bg-black/60 text-white text-[9px] font-bold">${idx + 1}</span>
+            </div>
+          `;
+        });
+        // 末尾"添加更多"格子（未达到上限时）
+        if (images.length < MAX_FILES) {
+          cells.push(`
+            <div data-upload-trigger class="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:border-brand-green hover:bg-green-50/40 active:scale-95 transition-all">
+              <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+              <span class="text-[10px] text-gray-400 font-medium">添加更多</span>
+            </div>
+          `);
+        }
+        grid.innerHTML = cells.join('');
+        // 重新绑定所有 trigger（包括"添加更多"格子）
+        grid.querySelectorAll('[data-upload-trigger]').forEach(el => el.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); }));
+        // 绑定删除按钮
+        grid.querySelectorAll('[data-remove]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute('data-remove');
+            images = images.filter(x => x.id !== id);
+            render();
+            toast('已删除', 'success');
+          });
+        });
+      }
+
+      // 处理传入的文件列表（来自点击或拖拽）
+      function handleFiles(fileList) {
+        const files = Array.from(fileList || []);
+        if (!files.length) return;
+        const remaining = MAX_FILES - images.length;
+        if (remaining <= 0) {
+          toast(`最多 ${MAX_FILES} 张图片`, 'error');
+          fileInput.value = '';
+          return;
+        }
+        const toProcess = files.slice(0, remaining);
+        if (files.length > remaining) {
+          toast(`只保留了前 ${remaining} 张`, 'error');
+        }
+        let done = 0;
+        toProcess.forEach((file) => {
+          if (!file.type.startsWith('image/')) {
+            toast('只支持图片格式', 'error');
+            done++;
+            if (done === toProcess.length) render();
+            return;
+          }
+          if (file.size > MAX_SIZE) {
+            toast(`${file.name} 超过 5MB`, 'error');
+            done++;
+            if (done === toProcess.length) render();
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            images.push({ id: uid(), name: file.name, dataUrl: ev.target.result, size: file.size });
+            done++;
+            if (done === toProcess.length) {
+              render();
+              toast(`已上传 ${toProcess.length} 张`, 'success');
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+        fileInput.value = '';
+      }
+
+      // 点击上传（外部触发器 + 末尾"添加更多"格子）
+      triggers.forEach(el => el.addEventListener('click', () => fileInput.click()));
+
+      // file input 变化
+      fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+      // 拖拽上传支持
+      area.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const trigger = area.querySelector('[data-upload-trigger]');
+        if (trigger) {
+          trigger.classList.add('border-brand-green', 'bg-green-50');
+        }
+      });
+      area.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        const trigger = area.querySelector('[data-upload-trigger]');
+        if (trigger) {
+          trigger.classList.remove('border-brand-green', 'bg-green-50');
+        }
+      });
+      area.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const trigger = area.querySelector('[data-upload-trigger]');
+        if (trigger) {
+          trigger.classList.remove('border-brand-green', 'bg-green-50');
+        }
+        if (e.dataTransfer && e.dataTransfer.files) {
+          handleFiles(e.dataTransfer.files);
+        }
+      });
+
+      // 暴露给外部
+      window._AL_UPLOADED = () => images.slice();
+    })();
   </script>
 
 </body>

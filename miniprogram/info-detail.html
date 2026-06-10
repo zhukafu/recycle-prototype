@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="touch-action: manipulation;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>详情 - 铝老板金属网</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="data/articles.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            green: '#10B981',
+                            'green-dark': '#059669',
+                            'green-light': '#D1FAE5',
+                            orange: '#F97316',
+                            'orange-light': '#FFF7ED',
+                            surface: '#F8FAFC',
+                            border: '#E2E8F0',
+                            muted: '#94A3B8',
+                            ink: '#1E293B',
+                            'ink-light': '#64748B',
+                            'gray-light': '#F1F5F9'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'Noto Sans SC', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', 'Noto Sans SC', system-ui, sans-serif;
+            background: #F8FAFC;
+            overscroll-behavior-y: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .article-body p { margin-bottom: 14px; line-height: 1.85; }
+        .article-body p:first-child::first-letter {
+            font-size: 2em;
+            font-weight: 900;
+            color: #10B981;
+            float: left;
+            line-height: 1;
+            margin-right: 6px;
+            margin-top: 4px;
+        }
+        /* 图文穿插：内联图片 */
+        .article-body figure {
+            margin: 22px 0;
+        }
+        .article-body figure img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+            background: #F1F5F9;
+        }
+        .article-body figcaption {
+            font-size: 12px;
+            color: #64748B;
+            margin-top: 8px;
+            text-align: center;
+            padding: 0 16px;
+            line-height: 1.5;
+        }
+        .article-body figure + p { margin-top: 6px; }
+        /* 平板及以上：图片略超出正文宽度，更具杂志感 */
+        @media (min-width: 640px) {
+            .article-body figure {
+                margin: 24px -16px;
+            }
+        }
+        /* PC：限制最大宽度居中，避免图片过宽失真 */
+        @media (min-width: 768px) {
+            #body { max-width: 720px; margin-left: auto; margin-right: auto; }
+            .article-body figure { margin: 24px -24px; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+    </style>
+</head>
+<body class="bg-brand-surface min-h-screen pb-32">
+
+    <!-- 顶部导航 -->
+    <nav class="sticky top-0 z-50 glass border-b border-gray-100">
+        <div class="grid grid-cols-3 items-center px-4 h-11">
+            <button onclick="history.back()" aria-label="返回" class="w-9 h-9 -ml-2 flex items-center justify-center rounded-full hover:bg-gray-100 active:scale-90 transition-transform">
+                <svg class="w-5 h-5 text-brand-ink" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <h1 id="pageTitle" class="text-lg font-semibold text-brand-ink text-center truncate px-2">详情</h1>
+            <div class="justify-self-end" id="page-actions"></div>
+        </div>
+    </nav>
+
+    <!-- 找不到文章时的兜底 -->
+    <div id="notFound" class="hidden flex-col items-center justify-center py-20 px-6 text-center max-w-screen-md mx-auto">
+        <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+            <i class="fas fa-exclamation-triangle text-3xl text-gray-300"></i>
+        </div>
+        <p class="text-sm text-brand-ink-light">未找到该内容</p>
+        <button onclick="history.back()" class="mt-4 px-5 py-2 bg-brand-green text-white rounded-full text-sm font-bold">返回</button>
+    </div>
+
+    <!-- 文章详情 -->
+    <article id="article" class="hidden max-w-screen-md mx-auto">
+        <!-- 大封面图（生成式图片占位） -->
+        <div class="aspect-[16/9] bg-gradient-to-br relative overflow-hidden" id="coverWrap">
+            <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5">
+                <span id="catBadge" class="text-[10px] bg-white/95 backdrop-blur-sm text-brand-ink font-bold px-2 py-1 rounded-full shadow-sm"></span>
+                <span id="tagBadge" class="text-[10px] bg-brand-orange text-white font-bold px-2 py-1 rounded-full shadow-sm"></span>
+            </div>
+            <div class="absolute bottom-3 left-4 right-4 z-20">
+                <h1 id="title" class="text-white text-xl font-black leading-tight drop-shadow-md"></h1>
+            </div>
+            <!-- 渐变背景图（用内联 SVG，避免外链） -->
+            <svg id="coverBg" class="w-full h-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 800 450">
+                <defs>
+                    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#10B981"/>
+                        <stop offset="100%" stop-color="#059669"/>
+                    </linearGradient>
+                    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#F97316"/>
+                        <stop offset="100%" stop-color="#EA580C"/>
+                    </linearGradient>
+                    <pattern id="p1" width="60" height="60" patternUnits="userSpaceOnUse">
+                        <path d="M0 30 L30 0 L60 30 L30 60 Z" fill="none" stroke="white" stroke-width="0.5" opacity="0.15"/>
+                    </pattern>
+                </defs>
+                <rect width="800" height="450" fill="url(#g1)"/>
+                <rect width="800" height="450" fill="url(#p1)"/>
+                <!-- 装饰圆 -->
+                <circle cx="650" cy="80" r="120" fill="white" opacity="0.1"/>
+                <circle cx="120" cy="400" r="90" fill="white" opacity="0.08"/>
+                <!-- 大字图标 -->
+                <text id="coverIcon" x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-size="160" fill="white" opacity="0.18" font-family="serif">银</text>
+            </svg>
+        </div>
+
+        <!-- 作者 / 时间 / 统计 -->
+        <div class="px-4 py-3 bg-white border-b border-gray-100 flex items-center gap-3 text-xs text-brand-ink-light">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-green to-brand-green-dark flex items-center justify-center text-white font-bold text-xs flex-shrink-0" id="avatarBadge">铝</div>
+            <div class="flex-1">
+                <p class="text-sm font-bold text-brand-ink" id="author"></p>
+                <p class="text-[10px] text-brand-muted" id="dateLine"></p>
+            </div>
+            <button id="likeBtn" class="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-pink-50 text-pink-500 active:scale-90 transition-transform">
+                <i class="far fa-heart text-xs"></i>
+                <span class="text-xs font-bold" id="likeCount">0</span>
+            </button>
+        </div>
+
+        <!-- 正文 -->
+        <div id="body" class="bg-white px-4 py-5 article-body text-[15px] text-brand-ink"></div>
+
+        <!-- 标签云 -->
+        <div class="px-4 py-3 bg-white border-t border-gray-100 flex flex-wrap gap-2">
+            <span class="text-[11px] text-brand-ink-light font-medium">#含银废料</span>
+            <span class="text-[11px] text-brand-ink-light font-medium">#回收行情</span>
+            <span class="text-[11px] text-brand-ink-light font-medium">#<span id="tagInline">贵金属</span></span>
+            <span class="text-[11px] text-brand-ink-light font-medium">#铝老板金属网</span>
+        </div>
+
+        <!-- 评论区 -->
+        <section class="mt-3 bg-white">
+            <div class="px-4 py-3 flex items-center justify-between">
+                <h2 class="text-base font-bold text-brand-ink">评论 <span class="text-sm text-brand-muted font-medium" id="commentCount">(0)</span></h2>
+                <div class="flex items-center gap-1 text-xs">
+                    <button data-csort="hot" class="px-2 py-1 rounded font-bold text-brand-green">最热</button>
+                    <span class="text-gray-300">|</span>
+                    <button data-csort="new" class="px-2 py-1 rounded text-brand-ink-light">最新</button>
+                </div>
+            </div>
+            <div id="commentList" class="px-4 pb-4 space-y-3"></div>
+        </section>
+    </article>
+
+    <!-- 底部固定评论输入栏 -->
+    <div class="fixed bottom-0 left-0 right-0 z-40 glass border-t border-gray-200 px-3 py-2.5 flex items-center gap-2" style="padding-bottom: max(10px, env(safe-area-inset-bottom));">
+        <!-- VIP 提示 -->
+        <div class="hidden sm:flex items-center gap-1 text-[10px] text-amber-500 font-bold bg-amber-50 px-2 py-1 rounded-full flex-shrink-0" id="vipTag">
+            <i class="fas fa-crown"></i> 会员特权
+        </div>
+        <input id="commentInput" type="text" placeholder="说点什么吧... 会员可发布评论" class="flex-1 min-w-0 h-9 px-3 bg-gray-100 rounded-full text-sm placeholder-gray-400 outline-none focus:bg-gray-50 focus:ring-2 focus:ring-brand-green/30" />
+        <button id="sendBtn" class="h-9 px-4 bg-gradient-to-r from-brand-green to-brand-green-dark text-white text-xs font-bold rounded-full shadow-md shadow-brand-green/25 active:scale-95 transition-transform flex items-center gap-1 flex-shrink-0">
+            <i class="fas fa-paper-plane text-[10px]"></i> 发送
+        </button>
+    </div>
+
+    <!-- Toast 容器 -->
+    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[200] hidden">
+        <div class="bg-black/80 text-white text-sm px-4 py-2.5 rounded-full shadow-lg"></div>
+    </div>
+
+    <script>
+      (function () {
+        const params = new URLSearchParams(location.search);
+        const id = params.get('id');
+        const article = id && window._AL_ARTICLES.getById(id);
+        const articleEl = document.getElementById('article');
+        const notFound = document.getElementById('notFound');
+
+        if (!article) {
+          notFound.classList.remove('hidden');
+          notFound.classList.add('flex');
+          return;
+        }
+
+        document.getElementById('pageTitle').textContent = article.cat === 'knowledge' ? '回收知识' : article.cat === 'notice' ? '通知公告' : article.cat === 'about' ? '关于铝老板' : '行业资讯';
+        document.title = article.title + ' - 铝老板金属网';
+        document.getElementById('title').textContent = article.title;
+        document.getElementById('author').textContent = article.author;
+        document.getElementById('dateLine').textContent = article.date + ' · 阅读 ' + article.views + ' · 点赞 ' + article.likes;
+        document.getElementById('catBadge').textContent = article.cat === 'knowledge' ? '回收知识' : article.cat === 'notice' ? '通知公告' : article.cat === 'about' ? '关于铝老板' : '行业资讯';
+        document.getElementById('tagBadge').textContent = article.tag;
+        document.getElementById('tagInline').textContent = article.tag;
+        document.getElementById('avatarBadge').textContent = article.author[0] || '铝';
+        document.getElementById('likeCount').textContent = article.likes;
+        document.getElementById('coverIcon').textContent = article.cat === 'knowledge' ? '识' : article.cat === 'notice' ? '告' : article.cat === 'about' ? '铝' : '银';
+
+        // 封面渐变色按分类切换
+        const gradEl = document.querySelector('#coverBg rect:first-of-type');
+        if (article.cat === 'knowledge') {
+          gradEl.setAttribute('fill', 'url(#g1)'); // 绿
+        } else if (article.cat === 'about') {
+          // 关于铝老板：蓝紫渐变
+          let g3 = document.getElementById('g3');
+          if (!g3) {
+            const ns = 'http://www.w3.org/2000/svg';
+            const defs = document.querySelector('#coverBg defs');
+            g3 = document.createElementNS(ns, 'linearGradient');
+            g3.setAttribute('id', 'g3');
+            g3.setAttribute('x1', '0%'); g3.setAttribute('y1', '0%');
+            g3.setAttribute('x2', '100%'); g3.setAttribute('y2', '100%');
+            const s1 = document.createElementNS(ns, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#3B82F6');
+            const s2 = document.createElementNS(ns, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#6366F1');
+            g3.appendChild(s1); g3.appendChild(s2);
+            defs.appendChild(g3);
+          }
+          gradEl.setAttribute('fill', 'url(#g3)');
+        } else if (article.cat === 'notice') {
+          // 通知公告：粉红渐变
+          let g4 = document.getElementById('g4');
+          if (!g4) {
+            const ns = 'http://www.w3.org/2000/svg';
+            const defs = document.querySelector('#coverBg defs');
+            g4 = document.createElementNS(ns, 'linearGradient');
+            g4.setAttribute('id', 'g4');
+            g4.setAttribute('x1', '0%'); g4.setAttribute('y1', '0%');
+            g4.setAttribute('x2', '100%'); g4.setAttribute('y2', '100%');
+            const s1 = document.createElementNS(ns, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#EC4899');
+            const s2 = document.createElementNS(ns, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#BE185D');
+            g4.appendChild(s1); g4.appendChild(s2);
+            defs.appendChild(g4);
+          }
+          gradEl.setAttribute('fill', 'url(#g4)');
+        } else {
+          gradEl.setAttribute('fill', 'url(#g2)'); // 橙
+        }
+
+        // 渲染正文（按 \n\n 切段，\n 切行；按 inlineImages 的 after 位置穿插图片）
+        function formatBody(text, images) {
+          const paragraphs = text.split('\n\n');
+          const imgs = (images || []).slice().sort((a, b) => a.after - b.after);
+          const segments = [];
+          paragraphs.forEach((p, idx) => {
+            segments.push({ kind: 'text', value: p });
+            imgs.forEach(img => {
+              if (img.after === idx) {
+                segments.push({ kind: 'image', value: img });
+              }
+            });
+          });
+          // 处理超出范围的图片（兜底追加到末尾）
+          imgs.forEach(img => {
+            if (img.after >= paragraphs.length) {
+              segments.push({ kind: 'image', value: img });
+            }
+          });
+          return segments.map(seg => {
+            if (seg.kind === 'image') {
+              const img = seg.value;
+              const caption = img.caption || '';
+              const onErr = "this.parentElement.outerHTML='<p class=&quot;text-xs text-red-500 my-4 text-center&quot;>[图片加载失败]</p>'";
+              return '<figure>' +
+                '<img src="' + img.url + '" alt="' + escapeHtml(caption) + '" loading="lazy" onerror="' + onErr + '">' +
+                (caption ? '<figcaption>' + escapeHtml(caption) + '</figcaption>' : '') +
+              '</figure>';
+            }
+            const p = seg.value;
+            // 跳过【...】行（作为小标题）
+            if (p.match(/^【.+】\s*$/)) {
+              return '<p class="font-bold text-brand-ink text-[16px] mt-4 mb-2 flex items-center gap-2"><span class="w-1 h-4 bg-brand-green rounded"></span>' + p + '</p>';
+            }
+            // 处理数字列表
+            if (p.match(/^\d+[\.、]/m)) {
+              return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+            }
+            return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+          }).join('');
+        }
+        document.getElementById('body').innerHTML = formatBody(article.body, article.inlineImages);
+
+        articleEl.classList.remove('hidden');
+
+        // 渲染评论
+        let allComments = (window._AL_ARTICLES.getComments(article.id) || []).slice();
+        let csort = 'hot';
+        function renderComments() {
+          const data = csort === 'hot' ? allComments.slice().sort((a, b) => b.likes - a.likes) : allComments.slice();
+          document.getElementById('commentCount').textContent = '(' + allComments.length + ')';
+          if (!data.length) {
+            document.getElementById('commentList').innerHTML = `
+              <div class="py-10 text-center">
+                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-2">
+                  <i class="far fa-comment-dots text-gray-300"></i>
+                </div>
+                <p class="text-xs text-brand-muted">还没有评论，来抢沙发吧</p>
+              </div>
+            `;
+            return;
+          }
+          document.getElementById('commentList').innerHTML = data.map((c, idx) => {
+            const roleBadge = c.role === 'admin'
+              ? '<span class="text-[9px] bg-blue-500 text-white px-1 py-0.5 rounded font-bold ml-1">官方</span>'
+              : c.role === 'vip'
+                ? '<span class="text-[9px] bg-amber-500 text-white px-1 py-0.5 rounded font-bold ml-1">VIP</span>'
+                : '';
+            const avatarColor = c.role === 'admin' ? 'from-blue-500 to-indigo-600' : c.role === 'vip' ? 'from-amber-500 to-yellow-600' : 'from-gray-400 to-gray-500';
+            return `
+              <div class="flex items-start gap-2.5 animate-slide-up" style="animation-delay: ${idx * 0.04}s">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-bold text-xs flex-shrink-0">${c.user[0]}</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center mb-0.5">
+                    <span class="text-[12px] font-bold text-brand-ink">${c.user}</span>${roleBadge}
+                    <span class="text-[10px] text-brand-muted ml-auto">${c.date}</span>
+                  </div>
+                  <p class="text-[13px] text-brand-ink leading-relaxed mb-1.5">${escapeHtml(c.text)}</p>
+                  <div class="flex items-center gap-3 text-[10px] text-brand-muted">
+                    <button class="flex items-center gap-0.5 hover:text-brand-green transition-colors" data-clike="${c.id}">
+                      <i class="far fa-thumbs-up"></i>
+                      <span>${c.likes}</span>
+                    </button>
+                    <button class="hover:text-brand-green transition-colors">回复</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // 评论点赞
+          document.querySelectorAll('[data-clike]').forEach(b => {
+            b.addEventListener('click', () => {
+              const cid = b.getAttribute('data-clike');
+              const c = allComments.find(x => x.id === cid);
+              if (c) {
+                c.likes += 1;
+                renderComments();
+              }
+            });
+          });
+        }
+        renderComments();
+        document.querySelectorAll('[data-csort]').forEach(b => {
+          b.addEventListener('click', () => {
+            csort = b.getAttribute('data-csort');
+            document.querySelectorAll('[data-csort]').forEach(x => {
+              if (x === b) {
+                x.className = 'px-2 py-1 rounded font-bold text-brand-green';
+              } else {
+                x.className = 'px-2 py-1 rounded text-brand-ink-light';
+              }
+            });
+            renderComments();
+          });
+        });
+
+        // 文章点赞
+        const likeBtn = document.getElementById('likeBtn');
+        let liked = false;
+        likeBtn.addEventListener('click', () => {
+          liked = !liked;
+          const span = likeBtn.querySelector('span');
+          const ic = likeBtn.querySelector('i');
+          article.likes += liked ? 1 : -1;
+          span.textContent = article.likes;
+          if (liked) {
+            likeBtn.className = 'flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-pink-500 text-white active:scale-90 transition-transform';
+            ic.className = 'fas fa-heart text-xs';
+          } else {
+            likeBtn.className = 'flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-pink-50 text-pink-500 active:scale-90 transition-transform';
+            ic.className = 'far fa-heart text-xs';
+          }
+        });
+
+        // 分享（暴露到 window._alInfoDetail，供 page-actions 菜单点击触发）
+        function shareArticle() {
+          const url = location.href;
+          if (navigator.share) {
+            navigator.share({ title: article.title, text: article.summary, url });
+          } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(() => toast('链接已复制'));
+          } else {
+            toast(url);
+          }
+        }
+        window._alInfoDetail = { shareArticle };
+
+        // 发送评论
+        document.getElementById('sendBtn').addEventListener('click', sendComment);
+        document.getElementById('commentInput').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') sendComment();
+        });
+        function sendComment() {
+          const input = document.getElementById('commentInput');
+          const text = (input.value || '').trim();
+          if (!text) {
+            toast('请输入评论内容');
+            return;
+          }
+          const me = window._AL_ARTICLES.CURRENT_USER;
+          const newComment = {
+            id: 'c' + Date.now(),
+            user: me.name || '我',
+            avatar: me.avatar,
+            date: nowStr(),
+            text,
+            likes: 0,
+            role: me.isVip ? 'vip' : 'user'
+          };
+          allComments.unshift(newComment);
+          csort = 'new';
+          document.querySelectorAll('[data-csort]').forEach(x => {
+            if (x.getAttribute('data-csort') === 'new') {
+              x.className = 'px-2 py-1 rounded font-bold text-brand-green';
+            } else {
+              x.className = 'px-2 py-1 rounded text-brand-ink-light';
+            }
+          });
+          input.value = '';
+          renderComments();
+          toast('评论已发布');
+        }
+        function nowStr() {
+          const d = new Date();
+          const pad = n => n < 10 ? '0' + n : '' + n;
+          return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+        function escapeHtml(s) {
+          return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function toast(msg) {
+          const el = document.getElementById('toast');
+          el.querySelector('div').textContent = msg;
+          el.classList.remove('hidden');
+          clearTimeout(toast._t);
+          toast._t = setTimeout(() => el.classList.add('hidden'), 1800);
+        }
+      })();
+    </script>
+
+    <script type="module">
+        import { mountPageActions } from '/src/components/page-actions.js';
+        mountPageActions('#page-actions', {
+            onMenu: () => window._alInfoDetail && window._alInfoDetail.shareArticle(),
+            onAvatar: () => location.href = 'mine.html',
+        });
+    </script>
+</body>
+</html>

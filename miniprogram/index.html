@@ -63,6 +63,7 @@ to { opacity: 1; transform: translateY(0); }
   </div>
 </header>
 
+<script src="data/articles.js"></script>
 <script type="module">
   import { mountPageActions } from '/src/components/page-actions.js';
   mountPageActions('#page-actions', {
@@ -298,79 +299,13 @@ to { opacity: 1; transform: translateY(0); }
 </div>
 </div>
 
-<!-- 轮播：技术交流文章（点击进入 tecexc.html 对应文章） -->
+<!-- 轮播：技术交流文章（从 articles.js 随机 3 篇，仅显示标签/主图/主标题/副标题） -->
 <div class="px-4 mb-5 slide-up stagger-4">
   <div class="relative overflow-hidden rounded-2xl shadow-lg shadow-green-brand/20" id="articleCarousel">
-    <div class="flex transition-transform duration-500 ease-out" data-carousel-track>
-      <!-- Slide 1：20221024期学员简介 -->
-      <a href="tecexc.html#article-1" class="block w-full flex-shrink-0 bg-gradient-to-br from-pink-500 to-rose-600 relative overflow-hidden no-underline" aria-label="查看文章：20221024期学员简介">
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
-        <div class="relative z-10 p-4 flex items-center justify-between min-h-[120px]">
-          <div class="flex-1 pr-3">
-            <div class="flex items-center gap-1.5 mb-2">
-              <span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">学员风采</span>
-              <span class="text-white/70 text-[10px]">2024-10-24</span>
-            </div>
-            <h3 class="text-white text-lg font-black mb-1 leading-tight">20221024期学员简介</h3>
-            <p class="text-white/85 text-[11px] leading-relaxed line-clamp-2">新一批学员结业，涵盖废铝回收、含银废料处理、接触器拆解等多个细分领域</p>
-          </div>
-          <div class="flex flex-col items-center gap-2 flex-shrink-0">
-            <div class="w-14 h-14 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <span class="text-2xl font-black text-white">1</span>
-            </div>
-          </div>
-        </div>
-      </a>
-      <!-- Slide 2：什么是三元催化 -->
-      <a href="tecexc.html#article-2" class="block w-full flex-shrink-0 bg-gradient-to-br from-orange-brand to-orange-dark relative overflow-hidden no-underline" aria-label="查看文章：什么是三元催化">
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
-        <div class="relative z-10 p-4 flex items-center justify-between min-h-[120px]">
-          <div class="flex-1 pr-3">
-            <div class="flex items-center gap-1.5 mb-2">
-              <span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">回收百科</span>
-              <span class="text-white/70 text-[10px]">热门文章</span>
-            </div>
-            <h3 class="text-white text-lg font-black mb-1 leading-tight">什么是三元催化</h3>
-            <p class="text-white/85 text-[11px] leading-relaxed line-clamp-2">含铂、钯、铑等贵金属，回收价值极高，详解结构、成分及回收流程</p>
-          </div>
-          <div class="flex flex-col items-center gap-2 flex-shrink-0">
-            <div class="w-14 h-14 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </a>
-      <!-- Slide 3：接触器银触点提取技术 -->
-      <a href="tecexc.html#article-4" class="block w-full flex-shrink-0 bg-gradient-to-br from-purple-500 to-violet-700 relative overflow-hidden no-underline" aria-label="查看文章：接触器银触点提取技术">
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
-        <div class="relative z-10 p-4 flex items-center justify-between min-h-[120px]">
-          <div class="flex-1 pr-3">
-            <div class="flex items-center gap-1.5 mb-2">
-              <span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">核心技术</span>
-              <span class="text-white/70 text-[10px]">进阶教学</span>
-            </div>
-            <h3 class="text-white text-lg font-black mb-1 leading-tight">接触器银触点提取</h3>
-            <p class="text-white/85 text-[11px] leading-relaxed line-clamp-2">物理拆解、化学溶解、电解法等，详解各种方法的优缺点及操作步骤</p>
-          </div>
-          <div class="flex flex-col items-center gap-2 flex-shrink-0">
-            <div class="w-14 h-14 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </a>
-    </div>
+    <div class="flex transition-transform duration-500 ease-out" data-carousel-track></div>
   </div>
   <!-- 指示器 -->
-  <div class="flex justify-center gap-1.5 mt-2.5" data-carousel-dots>
-    <div class="h-1.5 rounded-full transition-all duration-300 cursor-pointer" style="width: 20px; background: #10B981;" data-carousel-dot="0"></div>
-    <div class="h-1.5 rounded-full transition-all duration-300 cursor-pointer" style="width: 6px; background: #D6D3D1;" data-carousel-dot="1"></div>
-    <div class="h-1.5 rounded-full transition-all duration-300 cursor-pointer" style="width: 6px; background: #D6D3D1;" data-carousel-dot="2"></div>
-  </div>
+  <div class="flex justify-center gap-1.5 mt-2.5" data-carousel-dots></div>
 </div>
 
 <!-- 底部信息区（今日行情 + 联系我们 双 Tab） -->
@@ -686,13 +621,70 @@ to { opacity: 1; transform: translateY(0); }
     });
   })();
 
-  // 文章轮播（自动播放 + 点击指示器跳转）
+  // 文章轮播（从 articles.js 随机 3 篇，仅展示 标签/主图/主标题/副标题）
   (function () {
     const carousel = document.getElementById('articleCarousel');
     if (!carousel) return;
     const track = carousel.querySelector('[data-carousel-track]');
-    const slides = track ? track.children : [];
-    const dots = document.querySelectorAll('[data-carousel-dot]');
+    const dotsWrap = document.querySelector('[data-carousel-dots]');
+    if (!track) return;
+
+    // 取随机 3 篇（合并 NEWS + KNOWLEDGE 池子）
+    const A = window._AL_ARTICLES || {};
+    const pool = []
+      .concat(A.NEWS || [])
+      .concat(A.KNOWLEDGE || [])
+      .filter(a => a && a.cover && a.title);
+    if (!pool.length) return;
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    const picked = shuffle(pool).slice(0, 3);
+
+    // 渲染 slide：左文右图（cover）+ 标签 + 主标题 + 副标题
+    const tagColors = [
+      'bg-green-surface text-green-dark',
+      'bg-orange-surface text-orange-dark',
+      'bg-blue-50 text-blue-700'
+    ];
+    track.innerHTML = picked.map((it, i) => {
+      const tagBg = tagColors[i % tagColors.length];
+      const safeTitle = String(it.title).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+      const safeSummary = String(it.summary || '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+      const safeTag = String(it.tag || (it.cat === 'knowledge' ? '回收知识' : '行业资讯')).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+      const onErr = "this.style.display='none'";
+      return `
+        <a href="info-detail.html?id=${it.id}" class="block w-full flex-shrink-0 bg-white relative overflow-hidden no-underline" aria-label="查看文章：${safeTitle}">
+          <!-- 右侧主图（cover） -->
+          <div class="absolute right-0 top-0 bottom-0 w-[44%] bg-gray-bg overflow-hidden">
+            <img src="${it.cover}" alt="${safeTitle}" class="w-full h-full object-cover" onerror="${onErr}">
+          </div>
+          <!-- 左侧内容：标签 + 主标题 + 副标题 -->
+          <div class="relative z-10 p-4 pr-[44%] min-h-[120px] flex flex-col justify-center">
+            <div class="mb-2">
+              <span class="inline-block ${tagBg} text-[10px] font-bold px-2 py-0.5 rounded-full">${safeTag}</span>
+            </div>
+            <h3 class="text-green-dark text-[17px] font-black mb-1.5 leading-snug line-clamp-2">${safeTitle}</h3>
+            <p class="text-gray-500 text-[12px] leading-relaxed line-clamp-2">${safeSummary}</p>
+          </div>
+        </a>
+      `;
+    }).join('');
+
+    // 渲染指示器
+    if (dotsWrap) {
+      dotsWrap.innerHTML = picked.map((_, i) =>
+        `<div class="h-1.5 rounded-full transition-all duration-300 cursor-pointer" data-carousel-dot="${i}"></div>`
+      ).join('');
+    }
+    const slides = track.children;
+    const dots = dotsWrap ? dotsWrap.querySelectorAll('[data-carousel-dot]') : [];
     if (slides.length === 0) return;
 
     let index = 0;
