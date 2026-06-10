@@ -334,7 +334,8 @@
         const items = ids.map(id => all.find(p => p.id === id)).filter(Boolean);
         if (!items.length) { list.innerHTML = ''; return; }
 
-        const lockHtml = (window._AL_lockBadge || function () { return ''; })();
+        const canViewMember = !!(window._AL_canView && window._AL_canView('member'));
+        const lockHtml = canViewMember ? '' : ((window._AL_lockBadge || function () { return ''; })());
         const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
         list.innerHTML = items.map(it => {
@@ -345,6 +346,13 @@
           // 兜底缩略图：用分类色块图
           const fallback = (window._AL_CAT_IMG || {})[it.cat] || '';
           const imgSrc = it.img || fallback;
+          // 会员态：显示回收价格；非会员态：显示锁徽章
+          let priceHtml = '';
+          if (canViewMember && it.price) {
+            priceHtml = '<p class="text-sm font-black text-al-orange font-mono leading-none">¥' + esc(it.price) + '<span class="text-[10px] text-al-gray font-normal ml-0.5">/件</span></p>';
+          } else if (!canViewMember) {
+            priceHtml = lockHtml;
+          }
           return (
             '<a href="product.html?id=' + esc(it.id) + '" ' +
                  'aria-label="查看 ' + esc(title) + ' 详情" ' +
@@ -355,7 +363,7 @@
               '<div class="p-3">' +
                 '<h4 class="text-sm font-semibold text-al-dark leading-snug mb-1 truncate" title="' + esc(title) + '">' + esc(title) + '</h4>' +
                 '<p class="text-xs text-al-gray mb-2 truncate" title="' + esc(subtitle) + '">' + esc(subtitle) + '</p>' +
-                lockHtml +
+                priceHtml +
               '</div>' +
             '</a>'
           );

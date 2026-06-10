@@ -116,7 +116,7 @@ to { opacity: 1; transform: translateY(0); }
   <!-- 银点铜回收价（锁区：会员可见） -->
   <section class="bg-white px-4 py-4 border-t border-gray-100 slide-up" style="animation-delay:.12s">
     <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
-      <span class="w-1 h-3.5 bg-blue-dark rounded-full"></span>
+      <span class="w-1 h-3.5 bg-amber-dark rounded-full"></span>
       银点铜回收价
       <span class="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-orange-brand to-orange-dark text-white text-[9px] font-bold shadow-sm">
         <i class="fas fa-crown text-[8px]"></i>VIP
@@ -125,25 +125,25 @@ to { opacity: 1; transform: translateY(0); }
     <div id="silverCopperCard" class="relative overflow-hidden rounded-2xl cursor-pointer active:scale-[0.99] transition-transform"
          onclick="window._AL_lockClick&&_AL_lockClick(event)" title="点击开通会员查看">
       <!-- 卡片主体：会员态显示真实数据，非会员态脱敏 -->
-      <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50 border border-blue-200/50 rounded-2xl p-4 min-h-[180px]">
+      <div class="relative bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 border border-amber-brand/20 rounded-2xl p-4 min-h-[180px]">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
-            <span class="text-xl">📊</span>
+          <div class="w-12 h-12 bg-gradient-to-br from-orange-brand to-orange-dark rounded-xl flex items-center justify-center shadow-md shadow-orange-brand/30 shrink-0">
+            <i class="fas fa-coins text-white text-lg"></i>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-[10px] text-blue-dark/80 font-bold">每公斤银点铜回收价</p>
-            <p class="text-2xl font-black text-blue-dark font-mono leading-tight" id="silverCopperEl">--</p>
+            <p class="text-[10px] text-amber-dark/80 font-bold">每公斤银点铜回收价</p>
+            <p class="text-2xl font-black text-amber-dark font-mono leading-tight" id="silverCopperEl">--</p>
           </div>
           <div class="text-right shrink-0">
-            <p class="text-[10px] text-gray-500">单位</p>
-            <p class="text-sm font-bold text-gray-700">元/公斤</p>
+            <p class="text-[10px] text-gray-400">单位</p>
+            <p class="text-[13px] font-bold text-amber-dark">元/公斤</p>
           </div>
         </div>
         <!-- 会员 CTA 覆盖层（非会员态显示）：渐变 + 皇冠脉冲 + 数据价值承诺 -->
-        <div id="silverCopperLocked" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-white/95 via-blue-50/90 to-white/95 backdrop-blur-md rounded-2xl overflow-hidden">
+        <div id="silverCopperLocked" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-white/95 via-amber-50/90 to-white/95 backdrop-blur-md rounded-2xl overflow-hidden">
           <!-- 装饰光晕 -->
-          <div class="absolute -top-6 -right-6 w-24 h-24 bg-blue-brand/20 rounded-full blur-2xl pointer-events-none"></div>
-          <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-cyan-brand/20 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="absolute -top-6 -right-6 w-24 h-24 bg-amber-brand/20 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-orange-brand/15 rounded-full blur-2xl pointer-events-none"></div>
           <!-- 皇冠徽章（脉冲） -->
           <div class="relative mb-1.5 flex items-center justify-center">
             <span class="absolute w-12 h-12 rounded-full bg-gradient-to-br from-orange-brand to-orange-dark opacity-25 animate-ping"></span>
@@ -151,7 +151,7 @@ to { opacity: 1; transform: translateY(0); }
               <i class="fas fa-crown"></i>
             </span>
           </div>
-          <p class="text-[13px] font-black text-blue-dark tracking-wide">开通会员 · 解锁实时回收价</p>
+          <p class="text-[13px] font-black text-amber-dark tracking-wide">开通会员 · 解锁实时回收价</p>
           <p class="text-[10px] text-gray-500 mt-0.5 mb-2.5">每公斤银点铜 · 当日行情 · 精准到分</p>
           <button onclick="event.preventDefault();event.stopPropagation();window._AL_lockClick&&_AL_lockClick(event)"
                   class="px-5 h-8 gradient-orange text-white text-xs font-bold rounded-full shadow-md shadow-orange-brand/30 active:scale-95 transition flex items-center gap-1.5">
@@ -361,9 +361,10 @@ to { opacity: 1; transform: translateY(0); }
     // 4. 银点铜回收价（锁区：会员可见）
     const silverCopperEl = document.getElementById('silverCopperEl');
     const silverCopperLocked = document.getElementById('silverCopperLocked');
-    if (canViewMember && it.silverCopperPrice) {
-      silverCopperEl.textContent = '¥' + it.silverCopperPrice;
+    if (canViewMember) {
+      // 会员态：无论有无数据都隐藏覆盖层
       if (silverCopperLocked) silverCopperLocked.classList.add('hidden');
+      silverCopperEl.textContent = it.silverCopperPrice ? '¥' + it.silverCopperPrice : '暂无数据';
     } else {
       silverCopperEl.textContent = '***';
       // silverCopperLocked 保持显示（已写好的 CTA 覆盖层）
@@ -420,6 +421,18 @@ to { opacity: 1; transform: translateY(0); }
       document.getElementById('silverEl').textContent = '***';
       document.getElementById('silverVal').textContent = '***';
       // 整卡已通过 onclick 触发 _AL_lockClick 拦截；这里只需保证 silverLocked 覆盖层可见
+    }
+
+    // 5.5 会员态清理：移除 title / cursor / onclick，让卡片恢复静态展示
+    if (canViewMember) {
+      ['silverCopperCard', 'unitWeightCard', 'silverCard'].forEach(function (id) {
+        var card = document.getElementById(id);
+        if (!card) return;
+        card.removeAttribute('title');
+        card.removeAttribute('onclick');
+        card.style.cursor = 'default';
+        card.classList.remove('cursor-pointer', 'active:scale-[0.99]');
+      });
     }
 
     // 6. 描述
