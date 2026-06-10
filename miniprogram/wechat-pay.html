@@ -164,7 +164,14 @@
       if (modal) modal.style.animation = 'slideUp 0.3s reverse forwards';
       overlay.classList.add('fade-out');
       setTimeout(function () {
-        history.back();
+        // 用户取消支付：按 return 参数跳回原页（产品详情 / 数据库 / 分类页），而非简单 history.back()
+        const safeHtml = (s) => /^[a-zA-Z0-9_./-]+\.html(\?.*)?$/.test(s || '');
+        if (safeHtml(pkgRet)) {
+          if (window._AL_navigate) window._AL_navigate(pkgRet);
+          else location.href = pkgRet;
+        } else {
+          history.back();
+        }
       }, 280);
     }
 

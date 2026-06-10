@@ -62,15 +62,18 @@
   //   - 已登录但未会员 → vip-center.html
   //   - 已会员 → 留在原页
   window._AL_requireMember = function (returnUrl) {
+    const _dir = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
+    const _vipTarget = _dir + 'vip-center.html';
     if (!window._AL_USER.isLoggedIn) {
       const ret = returnUrl || (location.pathname + location.search);
-      if (window._AL_navigate) window._AL_navigate('login.html?return=' + encodeURIComponent(ret));
-      else location.href = 'login.html?return=' + encodeURIComponent(ret);
+      const url = 'login.html?return=' + encodeURIComponent(ret) + '&target=' + encodeURIComponent(_vipTarget);
+      if (window._AL_navigate) window._AL_navigate(url);
+      else location.href = url;
       return false;
     }
     if (!window._AL_canView('member')) {
-      if (window._AL_navigate) window._AL_navigate('vip-center.html');
-      else location.href = 'vip-center.html';
+      if (window._AL_navigate) window._AL_navigate('vip-center.html?return=' + encodeURIComponent(returnUrl || location.pathname + location.search));
+      else location.href = 'vip-center.html?return=' + encodeURIComponent(returnUrl || location.pathname + location.search);
       return false;
     }
     return true;
@@ -86,9 +89,12 @@
     e && e.preventDefault();
     e && e.stopPropagation();
     const ret = (location.pathname + location.search) || 'index.html';
+    // 动态提取当前目录前缀，确保 target 路径与 return 路径一致
+    const _dir = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
+    const _vipTarget = _dir + 'vip-center.html';
     if (!window._AL_USER || !window._AL_USER.isLoggedIn) {
       try { sessionStorage.setItem('_AL_loginAutoRedirected', '1'); } catch (err) {}
-      const url = 'login.html?return=' + encodeURIComponent(ret) + '&target=vip-center.html';
+      const url = 'login.html?return=' + encodeURIComponent(ret) + '&target=' + encodeURIComponent(_vipTarget);
       if (window._AL_navigate) window._AL_navigate(url);
       else location.href = url;
     } else if (!window._AL_canView('member')) {
