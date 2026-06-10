@@ -125,47 +125,68 @@
 
     <!-- 文章详情 -->
     <article id="article" class="hidden max-w-screen-md mx-auto">
-        <!-- 大封面图（生成式图片占位） -->
-        <div class="aspect-[16/9] bg-gradient-to-br relative overflow-hidden" id="coverWrap">
+        <!--
+          文章封面区：支持两种展示模式
+          - 纯文字模式（data-cover-mode="gradient"）：用 SVG 渐变 + 装饰图案 + 行业大字，标签 / 主标题 / 副标题 / 元信息全部直接渲染在背景上
+          - 纯图片模式（data-cover-mode="image"）：用 article.cover 真实图作为底图，叠加底部黑色渐变保证文字可读
+            图片模式下，主标题优先取 article.coverTitle（管理后台可单独设置），否则回退到 article.title
+        -->
+        <div class="relative overflow-hidden bg-gray-900" id="coverWrap" data-cover-mode="gradient">
+            <!-- 背景层：图片 / 渐变二选一 -->
+            <div class="relative w-full aspect-[16/9]">
+                <!-- 纯图片模式：实拍封面图（加载失败自动降级为渐变） -->
+                <img id="coverImg" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover hidden" onerror="this.classList.add('hidden');var b=document.getElementById('coverBg');if(b)b.classList.remove('hidden');var w=document.getElementById('coverWrap');if(w)w.dataset.coverMode='gradient';" />
+                <!-- 纯文字模式：渐变 SVG -->
+                <svg id="coverBg" class="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 800 450">
+                    <defs>
+                        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#10B981"/>
+                            <stop offset="100%" stop-color="#059669"/>
+                        </linearGradient>
+                        <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#F97316"/>
+                            <stop offset="100%" stop-color="#EA580C"/>
+                        </linearGradient>
+                        <pattern id="p1" width="60" height="60" patternUnits="userSpaceOnUse">
+                            <path d="M0 30 L30 0 L60 30 L30 60 Z" fill="none" stroke="white" stroke-width="0.5" opacity="0.15"/>
+                        </pattern>
+                    </defs>
+                    <rect width="800" height="450" fill="url(#g1)"/>
+                    <rect width="800" height="450" fill="url(#p1)"/>
+                    <!-- 装饰圆 -->
+                    <circle cx="650" cy="80" r="120" fill="white" opacity="0.1"/>
+                    <circle cx="120" cy="400" r="90" fill="white" opacity="0.08"/>
+                    <!-- 大字图标 -->
+                    <text id="coverIcon" x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-size="160" fill="white" opacity="0.18" font-family="serif">银</text>
+                </svg>
+                <!-- 文字可读性遮罩：底部 3/4 黑色渐变到透明 -->
+                <div class="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/85 via-black/45 to-transparent pointer-events-none"></div>
+            </div>
+
+            <!-- 顶部：分类 + 标签徽章（两种模式共用） -->
             <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5">
                 <span id="catBadge" class="text-[10px] bg-white/95 backdrop-blur-sm text-brand-ink font-bold px-2 py-1 rounded-full shadow-sm"></span>
                 <span id="tagBadge" class="text-[10px] bg-brand-orange text-white font-bold px-2 py-1 rounded-full shadow-sm"></span>
             </div>
-            <div class="absolute bottom-3 left-4 right-4 z-20">
-                <h1 id="title" class="text-white text-xl font-black leading-tight drop-shadow-md"></h1>
+
+            <!-- 底部：主标题 + 副标题 + 元信息 -->
+            <div class="absolute inset-x-0 bottom-0 z-20 p-4 pb-5">
+                <h1 id="title" class="text-white text-[22px] font-black leading-tight drop-shadow-md mb-1.5 line-clamp-2"></h1>
+                <p id="subtitle" class="text-white/85 text-[13px] leading-relaxed line-clamp-2 mb-2.5 drop-shadow-sm"></p>
+                <div class="flex items-center gap-2 text-[11px] text-white/70 font-medium">
+                    <i class="far fa-calendar-alt text-[10px]"></i>
+                    <span id="coverDate"></span>
+                    <span class="w-1 h-1 rounded-full bg-white/40"></span>
+                    <i class="far fa-eye text-[10px]"></i>
+                    <span id="coverViews"></span>
+                </div>
             </div>
-            <!-- 渐变背景图（用内联 SVG，避免外链） -->
-            <svg id="coverBg" class="w-full h-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 800 450">
-                <defs>
-                    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#10B981"/>
-                        <stop offset="100%" stop-color="#059669"/>
-                    </linearGradient>
-                    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#F97316"/>
-                        <stop offset="100%" stop-color="#EA580C"/>
-                    </linearGradient>
-                    <pattern id="p1" width="60" height="60" patternUnits="userSpaceOnUse">
-                        <path d="M0 30 L30 0 L60 30 L30 60 Z" fill="none" stroke="white" stroke-width="0.5" opacity="0.15"/>
-                    </pattern>
-                </defs>
-                <rect width="800" height="450" fill="url(#g1)"/>
-                <rect width="800" height="450" fill="url(#p1)"/>
-                <!-- 装饰圆 -->
-                <circle cx="650" cy="80" r="120" fill="white" opacity="0.1"/>
-                <circle cx="120" cy="400" r="90" fill="white" opacity="0.08"/>
-                <!-- 大字图标 -->
-                <text id="coverIcon" x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-size="160" fill="white" opacity="0.18" font-family="serif">银</text>
-            </svg>
         </div>
 
-        <!-- 作者 / 时间 / 统计 -->
+        <!-- 作者 / 点赞（日期已上移到封面区） -->
         <div class="px-4 py-3 bg-white border-b border-gray-100 flex items-center gap-3 text-xs text-brand-ink-light">
             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-green to-brand-green-dark flex items-center justify-center text-white font-bold text-xs flex-shrink-0" id="avatarBadge">铝</div>
-            <div class="flex-1">
-                <p class="text-sm font-bold text-brand-ink" id="author"></p>
-                <p class="text-[10px] text-brand-muted" id="dateLine"></p>
-            </div>
+            <p class="text-sm font-bold text-brand-ink flex-1" id="author"></p>
             <button id="likeBtn" class="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-pink-50 text-pink-500 active:scale-90 transition-transform">
                 <i class="far fa-heart text-xs"></i>
                 <span class="text-xs font-bold" id="likeCount">0</span>
@@ -230,54 +251,87 @@
 
         document.getElementById('pageTitle').textContent = article.cat === 'knowledge' ? '回收知识' : article.cat === 'notice' ? '通知公告' : article.cat === 'about' ? '关于铝老板' : '行业资讯';
         document.title = article.title + ' - 铝老板金属网';
-        document.getElementById('title').textContent = article.title;
         document.getElementById('author').textContent = article.author;
-        document.getElementById('dateLine').textContent = article.date + ' · 阅读 ' + article.views + ' · 点赞 ' + article.likes;
         document.getElementById('catBadge').textContent = article.cat === 'knowledge' ? '回收知识' : article.cat === 'notice' ? '通知公告' : article.cat === 'about' ? '关于铝老板' : '行业资讯';
         document.getElementById('tagBadge').textContent = article.tag;
         document.getElementById('tagInline').textContent = article.tag;
         document.getElementById('avatarBadge').textContent = article.author[0] || '铝';
         document.getElementById('likeCount').textContent = article.likes;
-        document.getElementById('coverIcon').textContent = article.cat === 'knowledge' ? '识' : article.cat === 'notice' ? '告' : article.cat === 'about' ? '铝' : '银';
 
-        // 封面渐变色按分类切换
-        const gradEl = document.querySelector('#coverBg rect:first-of-type');
-        if (article.cat === 'knowledge') {
-          gradEl.setAttribute('fill', 'url(#g1)'); // 绿
-        } else if (article.cat === 'about') {
-          // 关于铝老板：蓝紫渐变
-          let g3 = document.getElementById('g3');
-          if (!g3) {
-            const ns = 'http://www.w3.org/2000/svg';
-            const defs = document.querySelector('#coverBg defs');
-            g3 = document.createElementNS(ns, 'linearGradient');
-            g3.setAttribute('id', 'g3');
-            g3.setAttribute('x1', '0%'); g3.setAttribute('y1', '0%');
-            g3.setAttribute('x2', '100%'); g3.setAttribute('y2', '100%');
-            const s1 = document.createElementNS(ns, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#3B82F6');
-            const s2 = document.createElementNS(ns, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#6366F1');
-            g3.appendChild(s1); g3.appendChild(s2);
-            defs.appendChild(g3);
-          }
-          gradEl.setAttribute('fill', 'url(#g3)');
-        } else if (article.cat === 'notice') {
-          // 通知公告：粉红渐变
-          let g4 = document.getElementById('g4');
-          if (!g4) {
-            const ns = 'http://www.w3.org/2000/svg';
-            const defs = document.querySelector('#coverBg defs');
-            g4 = document.createElementNS(ns, 'linearGradient');
-            g4.setAttribute('id', 'g4');
-            g4.setAttribute('x1', '0%'); g4.setAttribute('y1', '0%');
-            g4.setAttribute('x2', '100%'); g4.setAttribute('y2', '100%');
-            const s1 = document.createElementNS(ns, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#EC4899');
-            const s2 = document.createElementNS(ns, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#BE185D');
-            g4.appendChild(s1); g4.appendChild(s2);
-            defs.appendChild(g4);
-          }
-          gradEl.setAttribute('fill', 'url(#g4)');
+        // 渲染封面：模式判断（coverMode 显式 > 根据 cover 是否存在自动判断）
+        const coverWrap = document.getElementById('coverWrap');
+        const coverImg = document.getElementById('coverImg');
+        const coverBg = document.getElementById('coverBg');
+        const explicitMode = article.coverMode;
+        const hasCoverImg = !!(article.cover && String(article.cover).trim() !== '');
+        const useImageMode = explicitMode === 'image' || (explicitMode !== 'gradient' && hasCoverImg);
+
+        if (useImageMode) {
+          coverImg.src = article.cover;
+          coverImg.alt = article.coverTitle || article.title;
+          coverImg.classList.remove('hidden');
+          coverBg.classList.add('hidden');
+          coverWrap.dataset.coverMode = 'image';
         } else {
-          gradEl.setAttribute('fill', 'url(#g2)'); // 橙
+          coverImg.removeAttribute('src');
+          coverImg.classList.add('hidden');
+          coverBg.classList.remove('hidden');
+          coverWrap.dataset.coverMode = 'gradient';
+        }
+
+        // 主标题：图片模式下用 coverTitle（管理后台可独立设置），文字模式下用 title
+        document.getElementById('title').textContent = (useImageMode && article.coverTitle) ? article.coverTitle : article.title;
+        // 副标题：用 summary 充当
+        document.getElementById('subtitle').textContent = article.summary || '';
+        // 元信息：日期 + 阅读量
+        document.getElementById('coverDate').textContent = article.date;
+        document.getElementById('coverViews').textContent = formatViews(article.views) + ' 阅读';
+        // 行业大字图标（仅在渐变模式有意义）
+        const coverIcon = document.getElementById('coverIcon');
+        if (coverIcon) {
+          coverIcon.textContent = article.cat === 'knowledge' ? '识' : article.cat === 'notice' ? '告' : article.cat === 'about' ? '铝' : '银';
+        }
+
+        // 封面渐变色按分类切换（仅在渐变模式生效）
+        const gradEl = coverBg && coverBg.querySelector('rect:first-of-type');
+        if (gradEl) {
+          if (article.cat === 'knowledge') {
+            gradEl.setAttribute('fill', 'url(#g1)'); // 绿
+          } else if (article.cat === 'about') {
+            // 关于铝老板：蓝紫渐变
+            let g3 = document.getElementById('g3');
+            if (!g3) {
+              const ns = 'http://www.w3.org/2000/svg';
+              const defs = coverBg.querySelector('defs');
+              g3 = document.createElementNS(ns, 'linearGradient');
+              g3.setAttribute('id', 'g3');
+              g3.setAttribute('x1', '0%'); g3.setAttribute('y1', '0%');
+              g3.setAttribute('x2', '100%'); g3.setAttribute('y2', '100%');
+              const s1 = document.createElementNS(ns, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#3B82F6');
+              const s2 = document.createElementNS(ns, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#6366F1');
+              g3.appendChild(s1); g3.appendChild(s2);
+              defs.appendChild(g3);
+            }
+            gradEl.setAttribute('fill', 'url(#g3)');
+          } else if (article.cat === 'notice') {
+            // 通知公告：粉红渐变
+            let g4 = document.getElementById('g4');
+            if (!g4) {
+              const ns = 'http://www.w3.org/2000/svg';
+              const defs = coverBg.querySelector('defs');
+              g4 = document.createElementNS(ns, 'linearGradient');
+              g4.setAttribute('id', 'g4');
+              g4.setAttribute('x1', '0%'); g4.setAttribute('y1', '0%');
+              g4.setAttribute('x2', '100%'); g4.setAttribute('y2', '100%');
+              const s1 = document.createElementNS(ns, 'stop'); s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#EC4899');
+              const s2 = document.createElementNS(ns, 'stop'); s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#BE185D');
+              g4.appendChild(s1); g4.appendChild(s2);
+              defs.appendChild(g4);
+            }
+            gradEl.setAttribute('fill', 'url(#g4)');
+          } else {
+            gradEl.setAttribute('fill', 'url(#g2)'); // 橙
+          }
         }
 
         // 渲染正文（按 \n\n 切段，\n 切行；按 inlineImages 的 after 位置穿插图片）
@@ -470,6 +524,13 @@
         }
         function escapeHtml(s) {
           return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        // 阅读量格式化：1283 -> "1.3k"，2156 -> "2.2k"，528 -> "528"
+        function formatViews(n) {
+          n = Number(n) || 0;
+          if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, '') + 'w';
+          if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+          return String(n);
         }
         function toast(msg) {
           const el = document.getElementById('toast');

@@ -11,7 +11,9 @@
       cat: 'notice',
       title: '白银价格突破 8000 元/千克，行情组紧急上调参考报价',
       summary: '受全球避险情绪与工业需求双轮驱动，银价创 12 年新高，建议含银废料从业者加快周转...',
-      cover: '/images/articles/notice-cover.jpg',
+      cover: '',
+      coverMode: 'gradient',
+      coverTitle: '银价突破 8000',
       inlineImages: [
         { url: '/images/articles/notice-inline.jpg', caption: '上海黄金交易所白银 T+D 实时行情', after: 0 }
       ],
@@ -27,7 +29,9 @@
       cat: 'notice',
       title: '会员体系升级：发布评论、查看实时行情享专属权益',
       summary: '6 月起，VIP 会员可发布评论、查看实时行情、获取 1 对 1 咨询等服务全面升级...',
-      cover: '/images/articles/notice-cover.jpg',
+      cover: '',
+      coverMode: 'gradient',
+      coverTitle: 'VIP 权益升级',
       inlineImages: [
         { url: '/images/articles/notice-inline.jpg', caption: '铝老板 VIP 会员权益一览', after: 1 }
       ],
@@ -64,6 +68,7 @@
       id: 'n1',
       cat: 'news',
       title: '白银价格突破 8000 元/千克，再创年内新高',
+      coverTitle: '银价突破 8000 元/千克',
       summary: '受全球避险情绪与工业需求双轮驱动，伦敦银现价创 12 年新高，国内白银现货报价同步攀升...',
       cover: '/images/articles/n1-cover.jpg',
       inlineImages: [
@@ -180,6 +185,7 @@
       id: 'k2',
       cat: 'knowledge',
       title: '银触点的化学溶解法与电解法对比',
+      coverTitle: '溶解法 vs 电解法',
       summary: '硝酸溶解 vs 电解精炼，两种主流提取工艺的优缺点分析',
       cover: '/images/articles/k2-cover.jpg',
       inlineImages: [
