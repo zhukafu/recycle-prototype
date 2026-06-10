@@ -55,11 +55,7 @@ to { opacity: 1; transform: translateY(0); }
       </svg>
     </a>
     <h1 class="text-base font-bold text-gray-900" id="pageTitle">产品详情</h1>
-    <button onclick="shareProduct()" aria-label="分享" class="w-9 h-9 -mr-1 flex items-center justify-center rounded-full active:bg-gray-100 transition-colors">
-      <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"></path>
-      </svg>
-    </button>
+    <div id="page-actions" class="-mr-1"></div>
   </div>
 </header>
 
@@ -175,7 +171,7 @@ to { opacity: 1; transform: translateY(0); }
 
 <!-- 底部固定操作栏 -->
 <footer class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 py-2.5 flex items-center gap-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
-  <a href="tel:13217121000" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm font-bold text-gray-700 bg-gray-bg rounded-xl active:scale-95 transition" aria-label="咨询电话">
+  <a id="consultBtn" href="tel:13217121000" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm font-bold text-gray-700 bg-gray-bg rounded-xl active:scale-95 transition" aria-label="咨询电话">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"></path></svg>
     咨询
   </a>
@@ -186,6 +182,9 @@ to { opacity: 1; transform: translateY(0); }
     立即交易
   </button>
 </footer>
+
+<!-- 站点配置：统一联系方式、微信唤起、平滑跳转工具（必须在 data/contacts.js 之前） -->
+<script src="data/site-config.js"></script>
 
 <script>
   // 数据从共享脚本 window._AL_PRODUCTS 读取
@@ -292,12 +291,21 @@ to { opacity: 1; transform: translateY(0); }
   // 操作
   function inquiry() {
     if (!it) return;
-    alert(`已提交询价：${it.model}\n我们将尽快与您联系。`);
+    if (window._AL_openWechat) {
+      window._AL_openWechat(window._AL_SITE && window._AL_SITE.wechat);
+    } else {
+      alert('即将打开微信客服');
+    }
   }
   function goPay() {
     if (!it) return;
-    alert(`跳转交易：${it.model} ¥${it.price}\n演示版：实际交易流程待对接。`);
+    if (window._AL_navigate) {
+      window._AL_navigate('contacts.html');
+    } else {
+      window.location.href = 'contacts.html';
+    }
   }
+
   function shareProduct() {
     if (!it) return;
     const url = location.origin + location.pathname + '?id=' + it.id;
@@ -309,6 +317,41 @@ to { opacity: 1; transform: translateY(0); }
       alert(url);
     }
   }
+</script>
+
+<!--
+  咨询按钮：tel: 链接从 _AL_SITE.phone 统一读取（与联系我们模块保持一致）
+  独立 script 块的原因：主 inline script 可能在 render 阶段抛错（找不到产品 / cat 缺字段 / DOM 元素未就绪），
+  把这段 IIFE 放在外面，HTML 上已写兜底 href="tel:13217121000"，即使 JS 挂了链接也能用
+-->
+<script>
+  (function () {
+    try {
+      var el = document.getElementById('consultBtn');
+      if (!el) return;
+      // 1) 用 _AL_SITE.phone 覆盖 HTML 默认值
+      if (window._AL_telLink) {
+        el.setAttribute('href', window._AL_telLink());
+      }
+      // 2) 桌面端点击 tel: 通常无效，给个 toast 提示
+      el.addEventListener('click', function () {
+        var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+        if (!isMobile && window._AL_toast) {
+          var phone = (window._AL_SITE && window._AL_SITE.phone) || '13217121000';
+          window._AL_toast('请使用手机拨打 ' + phone, 2200);
+        }
+      });
+    } catch (e) { /* 兜底：HTML 上已写 tel:13217121000，无需处理 */ }
+  })();
+</script>
+
+<!-- 挂载顶部右侧操作按钮组件（3点菜单 + 头像入口） -->
+<script type="module">
+  import { mountPageActions } from '/src/components/page-actions.js';
+  mountPageActions('#page-actions', {
+    onMenu: () => shareProduct(),
+    onAvatar: () => location.href = 'mine.html',
+  });
 </script>
 
 </body>

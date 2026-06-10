@@ -63,6 +63,7 @@ to { opacity: 1; transform: translateY(0); }
   </div>
 </header>
 
+<script src="data/site-config.js"></script>
 <script src="data/articles.js"></script>
 <script type="module">
   import { mountPageActions } from '/src/components/page-actions.js';
@@ -432,7 +433,7 @@ to { opacity: 1; transform: translateY(0); }
         <img src="/icons/wechat.svg" alt="微信" class="w-5 h-5" style="filter: invert(50%) sepia(95%) saturate(485%) hue-rotate(112deg) brightness(95%) contrast(91%);">
       </div>
       <div>
-        <p class="text-sm font-bold text-gray-900">13217121000</p>
+        <p class="text-sm font-bold text-gray-900" id="contactWechatLabel">13217121000</p>
       </div>
     </div>
     <button class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors" data-copy-wechat>复制</button>
@@ -448,6 +449,30 @@ to { opacity: 1; transform: translateY(0); }
     <a href="https://uri.amap.com/marker?position=113.9268,30.9264&name=湖北省孝感市天下循环经济产业园&src=mypage&coordinate=gaode&callnative=1" class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors flex-shrink-0 no-underline">导航</a>
   </div>
 </div>
+
+<!-- 用 _AL_SITE 同步联系我们区域的电话/微信显示，保证全站统一 -->
+<script>
+  (function () {
+    const S = window._AL_SITE;
+    if (!S) return;
+    const phoneLabel = document.getElementById('contactPhoneLabel');
+    const telBtn = document.getElementById('contactTelBtn');
+    const wechatLabel = document.getElementById('contactWechatLabel');
+    if (phoneLabel) phoneLabel.textContent = (S.brandName ? S.brandName.replace(/金属网$/, '') : '铝老板') + ' ' + S.phone;
+    if (telBtn) {
+      telBtn.setAttribute('href', 'tel:' + S.phone);
+      // 桌面端：点击给个 toast 提示用手机拨打
+      telBtn.addEventListener('click', function () {
+        const ua = navigator.userAgent;
+        const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
+        if (!isMobile && window._AL_toast) {
+          window._AL_toast('请使用手机拨打 ' + S.phone, 2200);
+        }
+      });
+    }
+    if (wechatLabel) wechatLabel.textContent = S.wechat;
+  })();
+</script>
 </div>
 </div>
 </div>
@@ -495,13 +520,20 @@ to { opacity: 1; transform: translateY(0); }
     const btn = document.querySelector('[data-copy-wechat]');
     if (!btn) return;
     btn.addEventListener('click', () => {
-      const text = '13217121000';
+      const text = (window._AL_SITE && window._AL_SITE.wechat) || '13217121000';
+      const after = () => {
+        const orig = btn.textContent;
+        btn.textContent = '已复制';
+        setTimeout(() => (btn.textContent = orig), 1500);
+      };
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-          const orig = btn.textContent;
-          btn.textContent = '已复制';
-          setTimeout(() => (btn.textContent = orig), 1500);
+        navigator.clipboard.writeText(text).then(after).catch(() => {
+          if (window._AL_copyToClipboard) window._AL_copyToClipboard(text);
+          after();
         });
+      } else if (window._AL_copyToClipboard) {
+        window._AL_copyToClipboard(text);
+        after();
       }
     });
   })();
