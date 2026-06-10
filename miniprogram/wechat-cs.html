@@ -503,24 +503,88 @@
       100% { opacity: 0; transform: translate(-50%, -55%); }
     }
 
-    /* 桌面端背景 */
-    @media (min-width: 481px) {
+    /* ===== 响应式布局 ===== */
+
+    /* 平板端 (481px ~ 768px) */
+    @media (min-width: 481px) and (max-width: 768px) {
       body {
-        max-width: 420px;
-        height: 860px;
-        max-height: 100vh;
-        margin: 0 auto;
-        border-left: 1px solid rgba(0,0,0,0.06);
-        border-right: 1px solid rgba(0,0,0,0.06);
-        box-shadow: 0 0 40px rgba(0,0,0,0.08);
+        max-width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        margin: 0;
+        border: none;
+        box-shadow: none;
       }
-      html { background: #ededed; }
-      body { margin-top: 0; }
+      .wx-nav { padding: 0 12px; }
+      .msg-row { padding: 8px 16px; }
+      .bubble { max-width: 65%; font-size: 15px; }
+      .brand-card { max-width: 70%; }
+      .contact-card { max-width: 72%; }
+      .quick-grid { gap: 10px; margin: 10px 0 6px; }
+      .quick-btn { padding: 12px 14px; }
     }
-    @media (max-width: 480px) {
-      @media (min-height: 700px) {
-        body { margin-top: 0; }
+
+    /* 桌面端 (>768px) — 居中卡片 + 自适应宽度 */
+    @media (min-width: 769px) {
+      html { background: #d9d9d9; }
+      body {
+        max-width: min(680px, 90vw);
+        height: 100vh;
+        height: 100dvh;
+        max-height: 960px;
+        margin: 0 auto;
+        border-left: 1px solid rgba(0,0,0,0.08);
+        border-right: 1px solid rgba(0,0,0,0.08);
+        box-shadow: 0 0 60px rgba(0,0,0,0.12);
+        border-radius: 0;
       }
+      .ios-status { height: 36px; padding: 0 28px; }
+      .wx-nav { padding: 0 14px; }
+      .wx-nav__title h1 { font-size: 17px; }
+      .wx-nav__title p { font-size: 12px; }
+      .msg-row { padding: 8px 20px; gap: 10px; }
+      .bubble { max-width: 60%; font-size: 15px; padding: 10px 14px; }
+      .brand-card { max-width: 65%; padding: 16px 14px 14px; }
+      .contact-card { max-width: 68%; }
+      .contact-card .row { padding: 13px 16px; }
+      .quick-grid { gap: 10px; margin: 10px 0 6px; }
+      .quick-btn { padding: 12px 14px; font-size: 14px; }
+      .quick-btn .ico { width: 32px; height: 32px; }
+      .wx-toolbar { padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); gap: 10px; }
+      .wx-toolbar .input { height: 40px; font-size: 15px; border-radius: 8px; }
+      .conversation { padding: 16px 0 24px; }
+      .fab-home { right: 16px; bottom: 80px; width: 46px; height: 46px; }
+    }
+
+    /* 超大屏 (>1200px) */
+    @media (min-width: 1200px) {
+      body {
+        max-width: 780px;
+      }
+      .bubble { max-width: 55%; }
+      .brand-card { max-width: 60%; }
+      .contact-card { max-width: 62%; }
+    }
+
+    /* 小屏手机 (<=360px) */
+    @media (max-width: 360px) {
+      .bubble { max-width: 78%; font-size: 14px; padding: 8px 10px; }
+      .brand-card { max-width: 84%; }
+      .contact-card { max-width: 86%; }
+      .quick-grid { grid-template-columns: 1fr; }
+      .wx-nav__title h1 { font-size: 15px; }
+      .ios-status { padding: 0 14px; font-size: 13px; }
+      .msg-row { padding: 5px 8px; gap: 6px; }
+      .avatar { width: 32px; height: 32px; font-size: 12px; }
+      .wx-toolbar .input { height: 34px; font-size: 14px; }
+    }
+
+    /* 横屏模式 */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .ios-status { display: none; }
+      .wx-nav { height: 40px; }
+      .conversation { padding: 8px 0 12px; }
+      .wx-toolbar { padding: 6px 8px; }
     }
   </style>
 </head>
