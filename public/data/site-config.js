@@ -226,17 +226,21 @@
     }
   };
 
-  /* ========== 4. 平滑跳转 ========== */
+  /* ========== 4. 平滑跳转（跨页导航，不使用 View Transitions API） ========== */
+  // 注意：document.startViewTransition 仅适用于同页 DOM 切换（SPA 场景），
+  //       跨页 location.href 放入其回调会导致部分浏览器静默失败（点击无反应）。
+  //       此处用简单的淡出过渡 + 直接跳转替代。
   window._AL_navigate = function (url) {
-    if (typeof document.startViewTransition === 'function') {
-      try {
-        document.startViewTransition(function () {
-          window.location.href = url;
-        });
-        return;
-      } catch (e) { /* 降级 */ }
+    try {
+      // 简单淡出效果
+      document.body.style.transition = 'opacity 0.15s ease';
+      document.body.style.opacity = '0';
+      setTimeout(function () {
+        window.location.href = url;
+      }, 150);
+    } catch (e) {
+      window.location.href = url;
     }
-    window.location.href = url;
   };
 
   /* ========== 5. Toast（顶部居中，自动消失） ========== */

@@ -344,9 +344,10 @@
           // 兜底缩略图：用分类色块图
           const fallback = (window._AL_CAT_IMG || {})[it.cat] || '';
           const imgSrc = it.img || fallback;
-          // 列表页公开展示回收参考价，优先使用 price，旧数据缺 price 时回退 silverCopperPrice。
+          // 列表页价格：会员可见；非会员显示「开通会员查看」锁标
           const displayPrice = it.price || it.silverCopperPrice || '';
-          const priceHtml = displayPrice
+          const canViewMember = !!(window._AL_canView && window._AL_canView('member'));
+          const priceHtml = (canViewMember && displayPrice)
             ? '<p class="text-sm font-black text-al-orange font-mono leading-none">¥' + esc(displayPrice) + '<span class="text-[10px] text-al-gray font-normal ml-0.5">/件</span></p>'
             : ((window._AL_lockBadge && window._AL_lockBadge('开通会员查看', 'sm')) || '<span class="text-sm text-al-orange font-medium">开通会员查看</span>');
           return (

@@ -277,9 +277,10 @@
           listEl.innerHTML = filtered.map((it, idx) => {
             const imgUrl = it.img || (window._AL_CAT_IMG || {})[it.cat] || '';
             const catLabel = (window._AL_CAT_LABEL || {})[it.cat] || '产品';
-            // 分类列表只展示回收参考价；无可用价格时回退到会员提示。
+            // 分类列表价格：会员可见；非会员显示「开通会员查看」锁标
             const displayPrice = it.price || it.silverCopperPrice || '';
-            const priceHtml = displayPrice
+            const canViewMember = !!(window._AL_canView && window._AL_canView('member'));
+            const priceHtml = (canViewMember && displayPrice)
               ? `<span class="text-xs text-brand-orange font-medium">¥</span><span class="text-xl font-bold text-brand-orange price-pulse font-mono tracking-tight">${displayPrice}</span>`
               : ((window._AL_lockBadge && window._AL_lockBadge('开通会员查看', 'sm')) ||
                 `<span class="text-sm text-brand-orange font-medium">开通会员查看</span>`);
