@@ -4,11 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev:mp": "vite",
-    "dev:admin": "vite --config vite.admin.config.js",
-    "build:mp": "vite build --config vite.mp.build.config.js",
-    "build:admin": "vite build --config vite.admin.build.config.js",
-    "build": "npm run build:mp && npm run build:admin"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "docker compose up -d --build"
   },
   "devDependencies": {
     "vite": "^5.4.10"
