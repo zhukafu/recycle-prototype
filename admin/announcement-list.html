@@ -61,8 +61,8 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-[13px] text-metal-800 font-semibold">公告将在小程序首页"通知公告"位展示</p>
-                    <p class="text-[11px] text-metal-500 mt-0.5">最多展示 3 条最新公告，按发布时间倒序排列</p>
+                    <p class="text-[13px] text-metal-800 font-semibold">公告将在小程序首页通知位和技术交流通知栏展示</p>
+                    <p class="text-[11px] text-metal-500 mt-0.5">支持首页通知、技术交流通知、置顶公告，按发布时间倒序排列</p>
                 </div>
             </div>
 
@@ -149,7 +149,7 @@
         title: '公告管理',
         back: true,
         onMenu: () => openActionMenu(['批量推送', '展示顺序', '刷新']),
-        onAvatar: () => location.href = 'mine.html',
+        onAvatar: () => location.href = 'system.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
 

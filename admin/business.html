@@ -38,108 +38,107 @@
     </header>
 
     <main class="admin-content">
-        <div class="content-inner px-4 lg:px-0 py-4 space-y-3">
+        <div class="content-inner px-4 lg:px-0 py-4 space-y-4">
 
-            <!-- 顶部说明 -->
             <div class="bg-gradient-to-br from-brand-500 to-brand-600 rounded-[16px] p-4 text-white shadow-[0_4px_16px_rgba(34,197,94,0.2)]">
                 <h2 class="text-[16px] font-bold">业务管理</h2>
-                <p class="text-[12px] opacity-90 mt-1">管理小程序所有业务内容：型号/报价/分类/资讯/询价/公告/账号</p>
+                <p class="text-[12px] opacity-90 mt-1">管理小程序核心内容：型号库、回收价、含量/重量等付费信息、行情与技术内容。</p>
                 <div class="grid grid-cols-3 gap-3 mt-3">
                     <div>
                         <p class="text-[10px] opacity-80">型号总数</p>
                         <p class="text-[16px] font-bold font-mono mt-0.5">128</p>
                     </div>
                     <div>
-                        <p class="text-[10px] opacity-80">报价条目</p>
-                        <p class="text-[16px] font-bold font-mono mt-0.5">42</p>
+                        <p class="text-[10px] opacity-80">付费字段</p>
+                        <p class="text-[16px] font-bold font-mono mt-0.5">4 类</p>
                     </div>
                     <div>
-                        <p class="text-[10px] opacity-80">待处理询价</p>
-                        <p class="text-[16px] font-bold font-mono mt-0.5">8</p>
+                        <p class="text-[10px] opacity-80">行情报价</p>
+                        <p class="text-[16px] font-bold font-mono mt-0.5">42</p>
                     </div>
                 </div>
             </div>
 
-            <!-- 业务入口列表 -->
-            <div class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] divide-y divide-metal-50">
-                <a href="catalog-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline">
-                    <div class="w-10 h-10 rounded-[10px] bg-brand-50 flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[14px] text-metal-800 font-medium">型号管理</p>
-                        <p class="text-[11px] text-metal-500 mt-0.5">接触器型号数据库</p>
-                    </div>
+            <section class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">型号与产品</h3>
+                <a href="catalog-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-brand-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">型号管理</p><p class="text-[11px] text-metal-500 mt-0.5">接触器型号库、产品详情、图片、上下架</p></div>
                     <span class="text-[11px] text-metal-400 mr-1">128</span>
-                    <svg class="text-metal-300 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
-                <a href="quote-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline">
-                    <div class="w-10 h-10 rounded-[10px] bg-amber-50 flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[14px] text-metal-800 font-medium">报价管理</p>
-                        <p class="text-[11px] text-metal-500 mt-0.5">金属价格报价数据</p>
-                    </div>
-                    <span class="text-[11px] text-metal-400 mr-1">42</span>
-                    <svg class="text-metal-300 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                </a>
-                <a href="category-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline">
-                    <div class="w-10 h-10 rounded-[10px] bg-blue-50 flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[14px] text-metal-800 font-medium">分类管理</p>
-                        <p class="text-[11px] text-metal-500 mt-0.5">接触器分类配置</p>
-                    </div>
+                <a href="category-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-blue-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">分类管理</p><p class="text-[11px] text-metal-500 mt-0.5">品牌、品类、标签、首页分类筛选</p></div>
                     <span class="text-[11px] text-metal-400 mr-1">8</span>
-                    <svg class="text-metal-300 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
-                <a href="article-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline">
-                    <div class="w-10 h-10 rounded-[10px] bg-red-50 flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[14px] text-metal-800 font-medium">资讯管理</p>
-                        <p class="text-[11px] text-metal-500 mt-0.5">技术教程/回收技巧</p>
-                    </div>
+            </section>
+
+            <section class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">回收价与行情</h3>
+                <a href="quote-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-amber-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">报价管理</p><p class="text-[11px] text-metal-500 mt-0.5">金属行情、废料行情、产品回收价</p></div>
+                    <span class="text-[11px] text-metal-400 mr-1">42</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </section>
+
+            <section class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">付费信息</h3>
+                <a href="catalog-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-orange-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7l3-7z"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">付费字段设置</p><p class="text-[11px] text-metal-500 mt-0.5">银点铜回收价、单位重量、金属含量、说明内容</p></div>
+                    <span class="text-[11px] text-orange-500 mr-1">VIP</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <a href="user-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-rose-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">付费权限用户</p><p class="text-[11px] text-metal-500 mt-0.5">会员状态、到期时间、查看权限</p></div>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </section>
+
+            <section class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">内容运营</h3>
+                <a href="article-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-red-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">资讯管理</p><p class="text-[11px] text-metal-500 mt-0.5">行业资讯、回收知识、关于铝老板</p></div>
                     <span class="text-[11px] text-metal-400 mr-1">48</span>
-                    <svg class="text-metal-300 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
-                <a href="inquiry-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline">
-                    <div class="w-10 h-10 rounded-[10px] bg-purple-50 flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[14px] text-metal-800 font-medium">询价管理</p>
-                        <p class="text-[11px] text-metal-500 mt-0.5">客户询价单处理</p>
-                    </div>
-                    <span class="text-[11px] text-rose-500 mr-1">8 待处理</span>
-                    <svg class="text-metal-300 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                </a>
-                <a href="announcement-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline">
-                    <div class="w-10 h-10 rounded-[10px] bg-cyan-50 flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[14px] text-metal-800 font-medium">公告管理</p>
-                        <p class="text-[11px] text-metal-500 mt-0.5">小程序首页通知</p>
-                    </div>
+                <a href="announcement-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-cyan-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">公告管理</p><p class="text-[11px] text-metal-500 mt-0.5">首页通知、技术交流公告、置顶内容</p></div>
                     <span class="text-[11px] text-metal-400 mr-1">12</span>
-                    <svg class="text-metal-300 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
-                <a href="user-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline">
-                    <div class="w-10 h-10 rounded-[10px] bg-rose-50 flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[14px] text-metal-800 font-medium">账号管理</p>
-                        <p class="text-[11px] text-metal-500 mt-0.5">管理员账号权限</p>
-                    </div>
+            </section>
+
+            <section class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">用户与权限</h3>
+                <a href="user-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-purple-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">账号管理</p><p class="text-[11px] text-metal-500 mt-0.5">管理员账号、普通用户、会员权限</p></div>
                     <span class="text-[11px] text-metal-400 mr-1">12</span>
-                    <svg class="text-metal-300 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
-            </div>
+            </section>
+
+            <section class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">站点配置</h3>
+                <a href="system.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-slate-100 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">联系方式配置</p><p class="text-[11px] text-metal-500 mt-0.5">电话、微信、地址、地图、客服入口</p></div>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <a href="announcement-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-indigo-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h8M8 16h5"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">首页配置</p><p class="text-[11px] text-metal-500 mt-0.5">首页通知、推荐内容、行情展示入口</p></div>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </section>
 
             <div class="h-4"></div>
         </div>
@@ -152,12 +151,11 @@
     import { mountAdminTopbar } from '/src/components/admin-topbar.js';
     import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
 
-    // 业务管理：一级菜单，不显示返回按钮
     mountAdminTopbar('#admin-topbar', {
         title: '业务管理',
         back: false,
         onMenu: () => openActionMenu(['刷新数据', '导出清单', '权限管理']),
-        onAvatar: () => location.href = 'mine.html',
+        onAvatar: () => location.href = 'system.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'business' });
 

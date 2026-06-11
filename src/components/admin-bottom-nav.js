@@ -158,10 +158,8 @@ const ICONS = {
 
 const ITEMS = [
   { key: 'home', label: '首页', href: 'manage.html' },
-  { key: 'business', label: '业务管理', href: 'business.html' },
-  { key: 'data', label: '数据运营', href: 'data.html' },
+  { key: 'business', label: '业务', href: 'business.html' },
   { key: 'system', label: '系统', href: 'system.html' },
-  { key: 'mine', label: '我的', href: 'mine.html' },
 ];
 
 function ensureStyles() {

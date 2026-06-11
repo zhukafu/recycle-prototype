@@ -64,8 +64,8 @@
                     <div class="text-[11px] text-metal-500 mt-0.5">本周新增</div>
                 </div>
                 <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="text-[20px] font-black text-amber-600 font-mono">8</div>
-                    <div class="text-[11px] text-metal-500 mt-0.5">待审核</div>
+                    <div class="text-[20px] font-black text-amber-600 font-mono">4</div>
+                    <div class="text-[11px] text-metal-500 mt-0.5">付费字段</div>
                 </div>
             </div>
 
@@ -129,7 +129,7 @@
                             <p class="text-[11px] text-metal-500 mt-1">银触点价格 · 接触器</p>
                         </div>
                         <div class="flex items-center gap-3 text-[11px] text-metal-500">
-                            <span class="text-brand-600 font-semibold font-mono">询价</span>
+                            <span class="text-amber-600 font-semibold font-mono">已配置付费字段</span>
                             <span>·</span>
                             <span>昨天</span>
                         </div>
@@ -178,7 +178,7 @@
         title: '型号管理',
         back: true,
         onMenu: () => openActionMenu(['导出 Excel', '批量删除', '刷新']),
-        onAvatar: () => location.href = 'mine.html',
+        onAvatar: () => location.href = 'system.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
 

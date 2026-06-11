@@ -45,10 +45,11 @@
                 <button class="tab-item px-4 py-2.5 text-[13px] font-semibold text-brand-600 relative whitespace-nowrap">
                     全部<div class="absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full"></div>
                 </button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">银触点</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">交流接触器</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">直流接触器</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">断路器</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">贵金属</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">有色金属</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">稀有金属</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">黑色金属</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">废料</button>
             </div>
         </div>
     </header>
@@ -157,7 +158,7 @@
         title: '报价管理',
         back: true,
         onMenu: () => openActionMenu(['导出 Excel', '批量更新', '刷新']),
-        onAvatar: () => location.href = 'mine.html',
+        onAvatar: () => location.href = 'system.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
 
