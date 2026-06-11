@@ -231,68 +231,72 @@ to { opacity: 1; transform: translateY(0); }
 
 <!-- 功能卡片区 -->
 <div class="px-4 mb-4">
-<div class="grid grid-cols-2 gap-3">
+<div class="grid grid-cols-2 gap-2">
 
-<!-- 查型号 - 红色卡片（点击跳转 contactors.html） -->
+<!-- 查型号 - 绿色卡片（点击跳转 contactors.html） -->
 <a href="contactors.html"
    aria-label="查型号：跳转到接触器数据库"
-   class="group block bg-red-brand rounded-2xl p-4 relative overflow-hidden shadow-lg shadow-red-brand/15 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-red-brand outline-none transition-transform slide-up stagger-1 will-change-transform">
-  <!-- 装饰光斑（右上 + 左下） -->
-  <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-[2px] pointer-events-none" aria-hidden="true"></div>
-  <div class="absolute -bottom-5 -left-5 w-20 h-20 bg-white/[0.07] rounded-full pointer-events-none" aria-hidden="true"></div>
+   class="group block bg-green-brand rounded-2xl p-3 relative overflow-hidden shadow-lg shadow-green-brand/20 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-green-300 focus-visible:ring-offset-2 focus-visible:ring-offset-green-brand outline-none transition-transform slide-up stagger-1 will-change-transform">
+  <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl pointer-events-none" aria-hidden="true"></div>
   <div class="relative z-10 flex flex-col h-full">
-    <span class="inline-flex w-fit bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-2">类型类</span>
-    <h3 class="text-white text-xl font-black mb-1">查型号</h3>
-    <p class="text-white/85 text-sm leading-snug mb-4">快速匹配检索器型号参数，精准识别含银废料规格</p>
-    <div class="mt-auto flex justify-end">
-      <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
-        <!-- 放大镜 + 列表，语义贴合"查型号" -->
-        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8 11h6M8 8h4"></path>
-        </svg>
-      </div>
+    <span class="inline-flex w-fit bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-1.5">类型类</span>
+    <h3 class="text-white text-lg font-black mb-0.5">查型号</h3>
+    <p class="text-white/80 text-[11px] leading-snug mb-2">精准识别含银废料规格</p>
+    <!-- 搜索框 mock -->
+    <div class="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-lg px-2.5 py-1.5 mb-2">
+      <svg class="w-3.5 h-3.5 text-white/70 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+      <span class="text-white/60 text-[11px]">搜索型号...</span>
+    </div>
+    <!-- 热门型号标签 -->
+    <div class="flex flex-wrap gap-1">
+      <span class="bg-white/15 text-white/90 text-[9px] font-medium px-1.5 py-0.5 rounded-full">CJX2-9511</span>
+      <span class="bg-white/15 text-white/90 text-[9px] font-medium px-1.5 py-0.5 rounded-full">CJX2-8011</span>
+      <span class="bg-white/15 text-white/90 text-[9px] font-medium px-1.5 py-0.5 rounded-full">CJX2-5011</span>
+      <span class="bg-white/15 text-white/90 text-[9px] font-medium px-1.5 py-0.5 rounded-full">CJX1-0910</span>
+    </div>
+    <div class="flex justify-end mt-auto">
+      <svg class="w-7 h-7 text-white/30" fill="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="9" ry="3.5"/><path d="M3 5.5v5c0 1.93 4.03 3.5 9 3.5s9-1.57 9-3.5v-5" opacity=".5"/><path d="M3 10.5v5c0 1.93 4.03 3.5 9 3.5s9-1.57 9-3.5v-5"/></svg>
     </div>
   </div>
 </a>
 
 <!-- 看报价 + 学技术 垂直堆叠 -->
-<div class="flex flex-col gap-3">
+<div class="flex flex-col gap-2">
 
-<!-- 看报价 - 绿色卡片（点击跳转 category.html 接触器类） -->
+<!-- 看报价 - 柔玫色卡片（点击跳转 category.html 接触器类） -->
 <a href="category.html"
    aria-label="看报价：跳转到接触器类"
-   class="bg-green-brand rounded-2xl p-3.5 relative overflow-hidden shadow-lg shadow-green-brand/15 flex-1 active:scale-[0.98] transition-transform cursor-pointer slide-up stagger-2 no-underline block">
-<div class="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-6 translate-x-6"></div>
+   class="bg-gradient-to-br from-rose-50 to-red-50 border border-rose-100 rounded-2xl p-3 relative overflow-hidden shadow-lg shadow-rose-100/60 flex-1 active:scale-[0.98] transition-transform cursor-pointer slide-up stagger-2 no-underline block">
+<div class="absolute top-0 right-0 w-16 h-16 bg-rose-200/25 rounded-full -translate-y-6 translate-x-6 blur-xl"></div>
 <div class="relative z-10 flex flex-col h-full justify-between">
 <div>
-<div class="flex items-center gap-2 mb-1.5">
-<h3 class="text-white text-lg font-black">看报价</h3>
-<span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">实时星</span>
+<div class="flex items-center gap-2 mb-1">
+<h3 class="text-rose-900 text-lg font-black">看报价</h3>
+<span class="bg-rose-100 text-rose-600 text-[10px] font-bold px-2 py-0.5 rounded-full">实时</span>
 </div>
-<p class="text-white/80 text-[11px] leading-relaxed">实时查铝合银废料回收行情，一键获取最新参考价</p>
+<p class="text-rose-700/80 text-[11px] leading-relaxed">实时查铝合银废料回收行情</p>
 </div>
-<div class="flex justify-end mt-2">
-<svg class="w-8 h-8 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v8H3zm4-8h2v16H7zm4-2h2v18h-2zm4 4h2v14h-2zm4-2h2v16h-2z"></path></svg>
+<div class="flex justify-end mt-1.5">
+<svg class="w-7 h-7 text-rose-300" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v8H3zm4-8h2v16H7zm4-2h2v18h-2zm4 4h2v14h-2zm4-2h2v16h-2z"></path></svg>
 </div>
 </div>
 </a>
 
-<!-- 学技术 - 橙色卡片（点击跳转 tecexc.html） -->
+<!-- 学技术 - 暖杏色卡片（点击跳转 tecexc.html） -->
 <a href="tecexc.html"
    aria-label="学技术：跳转到技术交流页面"
-   class="bg-orange-brand rounded-2xl p-3.5 relative overflow-hidden shadow-lg shadow-orange-brand/15 flex-1 active:scale-[0.98] transition-transform cursor-pointer slide-up stagger-3 no-underline block">
-<div class="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-6 translate-x-6"></div>
+   class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-3 relative overflow-hidden shadow-lg shadow-amber-100/60 flex-1 active:scale-[0.98] transition-transform cursor-pointer slide-up stagger-3 no-underline block">
+<div class="absolute top-0 right-0 w-16 h-16 bg-amber-200/25 rounded-full -translate-y-6 translate-x-6 blur-xl"></div>
 <div class="relative z-10 flex flex-col h-full justify-between">
 <div>
-<div class="flex items-center gap-2 mb-1.5">
-<h3 class="text-white text-lg font-black">学技术</h3>
-<span class="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">零基础</span>
+<div class="flex items-center gap-2 mb-1">
+<h3 class="text-amber-900 text-lg font-black">学技术</h3>
+<span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">零基础</span>
 </div>
-<p class="text-white/80 text-[11px] leading-relaxed">拆解快T5与合刷教学，新手也能快速上手</p>
+<p class="text-amber-700/80 text-[11px] leading-relaxed">拆解快T5与合刷教学</p>
 </div>
-<div class="flex justify-end mt-2">
-<svg class="w-8 h-8 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"></path></svg>
+<div class="flex justify-end mt-1.5">
+<svg class="w-7 h-7 text-amber-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"></path></svg>
 </div>
 </div>
 </a>
