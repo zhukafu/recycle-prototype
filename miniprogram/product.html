@@ -118,7 +118,7 @@ to { opacity: 1; transform: translateY(0); }
     <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
       <span class="w-1 h-3.5 bg-amber-dark rounded-full"></span>
       银点铜回收价
-      <span class="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-orange-brand to-orange-dark text-white text-[9px] font-bold shadow-sm">
+      <span data-vip-badge class="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-orange-brand to-orange-dark text-white text-[9px] font-bold shadow-sm">
         <i class="fas fa-crown text-[8px]"></i>VIP
       </span>
     </h3>
@@ -163,13 +163,13 @@ to { opacity: 1; transform: translateY(0); }
     </div>
   </section>
 
-  <!-- 单位重量表（锁区：会员可见） -->
-  <section class="bg-white px-4 py-4 border-t border-gray-100 slide-up" style="animation-delay:.15s">
+  <!-- 单位重量表（锁区：高级会员可见） -->
+  <section data-premium-only class="bg-white px-4 py-4 border-t border-gray-100 slide-up" style="animation-delay:.15s">
     <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
       <span class="w-1 h-3.5 bg-amber-dark rounded-full"></span>
       单位重量
       <span class="text-[10px] text-gray-400 font-normal ml-1">（每件产品可拆解材料）</span>
-      <span class="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-orange-brand to-orange-dark text-white text-[9px] font-bold shadow-sm">
+      <span data-vip-badge class="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-orange-brand to-orange-dark text-white text-[9px] font-bold shadow-sm">
         <i class="fas fa-crown text-[8px]"></i>VIP
       </span>
     </h3>
@@ -195,7 +195,7 @@ to { opacity: 1; transform: translateY(0); }
               <i class="fas fa-crown text-sm"></i>
             </span>
           </div>
-          <p class="text-[13px] font-black text-amber-dark tracking-wide">开通会员 · 解锁单位重量</p>
+          <p id="uwOverlayCta" class="text-[13px] font-black text-amber-dark tracking-wide">开通会员 · 解锁单位重量</p>
           <p class="text-[10px] text-gray-500 mt-0.5 mb-2.5">白银 / 烤点铜 / 漆包铜 重量与价值</p>
           <button onclick="event.preventDefault();event.stopPropagation();window._AL_lockClick&&_AL_lockClick(event)"
                   class="px-5 h-8 gradient-orange text-white text-[12px] font-bold rounded-full shadow-md shadow-orange-brand/30 active:scale-95 transition flex items-center gap-1.5">
@@ -207,12 +207,12 @@ to { opacity: 1; transform: translateY(0); }
     </div>
   </section>
 
-  <!-- 含银量（锁区：会员可见，整卡可点击拦截） -->
-  <section class="bg-white px-4 py-4 border-t border-gray-100 slide-up" style="animation-delay:.18s">
+  <!-- 含银量（锁区：高级会员可见，整卡可点击拦截） -->
+  <section data-premium-only class="bg-white px-4 py-4 border-t border-gray-100 slide-up" style="animation-delay:.18s">
     <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
       <span class="w-1 h-3.5 bg-amber-dark rounded-full"></span>
       金属含量
-      <span class="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-orange-brand to-orange-dark text-white text-[9px] font-bold shadow-sm">
+      <span data-vip-badge class="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-orange-brand to-orange-dark text-white text-[9px] font-bold shadow-sm">
         <i class="fas fa-crown text-[8px]"></i>VIP
       </span>
     </h3>
@@ -240,7 +240,7 @@ to { opacity: 1; transform: translateY(0); }
               <i class="fas fa-crown text-sm"></i>
             </span>
           </div>
-          <p class="text-[13px] font-black text-amber-dark tracking-wide">开通会员 · 解锁含银量</p>
+          <p id="silverOverlayCta" class="text-[13px] font-black text-amber-dark tracking-wide">开通会员 · 解锁含银量</p>
           <p class="text-[10px] text-gray-500 mt-0.5 mb-2.5">触点 Ag 含量 · 当日银价估值</p>
           <button onclick="event.preventDefault();event.stopPropagation();window._AL_lockClick&&_AL_lockClick(event)"
                   class="px-5 h-8 gradient-orange text-white text-[12px] font-bold rounded-full shadow-md shadow-orange-brand/30 active:scale-95 transition flex items-center gap-1.5">
@@ -342,6 +342,21 @@ to { opacity: 1; transform: translateY(0); }
     // 3. 关键参数（回收价格替代库存展示）
     const canViewMember = !!(window._AL_canView && window._AL_canView('member'));
     const canViewPrice = canViewMember;
+    const canViewPremium = !!(window._AL_canView && window._AL_canView('premium'));
+    // VIP 徽章：动态显示当前会员套餐名（高级会员显示套餐名，初级/体验版显示对应名称，非会员显示 VIP）
+    var vipLabel = 'VIP';
+    if (canViewMember && window._AL_USER.memberPackage) {
+      var pkg = window._AL_getPackage ? window._AL_getPackage(window._AL_USER.memberPackage) : null;
+      vipLabel = (pkg && pkg.name) || window._AL_USER.memberPackageName || 'VIP';
+    }
+    document.querySelectorAll('[data-vip-badge]').forEach(function(el) { el.innerHTML = '<i class="fas fa-crown text-[8px]"></i>' + vipLabel; });
+    // 高级专属区域覆盖层文案：初级会员显示「升级」，非会员显示「开通」
+    if (!canViewPremium && canViewMember) {
+      var uwCta = document.getElementById('uwOverlayCta');
+      if (uwCta) uwCta.textContent = '升级高级会员 · 解锁单位重量';
+      var sCta = document.getElementById('silverOverlayCta');
+      if (sCta) sCta.textContent = '升级高级会员 · 解锁含银量';
+    }
     // 关键参数只展示公共基础信息（品牌/分类/规格），回收价等敏感数据在下方专区由会员体系承接
     const params = [
       { label: '品牌',   value: it.brand },
@@ -370,13 +385,13 @@ to { opacity: 1; transform: translateY(0); }
       // silverCopperLocked 保持显示（已写好的 CTA 覆盖层）
     }
 
-    // 4.5 单位重量表（锁区：会员可见）
+    // 4.5 单位重量表（锁区：高级会员可见）
     const unitWeightRows = document.getElementById('unitWeightRows');
     const unitWeightLocked = document.getElementById('unitWeightLocked');
     if (Array.isArray(it.unitWeight) && it.unitWeight.length) {
       unitWeightRows.innerHTML = it.unitWeight.map((row, idx) => {
         const rowDelay = (idx * 60) + 'ms';
-        if (canViewMember) {
+        if (canViewPremium) {
           return `
             <div class="grid grid-cols-[1.2fr_1fr_0.8fr_1fr] gap-2 px-2 py-2.5 items-center slide-up" style="animation-delay:${rowDelay}">
               <div class="flex items-center gap-1.5 min-w-0">
@@ -402,16 +417,16 @@ to { opacity: 1; transform: translateY(0); }
           `;
         }
       }).join('');
-      if (canViewMember && unitWeightLocked) unitWeightLocked.classList.add('hidden');
+      if (canViewPremium && unitWeightLocked) unitWeightLocked.classList.add('hidden');
     } else {
-      // 没有单位重量数据时：会员态显示占位，非会员态保持拦截覆盖层可见
+      // 没有单位重量数据时：高级会员态显示占位，初级/非会员不显示此区域
       unitWeightRows.innerHTML = '<div class="px-2 py-4 text-center text-[11px] text-gray-400">暂无单位重量数据</div>';
-      if (canViewMember && unitWeightLocked) unitWeightLocked.classList.add('hidden');
+      if (canViewPremium && unitWeightLocked) unitWeightLocked.classList.add('hidden');
     }
 
-    // 5. 含银量（未登录 / 未会员时脱敏 + 全屏覆盖层）
+    // 5. 含银量（锁区：高级会员可见，整卡可点击拦截）
     const silverLocked = document.getElementById('silverLocked');
-    if (canViewMember) {
+    if (canViewPremium) {
       document.getElementById('silverEl').textContent = it.silver;
       const silverG = parseFloat(it.silver) || 0;
       document.getElementById('silverVal').textContent = '¥' + (silverG * SILVER_PRICE_PER_G).toFixed(2);
@@ -425,7 +440,17 @@ to { opacity: 1; transform: translateY(0); }
 
     // 5.5 会员态清理：移除 title / cursor / onclick，让卡片恢复静态展示
     if (canViewMember) {
-      ['silverCopperCard', 'unitWeightCard', 'silverCard'].forEach(function (id) {
+      ['silverCopperCard'].forEach(function (id) {
+        var card = document.getElementById(id);
+        if (!card) return;
+        card.removeAttribute('title');
+        card.removeAttribute('onclick');
+        card.style.cursor = 'default';
+        card.classList.remove('cursor-pointer', 'active:scale-[0.99]');
+      });
+    }
+    if (canViewPremium) {
+      ['unitWeightCard', 'silverCard'].forEach(function (id) {
         var card = document.getElementById(id);
         if (!card) return;
         card.removeAttribute('title');

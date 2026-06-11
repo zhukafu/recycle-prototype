@@ -48,11 +48,16 @@
   } catch (e) { /* localStorage 不可用 */ }
 
   // 权限检查
-  //   level: 'public'（默认）| 'login'（需登录）| 'member'（需开通会员）
+  //   level: 'public'（默认）| 'login'（需登录）| 'member'（需开通会员）| 'premium'（需高级会员，tag=STD）
   window._AL_canView = function (level) {
     if (!level || level === 'public') return true;
     if (level === 'login')  return !!window._AL_USER.isLoggedIn;
     if (level === 'member') return !!(window._AL_USER.isLoggedIn && window._AL_USER.isMember && (window._AL_USER.memberExpireAt === 0 || window._AL_USER.memberExpireAt > Date.now()));
+    if (level === 'premium') {
+      if (!window._AL_canView('member')) return false;
+      const pkg = window._AL_getPackage ? window._AL_getPackage(window._AL_USER.memberPackage) : null;
+      return !!(pkg && pkg.tag === 'STD');
+    }
     return true;
   };
 
