@@ -100,6 +100,21 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-slide-up { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+
+        /* 回复状态条动画 */
+        @keyframes slideUpBar {
+            from { opacity: 0; transform: translateY(-8px); max-height: 0; padding-top: 0; padding-bottom: 0; }
+            to { opacity: 1; transform: translateY(0); max-height: 48px; padding-top: 6px; padding-bottom: 6px; }
+        }
+        .reply-bar-enter { animation: slideUpBar 0.25s ease-out forwards; }
+
+        /* 新回复高亮入场 */
+        @keyframes newReplyPulse {
+            0%   { background-color: rgba(16,185,129,0.15); transform: scale(0.98); }
+            40%  { background-color: rgba(16,185,129,0.25); transform: scale(1); }
+            100% { background-color: transparent; transform: scale(1); }
+        }
+        .new-reply-highlight { animation: newReplyPulse 1s ease-out forwards; }
     </style>
 </head>
 <body class="bg-brand-surface min-h-screen pb-32">
@@ -219,12 +234,33 @@
         </section>
     </article>
 
-    <!-- 底部固定评论输入栏（论坛爬楼风格） -->
-    <div class="fixed bottom-0 left-0 right-0 z-40 glass border-t border-gray-200 px-4 py-2.5 flex items-center gap-3" style="padding-bottom: max(10px, env(safe-area-inset-bottom));">
-        <input id="commentInput" type="text" placeholder="我来说两句..." class="flex-1 min-w-0 h-9 px-3 bg-gray-100 rounded-full text-sm placeholder-gray-400 outline-none focus:bg-gray-50 focus:ring-2 focus:ring-brand-green/30" />
-        <button id="sendBtn" class="h-9 px-4 bg-gradient-to-r from-brand-green to-brand-green-dark text-white text-xs font-bold rounded-full shadow-md shadow-brand-green/25 active:scale-95 transition-transform flex items-center gap-1 flex-shrink-0">
-            发送
-        </button>
+    <!-- 底部固定评论输入栏（论坛爬楼风格 + 回复状态） -->
+    <div id="commentBar" class="fixed bottom-0 left-0 right-0 z-40 glass border-t border-gray-200" style="padding-bottom: max(10px, env(safe-area-inset-bottom));">
+        <!-- 回复状态指示条（默认隐藏，点击回复时显示） -->
+        <div id="replyIndicator" class="hidden px-4 py-1.5 bg-brand-green-light/40 border-b border-brand-green/20">
+            <div class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0" id="replyTargetAvatar">?</div>
+                <span class="text-xs font-medium text-brand-green-dark flex-1">正在回复 <strong class="text-brand-green" id="replyTargetName"></strong></span>
+                <button id="cancelReplyBtn" class="w-5 h-5 rounded-full flex items-center justify-center hover:bg-white/60 transition-colors">
+                    <i class="fas fa-times text-[10px] text-brand-muted"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 图片预览区（选择图片后显示缩略图，默认隐藏） -->
+        <div id="imagePreviewArea" class="hidden px-4 py-1.5 bg-gray-50 border-t border-gray-100">
+            <div id="imagePreviewList" class="flex gap-2 overflow-x-auto"></div>
+        </div>
+        <!-- 输入行（含图片按钮） -->
+        <div class="px-4 py-2.5 flex items-center gap-3">
+            <button id="imageBtn" type="button" class="w-9 h-9 flex items-center justify-center text-brand-muted hover:text-brand-green transition-colors flex-shrink-0 rounded-full hover:bg-gray-100" title="添加图片">
+                <i class="fas fa-image text-sm"></i>
+            </button>
+            <input id="imageInput" type="file" accept="image/*" multiple class="hidden" />
+            <input id="commentInput" type="text" placeholder="我来说两句..." class="flex-1 min-w-0 h-9 px-3 bg-gray-100 rounded-full text-sm placeholder-gray-400 outline-none focus:bg-gray-50 focus:ring-2 focus:ring-brand-green/30" />
+            <button id="sendBtn" class="h-9 px-4 bg-gradient-to-r from-brand-green to-brand-green-dark text-white text-xs font-bold rounded-full shadow-md shadow-brand-green/25 active:scale-95 transition-transform flex items-center gap-1 flex-shrink-0">
+                发送
+            </button>
+        </div>
     </div>
 
     <!-- Toast 容器 -->
@@ -393,6 +429,92 @@
         // 地区标签池（模拟用户所在地区）
         const LOCATIONS = ['浙江', '广东', '四川', '湖北', '河北', '山东', '江苏', '河南', '福建', '陕西'];
 
+        // 回复目标状态（外层作用域：renderComments 和 sendComment 共享）
+        let replyTarget = null; // { id, name }
+        function exitReplyMode() {
+          replyTarget = null;
+          const ri = document.getElementById('replyIndicator');
+          if (ri) {
+            ri.classList.add('hidden');
+            ri.classList.remove('reply-bar-enter');
+          }
+          const input = document.getElementById('commentInput');
+          if (input) input.placeholder = '我来说两句...';
+        }
+        // 取消回复按钮绑定（只绑一次）
+        document.getElementById('cancelReplyBtn').addEventListener('click', exitReplyMode);
+
+        // ========== 图片上传功能 ==========
+        const MAX_IMAGES = 9;
+        let pendingImages = []; // { id, dataURL, name }
+        const imageBtn = document.getElementById('imageBtn');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreviewArea = document.getElementById('imagePreviewArea');
+        const imagePreviewList = document.getElementById('imagePreviewList');
+
+        // 点击图片图标触发文件选择
+        imageBtn.addEventListener('click', () => {
+          imageInput.click();
+        });
+
+        // 选择文件后读取为 base64 并显示预览
+        imageInput.addEventListener('change', () => {
+          const files = Array.from(imageInput.files || []);
+          if (!files.length) return;
+          // 检查数量上限
+          if (pendingImages.length + files.length > MAX_IMAGES) {
+            toast(`最多添加 ${MAX_IMAGES} 张图片`);
+            imageInput.value = '';
+            return;
+          }
+          files.forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+              pendingImages.push({
+                id: 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                dataURL: reader.result,
+                name: file.name
+              });
+              refreshImagePreview();
+            };
+            reader.readAsDataURL(file);
+          });
+          imageInput.value = ''; // 重置以便重复选择同一文件
+        });
+
+        // 刷新预览缩略图列表
+        function refreshImagePreview() {
+          if (!pendingImages.length) {
+            imagePreviewArea.classList.add('hidden');
+            imagePreviewList.innerHTML = '';
+            return;
+          }
+          imagePreviewArea.classList.remove('hidden');
+          imagePreviewList.innerHTML = pendingImages.map(img =>
+            '<div class="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gray-100">' +
+              '<img src="' + img.dataURL + '" class="w-full h-full object-cover" />' +
+              '<button data-img-del="' + img.id + '" class="absolute top-0 right-0 w-4.5 h-4.5 -mt-1 -mr-1 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black/80 transition-colors" title="移除">' +
+                '<i class="fas fa-times text-[8px]"></i>' +
+              '</button>' +
+            '</div>'
+          ).join('');
+          // 绑定删除预览图事件
+          imagePreviewList.querySelectorAll('[data-img-del]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const delId = btn.getAttribute('data-img-del');
+              pendingImages = pendingImages.filter(i => i.id !== delId);
+              refreshImagePreview();
+            });
+          });
+        }
+
+        // 清空待发送的图片（发送后调用）
+        function clearPendingImages() {
+          pendingImages = [];
+          refreshImagePreview();
+        }
+
         function renderComments() {
           const data = csort === 'hot' ? allComments.slice().sort((a, b) => b.likes - a.likes) : allComments.slice();
           document.getElementById('commentCount').textContent = data.length;
@@ -435,21 +557,25 @@
                 <!-- 头像 + 名字行 -->
                 <div class="flex items-start gap-2.5">
                   <div class="w-9 h-9 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white flex-shrink-0 overflow-hidden">${avatarHtml}</div>
-                  <div class="flex-1 min-w-0 pt-0.5">
+                  <div class="flex-1 min-w-0 pt-0.5 relative">
                     <!-- 昵称 + 徽章 + 更多 -->
                     <div class="flex items-center mb-1">
                       <span class="text-[13px] font-bold text-brand-ink">${escapeHtml(c.user)}</span>${roleBadge}${meTag}
-                      <button class="ml-auto text-gray-400 hover:text-gray-600 p-1"><i class="fas fa-ellipsis-h text-xs"></i></button>
+                      <button data-cmenu="${c.id}" class="ml-auto text-gray-400 hover:text-gray-600 p-1"><i class="fas fa-ellipsis-h text-xs"></i></button>
                     </div>
+                    <!-- 更多操作下拉菜单（仅自己的评论可删除） -->
+                    ${isMine ? '<div data-cmenu-panel="' + c.id + '" class="hidden absolute right-0 top-6 bg-white shadow-lg rounded-lg border border-gray-100 py-1 z-10 min-w-[100px]"><button data-cdel="' + c.id + '" class="w-full px-3 py-1.5 text-left text-[12px] text-red-500 hover:bg-red-50 transition-colors">删除</button></div>' : ''}
                     <!-- 评论正文 -->
                     <p class="text-[14px] text-brand-ink leading-relaxed mb-2">${escapeHtml(c.text)}</p>
+                    <!-- 评论图片（圆角网格展示） -->
+                    ${(c.images && c.images.length) ? '<div class="grid gap-1.5 mb-2 ' + (c.images.length === 1 ? 'grid-cols-2 max-w-[200px]' : c.images.length <= 4 ? 'grid-cols-3' : 'grid-cols-3') + '">' + c.images.map(src => '<img src="' + src + '" class="w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open(\'' + src + '\')" />').join('') + '</div>' : ''}
                     <!-- 底部操作栏：时间 · 地区 · 回复  |  赞 · 踩 -->
                     <div class="flex items-center justify-between text-[11px] text-brand-muted">
                       <div class="flex items-center gap-1.5">
                         <span>${c.date.split(' ')[0]}</span>
                         <span class="text-gray-300">·</span>
                         <span>${location}</span>
-                        <button class="hover:text-brand-green transition-colors ml-1">回复</button>
+                        <button data-creply="${c.id}" data-reply-name="${escapeHtml(c.user)}" class="hover:text-brand-green transition-colors ml-1">回复</button>
                       </div>
                       <div class="flex items-center gap-3">
                         <button class="flex items-center gap-0.5 hover:text-brand-green transition-colors" data-clike="${c.id}">
@@ -461,6 +587,21 @@
                         </button>
                       </div>
                     </div>
+                    <!-- 嵌套回复列表（层级缩进 + 左侧绿色竖线区分） -->
+                    ${(c.replies || []).length ? '<div class="mt-2 space-y-1.5 ml-4 pl-3 border-l-2 border-brand-green/25">' + c.replies.map((r, ri) => {
+                      const rIsMine = !!r.isMine || r.user === meName;
+                      const rMeTag = rIsMine ? '<span class="text-[9px] bg-brand-green text-white px-1 py-px rounded font-bold ml-0.5">我</span>' : '';
+                      const rRoleBadge = r.role === 'vip' ? '<span class="text-[9px] bg-amber-500 text-white px-1 py-px rounded font-bold ml-0.5">VIP</span>' : '';
+                      const isNewReply = r.isNew ? ' new-reply-highlight' : '';
+                      return '<div class="bg-gray-50/80 rounded-lg px-3 py-2' + isNewReply + '"><div class="flex items-center mb-0.5 flex-wrap gap-y-0.5">' +
+                        '<span class="text-[12px] font-bold text-brand-ink">' + escapeHtml(r.user) + '</span>' + rMeTag + rRoleBadge +
+                        (r.replyTo ? '<span class="text-[10px] text-brand-green bg-brand-green-light/60 px-1.5 py-px rounded-full ml-1 font-medium">回复 @' + escapeHtml(r.replyTo) + '</span>' : '') +
+                        '<span class="text-[10px] text-brand-muted ml-auto">' + r.date.split(' ')[0] + '</span>' +
+                        (rIsMine ? '<button data-rdel="' + c.id + ':' + r.id + '" class="ml-2 text-gray-400 hover:text-red-500 p-0.5 transition-colors" title="删除"><i class="fas fa-trash-alt text-[10px]"></i></button>' : '') +
+                        '</div><p class="text-[13px] text-brand-ink leading-relaxed">' + escapeHtml(r.text) + '</p>' +
+                        (r.images && r.images.length ? '<div class="grid grid-cols-3 gap-1 mt-1.5">' + r.images.map(src => '<img src="' + src + '" class="w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open(\'' + src + '\')" />').join('') + '</div>' : '') +
+                        '</div>';
+                    }).join('') + '</div>' : ''}
                   </div>
                 </div>
               </div>
@@ -484,6 +625,86 @@
               const ic = b.querySelector('i');
               ic.className = 'fas fa-thumbs-down text-xs text-brand-orange';
               setTimeout(() => { ic.className = 'far fa-thumbs-down text-xs'; }, 800);
+            });
+          });
+          // ⋮ 更多菜单：切换下拉面板
+          document.querySelectorAll('[data-cmenu]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const cid = btn.getAttribute('data-cmenu');
+              const panel = document.querySelector('[data-cmenu-panel="' + cid + '"]');
+              if (!panel) return;
+              // 先关闭其他已打开的面板
+              document.querySelectorAll('[data-cmenu-panel]:not([hidden])').forEach(p => {
+                if (p !== panel) p.classList.add('hidden');
+              });
+              panel.classList.toggle('hidden');
+            });
+          });
+          // 删除评论
+          document.querySelectorAll('[data-cdel]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const cid = btn.getAttribute('data-cdel');
+              allComments = allComments.filter(x => x.id !== cid);
+              renderComments();
+              toast('评论已删除');
+            });
+          });
+          // 删除回复（格式 data-rdel="评论id:回复id"）
+          document.querySelectorAll('[data-rdel]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const val = (btn.getAttribute('data-rdel') || '').split(':');
+              const parentId = val[0];
+              const replyId = val[1];
+              const parent = allComments.find(x => x.id === parentId);
+              if (parent && parent.replies) {
+                parent.replies = parent.replies.filter(r => r.id !== replyId);
+                renderComments();
+                toast('回复已删除');
+              }
+            });
+          });
+          // 点击页面其他区域关闭所有菜单
+          document.addEventListener('click', () => {
+            document.querySelectorAll('[data-cmenu-panel]').forEach(p => p.classList.add('hidden'));
+          });
+          // 回复按钮：进入回复模式（显示状态指示条）
+          // 注意：replyTarget / exitReplyMode 定义在外层 IIFE 作用域，sendComment 才能访问
+          const replyIndicator = document.getElementById('replyIndicator');
+          const replyTargetAvatarEl = document.getElementById('replyTargetAvatar');
+          const replyTargetNameEl = document.getElementById('replyTargetName');
+          const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+
+          // 点击回复按钮
+          document.querySelectorAll('[data-creply]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const cid = btn.getAttribute('data-creply');
+              const name = btn.getAttribute('data-reply-name');
+              // 获取被回复者的头像首字（从评论数据中查找）
+              const targetComment = allComments.find(x => x.id === cid);
+              const avatarInitial = (targetComment && targetComment.user) ? targetComment.user[0] : name[0];
+
+              replyTarget = { id: cid, name: name };
+
+              // 更新状态条内容
+              replyTargetAvatarEl.textContent = avatarInitial;
+              replyTargetNameEl.textContent = '@' + name;
+
+              // 显示状态条（带动画）
+              replyIndicator.classList.remove('hidden');
+              replyIndicator.classList.remove('reply-bar-enter');
+              void replyIndicator.offsetWidth; // 触发 reflow 重启动画
+              replyIndicator.classList.add('reply-bar-enter');
+
+              // 更新输入框
+              const input = document.getElementById('commentInput');
+              input.placeholder = '回复 @' + name + ' 的评论…';
+
+              // 滚动到底部并聚焦
+              setTimeout(() => {
+                input.focus();
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+              }, 100);
             });
           });
         }
@@ -554,21 +775,37 @@
         function sendComment() {
           const input = document.getElementById('commentInput');
           const text = (input.value || '').trim();
-          if (!text) {
-            toast('请输入评论内容');
+          if (!text && !pendingImages.length) {
+            toast('请输入评论内容或添加图片');
             return;
           }
-          const newComment = {
-            id: 'c' + Date.now(),
+          const reply = {
+            id: 'r' + Date.now(),
             user: meName,
             avatar: meAvatar,
             date: nowStr(),
             text,
             likes: 0,
             role: meIsVip ? 'vip' : 'user',
-            isMine: true
+            isMine: true,
+            images: pendingImages.map(i => i.dataURL) // 附带图片 dataURL 数组
           };
-          allComments.unshift(newComment);
+          // 回复模式：追加到目标评论的 replies 数组，标记 replyTo 和 isNew
+          if (replyTarget) {
+            const parent = allComments.find(x => x.id === replyTarget.id);
+            if (parent) {
+              if (!parent.replies) parent.replies = [];
+              reply.replyTo = replyTarget.name;
+              reply.isNew = true;
+              parent.replies.push(reply);
+            }
+            exitReplyMode();
+            toast('回复已发布');
+          } else {
+            // 普通模式：作为新顶层评论
+            allComments.unshift(reply);
+            toast('评论已发布');
+          }
           csort = 'new';
           document.querySelectorAll('[data-csort]').forEach(x => {
             if (x.getAttribute('data-csort') === 'new') {
@@ -578,8 +815,15 @@
             }
           });
           input.value = '';
+          input.placeholder = '我来说两句...';
+          clearPendingImages(); // 清空已选图片预览
           renderComments();
-          toast('评论已发布');
+          // 动画结束后清除 isNew 标记（避免重复渲染时再次高亮）
+          setTimeout(() => {
+            allComments.forEach(c => {
+              if (c.replies) c.replies.forEach(r => { r.isNew = false; });
+            });
+          }, 1200);
         }
         function nowStr() {
           const d = new Date();
