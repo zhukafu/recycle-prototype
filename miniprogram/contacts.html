@@ -120,23 +120,23 @@
       <div class="grid grid-cols-3 gap-3 mb-6">
         <div>
           <label class="text-xs text-brand-ink-light mb-1 block">接触器总重</label>
-          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+          <input type="number" min="0" step="0.01" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
         </div>
         <div>
           <label class="text-xs text-brand-ink-light mb-1 block">银点铜总重</label>
-          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+          <input type="number" min="0" step="0.01" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
         </div>
         <div>
           <label class="text-xs text-brand-ink-light mb-1 block">铜板线图总重</label>
-          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+          <input type="number" min="0" step="0.01" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
         </div>
         <div>
           <label class="text-xs text-brand-ink-light mb-1 block">铜板线圈总重</label>
-          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+          <input type="number" min="0" step="0.01" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
         </div>
         <div>
           <label class="text-xs text-brand-ink-light mb-1 block">点块烤点重</label>
-          <input type="number" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
+          <input type="number" min="0" step="0.01" placeholder="kg" class="w-full h-10 border border-gray-200 rounded-lg text-sm text-center focus:outline-none focus:border-brand-green placeholder-gray-300">
         </div>
         <div>
           <label class="text-xs text-brand-ink-light mb-1 block">类型选择</label>
@@ -158,7 +158,7 @@
             </label>
             <label class="cursor-pointer">
               <input type="radio" name="contactType" value="电容接触器" class="peer hidden">
-              <div class="peer-checked:border-brand-teal peer-checked:bg-teal-50 peer-checked:[&_.opt-icon]:bg-brand-teal peer-checked:[&_.opt-icon]:text-white peer-checked:[&_.opt-label]:text-brand-teal border-2 border-gray-200 rounded-xl py-2.5 flex flex-col items-center gap-1 hover:border-gray-300 active:scale-95 transition-all">
+              <div class="peer-checked:border-yellow-500 peer-checked:bg-yellow-50 peer-checked:[&_.opt-icon]:bg-yellow-500 peer-checked:[&_.opt-icon]:text-white peer-checked:[&_.opt-label]:text-yellow-600 border-2 border-gray-200 rounded-xl py-2.5 flex flex-col items-center gap-1 hover:border-gray-300 active:scale-95 transition-all">
                 <div class="opt-icon w-7 h-7 rounded-lg bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-black transition-colors">容</div>
                 <span class="opt-label text-[11px] font-semibold text-gray-500 transition-colors">电容</span>
               </div>
@@ -167,7 +167,7 @@
         </div>
         <div class="col-span-3">
           <label class="text-xs text-brand-ink-light mb-1 block">第五项重量</label>
-          <input type="number" placeholder="请输入第五项重量（kg）" class="w-full h-10 border border-gray-200 rounded-lg text-sm px-3 focus:outline-none focus:border-brand-green placeholder-gray-300">
+          <input type="number" min="0" step="0.01" placeholder="请输入第五项重量（kg）" class="w-full h-10 border border-gray-200 rounded-lg text-sm px-3 focus:outline-none focus:border-brand-green placeholder-gray-300">
         </div>
       </div>
 

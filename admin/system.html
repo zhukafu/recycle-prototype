@@ -74,34 +74,30 @@
             <!-- 基础设置 -->
             <section class="bg-white rounded-[14px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
                 <h3 class="text-[14px] font-bold text-metal-900 px-4 pt-4 pb-2">基础设置</h3>
-                <div class="w-full flex items-center gap-3 px-4 py-3.5 border-t border-metal-100">
+                <button class="w-full flex items-center gap-3 px-4 py-3.5 border-t border-metal-100 tap-active text-left" data-open-panel="site">
                     <div class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center flex-shrink-0">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                     </div>
-                    <span class="flex-1 text-left text-[14px] text-metal-800">站点信息</span>
+                    <span class="flex-1 text-[14px] text-metal-800">站点信息</span>
                     <span class="text-[11px] text-metal-400">已配置</span>
-                </div>
-                <div class="w-full flex items-center gap-3 px-4 py-3.5 border-t border-metal-100">
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <button class="w-full flex items-center gap-3 px-4 py-3.5 border-t border-metal-100 tap-active text-left" data-open-panel="contact">
                     <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                     </div>
-                    <span class="flex-1 text-left text-[14px] text-metal-800">联系方式</span>
+                    <span class="flex-1 text-[14px] text-metal-800">联系方式</span>
                     <span class="text-[11px] text-metal-400">已配置</span>
-                </div>
-                <div class="w-full flex items-center gap-3 px-4 py-3.5 border-t border-metal-100">
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <button class="w-full flex items-center gap-3 px-4 py-3.5 border-t border-metal-100 tap-active text-left" data-open-panel="quotes">
                     <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     </div>
-                    <span class="flex-1 text-left text-[14px] text-metal-800">行情刷新</span>
+                    <span class="flex-1 text-[14px] text-metal-800">行情刷新</span>
                     <span class="text-[11px] text-metal-400">报价定时更新</span>
-                </div>
-                <div class="w-full flex items-center gap-3 px-4 py-3.5 border-t border-metal-100">
-                    <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center flex-shrink-0">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/><line x1="9" y1="15" x2="9.01" y2="15"/><line x1="15" y1="15" x2="15.01" y2="15"/></svg>
-                    </div>
-                    <span class="flex-1 text-left text-[14px] text-metal-800">小程序配置</span>
-                    <span class="text-[11px] text-metal-400">首页入口/付费锁区</span>
-                </div>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
             </section>
 
             <!-- 安全设置 -->
@@ -155,6 +151,146 @@
     document.querySelectorAll('[data-switch]').forEach(el => {
         el.addEventListener('click', () => el.classList.toggle('on'));
     });
+
+    // 设置面板
+    document.querySelectorAll('[data-open-panel]').forEach(btn => {
+        btn.addEventListener('click', () => openSettingsPanel(btn.dataset.openPanel));
+    });
+
+    function openSettingsPanel(type) {
+        const existing = document.getElementById('__settings_panel__');
+        if (existing) existing.remove();
+
+        const panels = {
+            site: {
+                title: '站点信息设置',
+                content: `
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">站点名称</label>
+                            <input type="text" value="铝老板金属网" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">站点描述</label>
+                            <textarea rows="3" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500 resize-none">卖货有参考不卖亏，收货有依据不踩坑。多年含银废料行情沉淀，一站查询更省心。</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">Logo 图标</label>
+                            <div class="flex items-center gap-3">
+                                <div class="w-14 h-14 bg-brand-500 rounded-xl flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                                </div>
+                                <button class="px-4 py-2 text-[13px] font-semibold text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition">更换图标</button>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            contact: {
+                title: '联系方式设置',
+                content: `
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">联系电话</label>
+                            <input type="tel" value="13217121000" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">微信号</label>
+                            <input type="text" value="13217121000" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">地址</label>
+                            <input type="text" value="湖北省孝感市天下循环经济产业园" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">高德坐标</label>
+                            <input type="text" value="113.9268,30.9264" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500" placeholder="经度,纬度">
+                        </div>
+                    </div>
+                `
+            },
+            quotes: {
+                title: '行情刷新设置',
+                content: `
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">刷新频率</label>
+                            <select class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500 bg-white">
+                                <option>每 5 分钟</option>
+                                <option selected>每 15 分钟</option>
+                                <option>每 30 分钟</option>
+                                <option>每 1 小时</option>
+                                <option>手动刷新</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-2">首页展示金属</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <span class="text-[14px] text-metal-800">黄金 (Au)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <span class="text-[14px] text-metal-800">白银 (Ag)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <span class="text-[14px] text-metal-800">铂金 (Pt)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <span class="text-[14px] text-metal-800">钯金 (Pd)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <span class="text-[14px] text-metal-800">铜 (Cu)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <span class="text-[14px] text-metal-800">铝 (Al)</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">展示样式</label>
+                            <select class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500 bg-white">
+                                <option selected>卡片式（2列网格）</option>
+                                <option>列表式（单列）</option>
+                                <option>滚动横幅</option>
+                            </select>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        const panel = panels[type];
+        if (!panel) return;
+
+        const el = document.createElement('div');
+        el.id = '__settings_panel__';
+        el.className = 'fixed inset-0 z-[60] flex items-end justify-center';
+        el.innerHTML = `
+            <div class="absolute inset-0 bg-black/40" data-close></div>
+            <div class="relative w-full max-w-lg bg-white rounded-t-2xl p-5 pb-8 animate-up max-h-[85vh] overflow-y-auto">
+                <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto mb-4"></div>
+                <h3 class="text-[17px] font-bold text-metal-900 mb-4">${panel.title}</h3>
+                ${panel.content}
+                <div class="flex gap-2 mt-6">
+                    <button class="flex-1 py-3 text-[14px] font-semibold text-metal-600 bg-metal-100 rounded-xl hover:bg-metal-200 transition" data-close>取消</button>
+                    <button class="flex-1 py-3 text-[14px] font-semibold text-white bg-brand-500 rounded-xl hover:bg-brand-600 transition" data-save>保存</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(el);
+
+        el.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => el.remove()));
+        el.querySelector('[data-save]').addEventListener('click', () => {
+            if (window._AL_toast) window._AL_toast('保存成功', 1500);
+            setTimeout(() => el.remove(), 300);
+        });
+    }
 
     function openActionMenu(items) {
         const existing = document.getElementById('__action_menu__');
