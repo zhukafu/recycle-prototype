@@ -306,7 +306,7 @@
   // 用户信息（模拟登录）
   const CURRENT_USER = {
     id: 'me',
-    name: '我',
+    name: '回收小达人',
     avatar: null,
     isVip: false
   };

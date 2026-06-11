@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/data/site-config.js"></script>
     <script src="/data/articles.js"></script>
     <script>
         tailwind.config = {
@@ -204,29 +205,25 @@
             <span class="text-[11px] text-brand-ink-light font-medium">#铝老板金属网</span>
         </div>
 
-        <!-- 评论区 -->
+        <!-- 评论区（论坛爬楼风格） -->
         <section class="mt-3 bg-white">
-            <div class="px-4 py-3 flex items-center justify-between">
-                <h2 class="text-base font-bold text-brand-ink">评论 <span class="text-sm text-brand-muted font-medium" id="commentCount">(0)</span></h2>
+            <div class="px-4 py-3 flex items-center justify-between border-b border-gray-100">
+                <h2 class="text-base font-bold text-brand-ink">全部评论 <span class="text-sm text-brand-muted font-normal" id="commentCount">0</span></h2>
                 <div class="flex items-center gap-1 text-xs">
                     <button data-csort="hot" class="px-2 py-1 rounded font-bold text-brand-green">最热</button>
                     <span class="text-gray-300">|</span>
                     <button data-csort="new" class="px-2 py-1 rounded text-brand-ink-light">最新</button>
                 </div>
             </div>
-            <div id="commentList" class="px-4 pb-4 space-y-3"></div>
+            <div id="commentList" class="px-4 pb-4 divide-y divide-gray-100"></div>
         </section>
     </article>
 
-    <!-- 底部固定评论输入栏 -->
-    <div class="fixed bottom-0 left-0 right-0 z-40 glass border-t border-gray-200 px-3 py-2.5 flex items-center gap-2" style="padding-bottom: max(10px, env(safe-area-inset-bottom));">
-        <!-- VIP 提示 -->
-        <div class="hidden sm:flex items-center gap-1 text-[10px] text-amber-500 font-bold bg-amber-50 px-2 py-1 rounded-full flex-shrink-0" id="vipTag">
-            <i class="fas fa-crown"></i> 会员特权
-        </div>
-        <input id="commentInput" type="text" placeholder="说点什么吧... 会员可发布评论" class="flex-1 min-w-0 h-9 px-3 bg-gray-100 rounded-full text-sm placeholder-gray-400 outline-none focus:bg-gray-50 focus:ring-2 focus:ring-brand-green/30" />
+    <!-- 底部固定评论输入栏（论坛爬楼风格） -->
+    <div class="fixed bottom-0 left-0 right-0 z-40 glass border-t border-gray-200 px-4 py-2.5 flex items-center gap-3" style="padding-bottom: max(10px, env(safe-area-inset-bottom));">
+        <input id="commentInput" type="text" placeholder="我来说两句..." class="flex-1 min-w-0 h-9 px-3 bg-gray-100 rounded-full text-sm placeholder-gray-400 outline-none focus:bg-gray-50 focus:ring-2 focus:ring-brand-green/30" />
         <button id="sendBtn" class="h-9 px-4 bg-gradient-to-r from-brand-green to-brand-green-dark text-white text-xs font-bold rounded-full shadow-md shadow-brand-green/25 active:scale-95 transition-transform flex items-center gap-1 flex-shrink-0">
-            <i class="fas fa-paper-plane text-[10px]"></i> 发送
+            发送
         </button>
     </div>
 
@@ -379,15 +376,29 @@
 
         articleEl.classList.remove('hidden');
 
-        // 渲染评论
+        // 渲染评论（论坛爬楼风格）
         let allComments = (window._AL_ARTICLES.getComments(article.id) || []).slice();
         let csort = 'hot';
+        const me = window._AL_ARTICLES.CURRENT_USER;
+        // 优先从登录态（_AL_USER）取昵称，未登录时再退回 CURRENT_USER 的默认值
+        const meName = (window._AL_USER && window._AL_USER.isLoggedIn && window._AL_USER.nickname)
+          ? window._AL_USER.nickname
+          : (me.name || '我');
+        const meAvatar = (window._AL_USER && window._AL_USER.isLoggedIn && window._AL_USER.avatar)
+          ? window._AL_USER.avatar
+          : me.avatar;
+        const meIsVip = (window._AL_USER && window._AL_USER.isLoggedIn)
+          ? !!window._AL_USER.isMember
+          : !!me.isVip;
+        // 地区标签池（模拟用户所在地区）
+        const LOCATIONS = ['浙江', '广东', '四川', '湖北', '河北', '山东', '江苏', '河南', '福建', '陕西'];
+
         function renderComments() {
           const data = csort === 'hot' ? allComments.slice().sort((a, b) => b.likes - a.likes) : allComments.slice();
-          document.getElementById('commentCount').textContent = '(' + allComments.length + ')';
+          document.getElementById('commentCount').textContent = data.length;
           if (!data.length) {
             document.getElementById('commentList').innerHTML = `
-              <div class="py-10 text-center">
+              <div class="py-12 text-center">
                 <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-2">
                   <i class="far fa-comment-dots text-gray-300"></i>
                 </div>
@@ -397,27 +408,59 @@
             return;
           }
           document.getElementById('commentList').innerHTML = data.map((c, idx) => {
-            const roleBadge = c.role === 'admin'
-              ? '<span class="text-[9px] bg-blue-500 text-white px-1 py-0.5 rounded font-bold ml-1">官方</span>'
-              : c.role === 'vip'
-                ? '<span class="text-[9px] bg-amber-500 text-white px-1 py-0.5 rounded font-bold ml-1">VIP</span>'
-                : '';
+            const isMine = !!c.isMine || c.user === meName;
+            const isAuthor = c.role === 'admin';
+            // 角色徽章：博主(作者) / 官方 / VIP
+            let roleBadge = '';
+            if (isAuthor) {
+              roleBadge = '<span class="text-[10px] bg-red-500 text-white px-1 py-px rounded font-bold ml-1">博主</span>';
+            } else if (c.role === 'vip') {
+              roleBadge = '<span class="text-[10px] bg-amber-500 text-white px-1 py-px rounded font-bold ml-1">VIP</span>';
+            }
+            // 自己的评论额外标记
+            const meTag = isMine ? '<span class="text-[10px] bg-brand-green text-white px-1 py-px rounded font-bold ml-1">我</span>' : '';
+
+            // 头像：有真实头像用 img，否则用首字渐变圆
             const avatarColor = c.role === 'admin' ? 'from-blue-500 to-indigo-600' : c.role === 'vip' ? 'from-amber-500 to-yellow-600' : 'from-gray-400 to-gray-500';
+            const avatarHtml = c.avatar
+              ? '<img src="' + escapeHtml(c.avatar) + '" class="w-full h-full object-cover rounded-full" />'
+              : '<span class="text-sm font-bold">' + c.user[0] + '</span>';
+
+            // 地区（根据评论 id 哈希分配固定地区）
+            const locIdx = Math.abs((c.id || '').split('').reduce((s,ch)=>s+ch.charCodeAt(0),0)) % LOCATIONS.length;
+            const location = c.location || LOCATIONS[locIdx];
+
             return `
-              <div class="flex items-start gap-2.5 animate-slide-up" style="animation-delay: ${idx * 0.04}s">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-bold text-xs flex-shrink-0">${c.user[0]}</div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center mb-0.5">
-                    <span class="text-[12px] font-bold text-brand-ink">${c.user}</span>${roleBadge}
-                    <span class="text-[10px] text-brand-muted ml-auto">${c.date}</span>
-                  </div>
-                  <p class="text-[13px] text-brand-ink leading-relaxed mb-1.5">${escapeHtml(c.text)}</p>
-                  <div class="flex items-center gap-3 text-[10px] text-brand-muted">
-                    <button class="flex items-center gap-0.5 hover:text-brand-green transition-colors" data-clike="${c.id}">
-                      <i class="far fa-thumbs-up"></i>
-                      <span>${c.likes}</span>
-                    </button>
-                    <button class="hover:text-brand-green transition-colors">回复</button>
+              <div class="py-3 animate-slide-up" style="animation-delay: ${idx * 0.04}s">
+                <!-- 头像 + 名字行 -->
+                <div class="flex items-start gap-2.5">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white flex-shrink-0 overflow-hidden">${avatarHtml}</div>
+                  <div class="flex-1 min-w-0 pt-0.5">
+                    <!-- 昵称 + 徽章 + 更多 -->
+                    <div class="flex items-center mb-1">
+                      <span class="text-[13px] font-bold text-brand-ink">${escapeHtml(c.user)}</span>${roleBadge}${meTag}
+                      <button class="ml-auto text-gray-400 hover:text-gray-600 p-1"><i class="fas fa-ellipsis-h text-xs"></i></button>
+                    </div>
+                    <!-- 评论正文 -->
+                    <p class="text-[14px] text-brand-ink leading-relaxed mb-2">${escapeHtml(c.text)}</p>
+                    <!-- 底部操作栏：时间 · 地区 · 回复  |  赞 · 踩 -->
+                    <div class="flex items-center justify-between text-[11px] text-brand-muted">
+                      <div class="flex items-center gap-1.5">
+                        <span>${c.date.split(' ')[0]}</span>
+                        <span class="text-gray-300">·</span>
+                        <span>${location}</span>
+                        <button class="hover:text-brand-green transition-colors ml-1">回复</button>
+                      </div>
+                      <div class="flex items-center gap-3">
+                        <button class="flex items-center gap-0.5 hover:text-brand-green transition-colors" data-clike="${c.id}">
+                          <i class="far fa-thumbs-up text-xs"></i>
+                          <span>${c.likes}</span>
+                        </button>
+                        <button class="hover:text-brand-orange transition-colors" data-cdislike="${c.id}">
+                          <i class="far fa-thumbs-down text-xs"></i>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -433,6 +476,14 @@
                 c.likes += 1;
                 renderComments();
               }
+            });
+          });
+          // 评论踩（仅视觉反馈）
+          document.querySelectorAll('[data-cdislike]').forEach(b => {
+            b.addEventListener('click', () => {
+              const ic = b.querySelector('i');
+              ic.className = 'fas fa-thumbs-down text-xs text-brand-orange';
+              setTimeout(() => { ic.className = 'far fa-thumbs-down text-xs'; }, 800);
             });
           });
         }
@@ -487,6 +538,19 @@
         document.getElementById('commentInput').addEventListener('keydown', (e) => {
           if (e.key === 'Enter') sendComment();
         });
+        // 聚焦输入框时检查登录态，未登录则跳转登录页并带回 return 参数
+        document.getElementById('commentInput').addEventListener('focus', function () {
+          const isLoggedIn = window._AL_USER && window._AL_USER.isLoggedIn;
+          if (!isLoggedIn) {
+            this.blur();
+            toast('请先登录');
+            setTimeout(() => {
+              const returnUrl = location.pathname + location.search + location.hash;
+              location.href = 'login.html?return=' + encodeURIComponent(returnUrl);
+            }, 400);
+            return;
+          }
+        });
         function sendComment() {
           const input = document.getElementById('commentInput');
           const text = (input.value || '').trim();
@@ -494,15 +558,15 @@
             toast('请输入评论内容');
             return;
           }
-          const me = window._AL_ARTICLES.CURRENT_USER;
           const newComment = {
             id: 'c' + Date.now(),
-            user: me.name || '我',
-            avatar: me.avatar,
+            user: meName,
+            avatar: meAvatar,
             date: nowStr(),
             text,
             likes: 0,
-            role: me.isVip ? 'vip' : 'user'
+            role: meIsVip ? 'vip' : 'user',
+            isMine: true
           };
           allComments.unshift(newComment);
           csort = 'new';
