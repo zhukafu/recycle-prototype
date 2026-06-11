@@ -160,6 +160,19 @@
       </div>
     </section>
 
+    <!-- 升级折算横幅（仅初级会员升级时显示） -->
+    <section id="upgradeSection" class="px-4 mt-4 hidden slide-up" style="animation-delay:.12s">
+      <div class="bg-gradient-to-r from-al-orange-light via-amber-50 to-al-orange-light rounded-2xl p-4 border border-al-orange/20">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-al-orange to-al-orange-dark flex items-center justify-center shrink-0">
+            <i class="fas fa-arrow-up text-white text-sm"></i>
+          </div>
+          <h4 class="text-sm font-bold text-al-dark">升级折算</h4>
+        </div>
+        <div id="upgradeDetail" class="space-y-1"></div>
+      </div>
+    </section>
+
     <!-- 服务说明 -->
     <section class="px-4 mt-4 slide-up" style="animation-delay:.15s">
       <div class="bg-white rounded-2xl p-4 shadow-soft">
@@ -182,14 +195,18 @@
   <footer class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-al-border px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center gap-3">
     <div class="flex-1">
       <p class="text-[11px] text-al-gray">应付</p>
-      <p class="text-xl font-black text-al-orange font-mono leading-tight">¥<span id="payAmount">68</span></p>
+      <p class="text-xl font-black text-al-orange font-mono leading-tight" id="payAmountWrap"><span id="payAmount">¥68</span></p>
     </div>
     <button id="payBtn" onclick="onPay()"
             class="flex-[1.4] h-12 gradient-orange text-white text-base font-bold rounded-2xl shadow-card active:scale-[0.98] transition flex items-center justify-center gap-2">
       <i class="fab fa-weixin text-lg"></i>
-      立即开通
+      <span class="payBtnLabel">立即开通</span>
     </button>
   </footer>
+
+  <style>
+    .price-through { text-decoration: line-through; text-decoration-color: #9CA3AF; }
+  </style>
 
   <!-- 支付成功提示 -->
   <div id="successToast" class="fixed inset-0 z-[300] hidden items-center justify-center p-5 pointer-events-none">
@@ -212,11 +229,12 @@
 
     /* ========== 状态：当前选中套餐 ========== */
     let selectedPkgId = 'basic';
-    // URL 参数：return = 订阅完成后要回的页（如产品详情页）；paid=1 + pkg = 支付成功回调
+    // URL 参数：return = 订阅完成后要回的页；paid=1 + pkg = 支付成功回调；upgrade=1 = 升级模式
     const urlParams = new URLSearchParams(location.search);
     const urlPaid   = urlParams.get('paid');
     const urlPkg    = urlParams.get('pkg');
     const urlReturn = urlParams.get('return');
+    const urlUpgrade = urlParams.get('upgrade') === '1';
     const safeHtml  = (s) => /^[a-zA-Z0-9_./-]+\.html(\?.*)?$/.test(s || '');
     const go = (url) => {
       if (window._AL_navigate) window._AL_navigate(url);
@@ -245,6 +263,22 @@
       }
     }
 
+    /* ========== 升级折算：计算剩余价值 ========== */
+    var upgradeMode = false;
+    var remainingValue = 0;
+    var currentPkgInfo = null;
+
+    function calcRemainingValue() {
+      var u = window._AL_USER || {};
+      if (!u.isMember || !u.memberExpireAt || u.memberExpireAt <= Date.now()) return { value: 0, remainingDays: 0 };
+      var curPkg = window._AL_getPackage ? window._AL_getPackage(u.memberPackage) : null;
+      if (!curPkg) return { value: 0, remainingDays: 0 };
+      var remainingDays = Math.max(0, Math.ceil((u.memberExpireAt - Date.now()) / (24 * 60 * 60 * 1000)));
+      var dailyRate = parseFloat(curPkg.price) / curPkg.days;
+      var value = Math.floor(dailyRate * remainingDays * 100) / 100;
+      return { value: value, remainingDays: remainingDays, pkg: curPkg };
+    }
+
     /* ========== 渲染：用户信息 ========== */
     function renderUserInfo() {
       const u = window._AL_USER || {};
@@ -262,13 +296,32 @@
       const badge = document.getElementById('memberBadge');
       const status = document.getElementById('memberStatus');
       if (isMember) {
-        badge.textContent = 'VIP 会员';
+        // 显示当前套餐名称
+        var curPkg = window._AL_getPackage ? window._AL_getPackage(u.memberPackage) : null;
+        var pkgDisplayName = (curPkg && curPkg.name) || u.memberPackageName || 'VIP 会员';
+        badge.textContent = pkgDisplayName;
         badge.className = 'text-[10px] font-bold text-white bg-gradient-to-r from-al-gold to-al-orange px-2 py-0.5 rounded-full';
+        currentPkgInfo = curPkg;
         if (u.memberExpireAt) {
           const d = new Date(u.memberExpireAt);
           document.getElementById('memberExpireText').textContent =
             d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' 到期';
           status.classList.remove('hidden');
+        }
+        // 升级模式：计算剩余价值
+        if (urlUpgrade && curPkg && curPkg.tag !== 'STD') {
+          var rv = calcRemainingValue();
+          if (rv.value > 0) {
+            upgradeMode = true;
+            remainingValue = rv.value;
+            var expireDate = new Date(u.memberExpireAt);
+            var expireStr = expireDate.getFullYear() + '-' + String(expireDate.getMonth()+1).padStart(2,'0') + '-' + String(expireDate.getDate()).padStart(2,'0');
+            document.getElementById('upgradeSection').classList.remove('hidden');
+            document.getElementById('upgradeDetail').innerHTML =
+              '<p class="text-[12px] text-al-dark">当前：<span class="font-bold">' + curPkg.name + '</span>（剩余 ' + rv.remainingDays + ' 天，' + expireStr + ' 到期）</p>' +
+              '<p class="text-[12px] text-al-dark">剩余价值：<span class="font-black text-al-orange">¥' + rv.value.toFixed(2) + '</span>（折算公式：' + curPkg.price + '÷' + curPkg.days + '天×' + rv.remainingDays + '天）</p>' +
+              '<p class="text-[11px] text-al-gray mt-1">升级高级会员时自动抵扣，仅需补差价</p>';
+          }
         }
       } else {
         badge.textContent = '普通用户';
@@ -282,11 +335,33 @@
       grid.innerHTML = pkgs.map(p => {
         const isSel = p.id === selectedPkgId;
         const isFeatured = p.featured;
+        // 升级模式：高级套餐显示折算价
+        var actualPrice = null;
+        var isUpgradeTarget = false;
+        if (upgradeMode && p.tag === 'STD') {
+          actualPrice = Math.max(0, parseFloat(p.price) - remainingValue);
+          isUpgradeTarget = true;
+        }
         const cls = [
           'package-card relative bg-white rounded-2xl p-3.5 cursor-pointer active:scale-[0.98] transition border-2',
           isSel ? 'selected border-al-gold' : 'border-al-border',
           isFeatured ? 'bg-gradient-to-br from-al-gold-light to-white' : ''
         ].join(' ');
+        var priceHtml;
+        if (isUpgradeTarget) {
+          priceHtml =
+            '<div class="flex items-baseline gap-0.5 mb-2">' +
+              '<span class="text-xs text-al-orange font-medium">¥</span>' +
+              '<span class="text-2xl font-black text-al-orange font-mono leading-none">' + actualPrice.toFixed(2) + '</span>' +
+              '<span class="text-[11px] text-al-gray price-through font-mono ml-1">¥' + p.price + '</span>' +
+            '</div>';
+        } else {
+          priceHtml =
+            '<div class="flex items-baseline gap-0.5 mb-2">' +
+              '<span class="text-xs text-al-orange font-medium">¥</span>' +
+              '<span class="text-2xl font-black text-al-orange font-mono leading-none">' + p.price + '</span>' +
+            '</div>';
+        }
         return (
           '<div class="' + cls + '" data-pkg="' + p.id + '" onclick="selectPkg(\'' + p.id + '\')">' +
             // 选中标识
@@ -299,11 +374,11 @@
             (isFeatured
               ? '<div class="absolute -top-1.5 -right-1.5 px-2 py-0.5 gradient-orange text-white text-[9px] font-bold rounded-full shadow-card">推荐</div>'
               : '') +
+            (isUpgradeTarget
+              ? '<div class="absolute -top-1.5 -left-1.5 px-2 py-0.5 bg-al-green text-white text-[9px] font-bold rounded-full shadow-card">折算</div>'
+              : '') +
             '<h4 class="text-[13px] font-bold text-al-dark leading-snug mb-1.5 line-clamp-2 min-h-[34px]">' + p.name + '</h4>' +
-            '<div class="flex items-baseline gap-0.5 mb-2">' +
-              '<span class="text-xs text-al-orange font-medium">¥</span>' +
-              '<span class="text-2xl font-black text-al-orange font-mono leading-none">' + p.price + '</span>' +
-            '</div>' +
+            priceHtml +
             '<p class="text-[10px] text-al-gray leading-relaxed mb-1.5 line-clamp-2 min-h-[28px]">' + p.desc + '</p>' +
             '<p class="text-[10px] text-al-gray font-medium pt-1.5 border-t border-al-border">' +
               (p.tag === 'STD' ? '尊享全部特权' : p.tag === 'BASIC' ? '基础报价权益' : '基础报价权益') +
@@ -324,8 +399,18 @@
     /* ========== 更新支付按钮 ========== */
     function updatePayBtn() {
       const pkg = window._AL_getPackage(selectedPkgId);
-      if (pkg) {
-        document.getElementById('payAmount').textContent = pkg.price;
+      const payAmountEl = document.getElementById('payAmount');
+      const payBtn = document.getElementById('payBtn');
+      if (!pkg) return;
+      if (upgradeMode && pkg.tag === 'STD') {
+        const actualPrice = Math.max(0, parseFloat(pkg.price) - remainingValue);
+        payAmountEl.innerHTML =
+          '<span class="text-[13px] text-al-gray price-through mr-1">¥' + pkg.price + '</span>' +
+          '<span class="text-xl font-black text-al-orange font-mono leading-tight">¥' + actualPrice.toFixed(2) + '</span>';
+        payBtn.querySelector('.payBtnLabel').textContent = '立即升级';
+      } else {
+        payAmountEl.textContent = '¥' + pkg.price;
+        payBtn.querySelector('.payBtnLabel').textContent = '立即开通';
       }
     }
 
@@ -345,10 +430,16 @@
       const retTail = safeHtml(urlReturn)
         ? '&return=' + encodeURIComponent(urlReturn)
         : '';
+      // 升级模式：传折算后实付金额给支付页
+      var priceTail = '';
+      if (upgradeMode && pkg.tag === 'STD') {
+        var actualPrice = Math.max(0, parseFloat(pkg.price) - remainingValue);
+        priceTail = '&actual_price=' + actualPrice.toFixed(2);
+      }
       if (window._AL_navigate) {
-        window._AL_navigate('wechat-pay.html?pkg=' + pkg.id + retTail);
+        window._AL_navigate('wechat-pay.html?pkg=' + pkg.id + priceTail + retTail);
       } else {
-        location.href = 'wechat-pay.html?pkg=' + pkg.id + retTail;
+        location.href = 'wechat-pay.html?pkg=' + pkg.id + priceTail + retTail;
       }
     }
 

@@ -197,10 +197,10 @@ to { opacity: 1; transform: translateY(0); }
           </div>
           <p id="uwOverlayCta" class="text-[13px] font-black text-amber-dark tracking-wide">开通会员 · 解锁单位重量</p>
           <p class="text-[10px] text-gray-500 mt-0.5 mb-2.5">白银 / 烤点铜 / 漆包铜 重量与价值</p>
-          <button onclick="event.preventDefault();event.stopPropagation();window._AL_lockClick&&_AL_lockClick(event)"
+          <button id="uwUpgradeBtn" onclick="event.preventDefault();event.stopPropagation();window._AL_upgradePremium&&_AL_upgradePremium(event)"
                   class="px-5 h-8 gradient-orange text-white text-[12px] font-bold rounded-full shadow-md shadow-orange-brand/30 active:scale-95 transition flex items-center gap-1.5">
             <i class="fas fa-bolt text-[9px]"></i>
-            立即开通
+            <span class="upgradeBtnLabel">立即开通</span>
           </button>
         </div>
       </div>
@@ -242,10 +242,10 @@ to { opacity: 1; transform: translateY(0); }
           </div>
           <p id="silverOverlayCta" class="text-[13px] font-black text-amber-dark tracking-wide">开通会员 · 解锁含银量</p>
           <p class="text-[10px] text-gray-500 mt-0.5 mb-2.5">触点 Ag 含量 · 当日银价估值</p>
-          <button onclick="event.preventDefault();event.stopPropagation();window._AL_lockClick&&_AL_lockClick(event)"
+          <button id="silverUpgradeBtn" onclick="event.preventDefault();event.stopPropagation();window._AL_upgradePremium&&_AL_upgradePremium(event)"
                   class="px-5 h-8 gradient-orange text-white text-[12px] font-bold rounded-full shadow-md shadow-orange-brand/30 active:scale-95 transition flex items-center gap-1.5">
             <i class="fas fa-bolt text-[9px]"></i>
-            立即开通
+            <span class="upgradeBtnLabel">立即开通</span>
           </button>
         </div>
       </div>
@@ -356,6 +356,8 @@ to { opacity: 1; transform: translateY(0); }
       if (uwCta) uwCta.textContent = '升级高级会员 · 解锁单位重量';
       var sCta = document.getElementById('silverOverlayCta');
       if (sCta) sCta.textContent = '升级高级会员 · 解锁含银量';
+      // 按钮文案：初级会员显示「立即升级」
+      document.querySelectorAll('.upgradeBtnLabel').forEach(function(el) { el.textContent = '立即升级'; });
     }
     // 关键参数只展示公共基础信息（品牌/分类/规格），回收价等敏感数据在下方专区由会员体系承接
     const params = [
@@ -568,6 +570,25 @@ to { opacity: 1; transform: translateY(0); }
       if (window._AL_navigate) window._AL_navigate('contacts.html');
       else window.location.href = 'contacts.html';
     } catch (e) { window.location.href = 'contacts.html'; }
+  };
+
+  /* 升级高级会员：从产品详情页跳 vip-center，并透传来源页 */
+  window._AL_upgradePremium = function (evt) {
+    if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+    var u = window._AL_USER || {};
+    var go = window._AL_navigate || function (url) { location.href = url; };
+    // 未登录：先登录再回来
+    if (!u.isLoggedIn) {
+      go('login.html?return=' + encodeURIComponent(location.pathname + location.search));
+      return;
+    }
+    // 已登录：跳 vip-center；upgrade=1 触发升级折算模式
+    var returnPage = encodeURIComponent(location.pathname + location.search);
+    var isBasicMember = u.isMember && u.memberExpireAt > Date.now();
+    var tail = isBasicMember
+      ? 'vip-center.html?upgrade=1&return=' + returnPage
+      : 'vip-center.html?return=' + returnPage;
+    go(tail);
   };
 </script>
 

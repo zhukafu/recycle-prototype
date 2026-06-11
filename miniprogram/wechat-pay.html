@@ -119,7 +119,7 @@
       <section class="px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <button id="payBtn" onclick="confirmPay()"
                 class="w-full h-12 pay-green text-white text-base font-bold rounded-xl active:scale-[0.98] transition flex items-center justify-center gap-2">
-          支付
+          <span class="payBtnLabel">支付</span>
         </button>
         <p class="text-[10px] text-al-gray text-center mt-2 leading-relaxed">
           支付即视为同意
@@ -148,12 +148,22 @@
   const urlParams = new URLSearchParams(location.search);
   const pkgId  = urlParams.get('pkg') || 'trial';
   const pkgRet = urlParams.get('return');  // 来源页地址，支付完成后回跳
+  const actualPriceParam = urlParams.get('actual_price'); // 升级折算后的实付金额
   const pkg    = window._AL_getPackage(pkgId);
+  const payPrice = actualPriceParam ? parseFloat(actualPriceParam) : (pkg ? parseFloat(pkg.price) : 0);
+  const isUpgrade = !!actualPriceParam;
 
     /* ========== 渲染金额 + 商品名 ========== */
     if (pkg) {
-      document.getElementById('payPrice').textContent = pkg.price;
-      document.getElementById('merchantName').textContent = '铝老板金属网 · ' + pkg.name;
+      document.getElementById('payPrice').textContent = payPrice.toFixed(2);
+      var merchantText = '铝老板金属网 · ' + pkg.name;
+      if (isUpgrade) merchantText += '（升级折算）';
+      document.getElementById('merchantName').textContent = merchantText;
+      // 升级模式：支付按钮文案
+      if (isUpgrade) {
+        var payBtnLabel = document.querySelector('.payBtnLabel');
+        if (payBtnLabel) payBtnLabel.textContent = '升级支付';
+      }
     }
 
     /* ========== 关闭 ========== */
@@ -227,12 +237,11 @@
         const hint = document.getElementById('balanceHint');
         if (this.value === 'card') {
           // 用银行卡：应付金额 - 5
-          const priceNum = parseFloat(pkg ? pkg.price : 0);
-          const newPrice = Math.max(0, priceNum - 5);
+          const newPrice = Math.max(0, payPrice - 5);
           document.getElementById('payPrice').textContent = newPrice.toFixed(2);
           hint.innerHTML = '<span class="text-al-blue font-medium">已减 5 元</span>';
         } else {
-          document.getElementById('payPrice').textContent = pkg ? pkg.price : '0.00';
+          document.getElementById('payPrice').textContent = payPrice.toFixed(2);
           hint.innerHTML = '余额 ¥<span id="balanceVal">328.50</span>';
         }
       });
