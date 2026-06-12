@@ -413,8 +413,8 @@
         mountAdminTopbar('#admin-topbar', {
             title: '首页',
             back: false,
-            onMenu: () => console.log('[manage] menu clicked'),
-            onAvatar: () => console.log('[manage] avatar clicked'),
+            // onMenu: 使用组件默认行为（弹出清除缓存菜单）
+            // onAvatar: 使用组件默认行为（回到后台首页）
         });
         mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
     </script>

@@ -227,8 +227,8 @@
       import { mountPageActions } from '/src/components/page-actions.js';
       import { mountBottomNav } from '/src/components/bottom-nav.js';
       mountPageActions('#page-actions', {
-        onMenu: () => console.log('[category] menu clicked'),
-        onAvatar: () => console.log('[category] avatar clicked'),
+        // onMenu: 使用组件默认行为（弹出清除缓存菜单）
+        // onAvatar: 使用组件默认行为（回到首页）
       });
       mountBottomNav('#app-bottom-nav', { active: 'quotes' });
     </script>

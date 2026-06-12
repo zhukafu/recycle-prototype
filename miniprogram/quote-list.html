@@ -77,8 +77,8 @@ to { opacity: 1; transform: translateY(0); }
 <script type="module">
   import { mountPageActions } from '/src/components/page-actions.js';
   mountPageActions('#page-actions', {
-    onMenu: () => console.log('[quote-list] menu clicked'),
-    onAvatar: () => console.log('[quote-list] avatar clicked'),
+    // onMenu: 使用组件默认行为（弹出清除缓存菜单）
+    // onAvatar: 使用组件默认行为（回到首页）
   });
 </script>
 

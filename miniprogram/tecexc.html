@@ -87,7 +87,7 @@
         <!-- 卡片区域 -->
         <div class="grid grid-cols-3 gap-3">
             <!-- 关于铝老板（跳转到平台介绍详情页） -->
-            <a href="info-detail.html?id=about" class="col-span-1 row-span-2 bg-white border border-gray-100 rounded-2xl p-4 flex flex-col relative overflow-hidden shadow-md no-underline active:scale-[0.98] transition-transform">
+            <a id="aboutCard" href="info-detail.html?id=about" class="col-span-1 row-span-2 bg-white border border-gray-100 rounded-2xl p-4 flex flex-col relative overflow-hidden shadow-md no-underline active:scale-[0.98] transition-transform">
                 <!-- 装饰光斑 -->
                 <div class="absolute -top-6 -right-6 w-20 h-20 bg-green-100/40 rounded-full blur-2xl pointer-events-none"></div>
                 <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-green-100/40 rounded-full blur-2xl pointer-events-none"></div>
@@ -158,8 +158,8 @@
         import { mountPageActions } from '/src/components/page-actions.js';
         import { mountBottomNav } from '/src/components/bottom-nav.js';
         mountPageActions('#page-actions', {
-            onMenu: () => console.log('[tecexc] menu clicked'),
-            onAvatar: () => console.log('[tecexc] avatar clicked'),
+            // onMenu: 使用组件默认行为（弹出清除缓存菜单）
+            // onAvatar: 使用组件默认行为（回到首页）
         });
         mountBottomNav('#app-bottom-nav', { active: 'forum' });
     </script>
@@ -322,8 +322,23 @@
             btn.addEventListener('click', () => setActiveTab(btn.getAttribute('data-tab')));
         });
 
+        // 动态更新「关于铝老板」卡片链接（读取 displayConfig.aboutId）
+        function bindAboutLink() {
+            var aboutId = 'about'; // 默认值
+            if (window._AL_ARTICLES && window._AL_ARTICLES.getAboutArticle) {
+                var art = window._AL_ARTICLES.getAboutArticle();
+                if (art && art.id) aboutId = art.id;
+            } else if (window._AL_ARTICLES && window._AL_ARTICLES.getData) {
+                var dc = (window._AL_ARTICLES.getData().displayConfig) || {};
+                if (dc.aboutId) aboutId = dc.aboutId;
+            }
+            var card = document.getElementById('aboutCard');
+            if (card) card.href = 'info-detail.html?id=' + aboutId;
+        }
+
         // 页面加载
         document.addEventListener('DOMContentLoaded', () => {
+            bindAboutLink();
             bindNoticeBar();
             setActiveTab('news');
         });
