@@ -154,27 +154,9 @@
     mountAdminTopbar('#admin-topbar', {
         title: '分类管理',
         back: true,
-        onMenu: () => openActionMenu(['批量编辑', '调整顺序', '刷新']),
-        onAvatar: () => location.href = 'system.html',
+        onAvatar: () => location.href = '/admin/manage.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
-
-    function openActionMenu(items) {
-        const existing = document.getElementById('__action_menu__');
-        if (existing) existing.remove();
-        const menu = document.createElement('div');
-        menu.id = '__action_menu__';
-        menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
-        menu.innerHTML = `
-          <div class="absolute inset-0 bg-black/40" data-close></div>
-          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 animate-up">
-            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
-            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
-            <button class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 font-medium active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
-          </div>`;
-        document.body.appendChild(menu);
-        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
-    }
 </script>
 
 </body>

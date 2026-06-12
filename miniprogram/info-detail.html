@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>详情 - 铝老板金属网</title>
     <script src="/lib/tailwind/tailwind.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/lib/fonts/fonts-mp-info-detail.css">
+    <link rel="stylesheet" href="/lib/font-awesome/6.5.1/css/all.min.css">
     <script src="/data/site-config.js"></script>
     <script src="/data/articles.js"></script>
     <script>
@@ -62,6 +60,31 @@
             line-height: 1;
             margin-right: 6px;
             margin-top: 4px;
+        }
+        /* ===== 富文本正文样式（与后台编辑器输出对应） ===== */
+        .article-body h2 { font-size: 20px; font-weight: 700; margin: 22px 0 10px; color: #0F172A; line-height: 1.45; }
+        .article-body h3 { font-size: 17px; font-weight: 700; margin: 18px 0 8px; color: #1E293B; line-height: 1.5; }
+        .article-body strong, .article-body b { font-weight: 700; color: #0F172A; }
+        .article-body em, .article-body i { font-style: italic; }
+        .article-body u { text-decoration: underline; text-decoration-color: #10B981; }
+        .article-body blockquote {
+            margin: 16px 0; padding: 12px 16px; border-left: 3.5px solid #10B981;
+            background: #F0FDF4; border-radius: 0 10px 10px 0; color: #334155;
+            font-size: 14px; line-height: 1.8;
+        }
+        .article-body ul, .article-body ol { margin: 10px 0; padding-left: 24px; }
+        .article-body li { margin-bottom: 6px; line-height: 1.75; }
+        .article-body ul > li { list-style-type: disc; }
+        .article-body ol > li { list-style-type: decimal; }
+        .article-body a { color: #16A34A; text-decoration: underline; word-break: break-all; }
+        .article-body img { max-width: 100%; height: auto; border-radius: 10px; margin: 10px 0; display: block; }
+        .article-body hr { border: none; border-top: 1px solid #E2E8F0; margin: 20px 0; }
+        .article-body table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; overflow-x: auto; display: block; }
+        .article-body th, .article-body td { border: 1px solid #E2E8F0; padding: 8px 12px; text-align: left; word-break: break-word; }
+        .article-body th { background: #F8FAFC; font-weight: 600; }
+        .article-body .inline-image-caption {
+            text-align: center; font-size: 12px; color: #94A3B8;
+            margin-top: -6px; margin-bottom: 12px;
         }
         /* 图文穿插：内联图片 */
         .article-body figure {
@@ -272,24 +295,38 @@
       (function () {
         const params = new URLSearchParams(location.search);
         const id = params.get('id');
-        const article = id && window._AL_ARTICLES.getById(id);
+        // 防御：确保 _AL_ARTICLES 已加载
+        const _api = (typeof window._AL_ARTICLES === 'object' && window._AL_ARTICLES.getDetail) ? window._AL_ARTICLES : null;
+        const article = (id && _api) ? _api.getDetail(id) : null;
         const articleEl = document.getElementById('article');
         const notFound = document.getElementById('notFound');
 
-        if (!article) {
+        if (!article || !article.id) {
           notFound.classList.remove('hidden');
           notFound.classList.add('flex');
+          console.warn('[info-detail] 未找到文章, id=', id);
           return;
         }
 
-        document.getElementById('pageTitle').textContent = article.cat === 'knowledge' ? '回收知识' : article.cat === 'notice' ? '通知公告' : article.cat === 'about' ? '关于铝老板' : '行业资讯';
-        document.title = article.title + ' - 铝老板金属网';
-        document.getElementById('author').textContent = article.author;
-        document.getElementById('catBadge').textContent = article.cat === 'knowledge' ? '回收知识' : article.cat === 'notice' ? '通知公告' : article.cat === 'about' ? '关于铝老板' : '行业资讯';
-        document.getElementById('tagBadge').textContent = article.tag;
-        document.getElementById('tagInline').textContent = article.tag;
-        document.getElementById('avatarBadge').textContent = article.author[0] || '铝';
-        document.getElementById('likeCount').textContent = article.likes;
+        // 安全取值辅助函数
+        const sv = (v, d) => (v != null ? v : d);
+
+        // v2.0 兼容：section + displayRole 映射到旧的 cat 语义
+        const _sec = article.section || '';
+        const _role = article.displayRole || '';
+        const _cat = _role || _sec; // notice/about/news/knowledge
+        const _tagText = (article.tags && article.tags.length) ? article.tags[0] : '';
+
+        document.getElementById('pageTitle').textContent =
+            _cat === 'knowledge' ? '回收知识' : _cat === 'notice' ? '通知公告' : _cat === 'about' ? '关于铝老板' : '行业资讯';
+        document.title = sv(article.title, '详情') + ' - 铝老板金属网';
+        document.getElementById('author').textContent = sv(article.author, '铝老板');
+        document.getElementById('catBadge').textContent =
+            _cat === 'knowledge' ? '回收知识' : _cat === 'notice' ? '通知公告' : _cat === 'about' ? '关于铝老板' : '行业资讯';
+        document.getElementById('tagBadge').textContent = sv(_tagText, '');
+        document.getElementById('tagInline').textContent = sv(_tagText, '');
+        document.getElementById('avatarBadge').textContent = (sv(article.author, '铝'))[0] || '铝';
+        document.getElementById('likeCount').textContent = sv(article.likes, 0);
 
         // 渲染封面：模式判断（coverMode 显式 > 根据 cover 是否存在自动判断）
         const coverWrap = document.getElementById('coverWrap');
@@ -313,24 +350,24 @@
         }
 
         // 主标题：图片模式下用 coverTitle（管理后台可独立设置），文字模式下用 title
-        document.getElementById('title').textContent = (useImageMode && article.coverTitle) ? article.coverTitle : article.title;
+        document.getElementById('title').textContent = (useImageMode && article.coverTitle) ? article.coverTitle : sv(article.title, '');
         // 副标题：用 summary 充当
-        document.getElementById('subtitle').textContent = article.summary || '';
+        document.getElementById('subtitle').textContent = sv(article.summary, '');
         // 元信息：日期 + 阅读量
-        document.getElementById('coverDate').textContent = article.date;
-        document.getElementById('coverViews').textContent = formatViews(article.views) + ' 阅读';
+        document.getElementById('coverDate').textContent = sv(article.date, '');
+        document.getElementById('coverViews').textContent = formatViews(sv(article.views, 0)) + ' 阅读';
         // 行业大字图标（仅在渐变模式有意义）
         const coverIcon = document.getElementById('coverIcon');
         if (coverIcon) {
-          coverIcon.textContent = article.cat === 'knowledge' ? '识' : article.cat === 'notice' ? '告' : article.cat === 'about' ? '铝' : '银';
+          coverIcon.textContent = _cat === 'knowledge' ? '识' : _cat === 'notice' ? '告' : _cat === 'about' ? '铝' : '银';
         }
 
         // 封面渐变色按分类切换（仅在渐变模式生效）
         const gradEl = coverBg && coverBg.querySelector('rect:first-of-type');
         if (gradEl) {
-          if (article.cat === 'knowledge') {
+          if (_cat === 'knowledge') {
             gradEl.setAttribute('fill', 'url(#g1)'); // 绿
-          } else if (article.cat === 'about') {
+          } else if (_cat === 'about') {
             // 关于铝老板：蓝紫渐变
             let g3 = document.getElementById('g3');
             if (!g3) {
@@ -346,7 +383,7 @@
               defs.appendChild(g3);
             }
             gradEl.setAttribute('fill', 'url(#g3)');
-          } else if (article.cat === 'notice') {
+          } else if (_cat === 'notice') {
             // 通知公告：粉红渐变
             let g4 = document.getElementById('g4');
             if (!g4) {
@@ -367,8 +404,24 @@
           }
         }
 
-        // 渲染正文（按 \n\n 切段，\n 切行；按 inlineImages 的 after 位置穿插图片）
+        // 渲染正文
+        // 智能判断内容类型：
+        //   - 如果 body 包含 HTML 标签（<p> <h2> <strong> 等）→ 直接渲染 + 穿插 inlineImages
+        //   - 否则按 \n\n 分段的纯文本方式处理（兼容旧数据）
         function formatBody(text, images) {
+          if (!text || typeof text !== 'string') return '<p class="text-gray-400">暂无内容</p>';
+
+          // 检测是否为 HTML 内容（包含常见块级标签）
+          const isHtml = /<(p|h[1-6]|div|li|ul|ol|br|hr|blockquote|img|strong|b|em|u|table)\b/i.test(text);
+
+          if (isHtml) {
+            // HTML 模式：body 本身已包含 <img> 标签（编辑器直接保存的富文本），
+            // 无需再追加 inlineImages，否则会导致图片重复展示。
+            // inlineImages 仅用于旧版纯文本模式（通过 after 位置索引穿插图片）
+            return text;
+          }
+
+          // 纯文本模式（兼容旧数据 / DEFAULT_DATA 中的原始文本）
           const paragraphs = text.split('\n\n');
           const imgs = (images || []).slice().sort((a, b) => a.after - b.after);
           const segments = [];
@@ -408,14 +461,19 @@
             return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
           }).join('');
         }
-        document.getElementById('body').innerHTML = formatBody(article.body, article.inlineImages);
+        document.getElementById('body').innerHTML = formatBody(article.body, article.inlineImages || []);
 
         articleEl.classList.remove('hidden');
 
         // 渲染评论（论坛爬楼风格）
-        let allComments = (window._AL_ARTICLES.getComments(article.id) || []).slice();
+        let allComments = [];
+        try {
+          allComments = ((typeof window._AL_ARTICLES.getComments === 'function') && window._AL_ARTICLES.getComments(article.id) || []).slice();
+        } catch (e) {
+          console.warn('[info-detail] 获取评论失败', e);
+        }
         let csort = 'hot';
-        const me = window._AL_ARTICLES.CURRENT_USER;
+        const me = (typeof window._AL_ARTICLES === 'object' && window._AL_ARTICLES.CURRENT_USER) || {};
         // 优先从登录态（_AL_USER）取昵称，未登录时再退回 CURRENT_USER 的默认值
         const meName = (window._AL_USER && window._AL_USER.isLoggedIn && window._AL_USER.nickname)
           ? window._AL_USER.nickname

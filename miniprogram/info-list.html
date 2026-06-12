@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>资讯 - 铝老板金属网</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/lib/tailwind/tailwind.js"></script>
+    <link rel="stylesheet" href="/lib/fonts/fonts-mp-info-detail.css">
+    <link rel="stylesheet" href="/lib/font-awesome/6.5.1/css/all.min.css">
     <script src="/data/articles.js"></script>
     <script>
         tailwind.config = {
@@ -117,7 +115,7 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-1.5 mb-1">
                     ${isFirst ? '<span class="text-[9px] bg-red-500 text-white px-1.5 py-0.5 rounded font-bold">HOT</span>' : ''}
-                    <span class="text-[9px] bg-gray-100 text-brand-ink-light px-1.5 py-0.5 rounded font-medium">${it.tag}</span>
+                    <span class="text-[9px] bg-gray-100 text-brand-ink-light px-1.5 py-0.5 rounded font-medium">${it.tags ? it.tags[0] : (cat === 'knowledge' ? '回收知识' : '行业资讯')}</span>
                   </div>
                   <h3 class="text-[15px] font-bold text-brand-ink leading-snug line-clamp-2 mb-1">${it.title}</h3>
                   <p class="text-[12px] text-brand-ink-light leading-relaxed line-clamp-2 mb-2">${it.summary}</p>

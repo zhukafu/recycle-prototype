@@ -89,14 +89,8 @@
                 <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">内容运营</h3>
                 <a href="article-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
                     <div class="w-10 h-10 rounded-[10px] bg-red-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
-                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">资讯管理</p><p class="text-[11px] text-metal-500 mt-0.5">行业资讯、回收知识、关于铝老板</p></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">资讯管理</p><p class="text-[11px] text-metal-500 mt-0.5">行业资讯、回收知识、公告与轮播配置</p></div>
                     <span class="text-[11px] text-metal-400 mr-1">48</span>
-                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                </a>
-                <a href="announcement-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
-                    <div class="w-10 h-10 rounded-[10px] bg-cyan-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">公告管理</p><p class="text-[11px] text-metal-500 mt-0.5">首页通知、技术交流公告、置顶内容</p></div>
-                    <span class="text-[11px] text-metal-400 mr-1">12</span>
                     <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
             </section>
@@ -107,15 +101,6 @@
                     <div class="w-10 h-10 rounded-[10px] bg-purple-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
                     <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">账号管理</p><p class="text-[11px] text-metal-500 mt-0.5">管理员账号、普通用户、会员权限</p></div>
                     <span class="text-[11px] text-metal-400 mr-1">12</span>
-                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                </a>
-            </section>
-
-            <section class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
-                <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">站点配置</h3>
-                <a href="announcement-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
-                    <div class="w-10 h-10 rounded-[10px] bg-indigo-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h8M8 16h5"/></svg></div>
-                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">首页配置</p><p class="text-[11px] text-metal-500 mt-0.5">首页通知、推荐内容、行情展示入口</p></div>
                     <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
             </section>
@@ -134,27 +119,9 @@
     mountAdminTopbar('#admin-topbar', {
         title: '业务管理',
         back: false,
-        onMenu: () => openActionMenu(['刷新数据', '导出清单', '权限管理']),
-        onAvatar: () => location.href = 'system.html',
+        onAvatar: () => location.href = '/admin/manage.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'business' });
-
-    function openActionMenu(items) {
-        const existing = document.getElementById('__action_menu__');
-        if (existing) existing.remove();
-        const menu = document.createElement('div');
-        menu.id = '__action_menu__';
-        menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
-        menu.innerHTML = `
-          <div class="absolute inset-0 bg-black/40" data-close></div>
-          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 animate-up">
-            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
-            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
-            <button class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 font-medium active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
-          </div>`;
-        document.body.appendChild(menu);
-        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
-    }
 </script>
 
 </body>

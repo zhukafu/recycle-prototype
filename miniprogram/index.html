@@ -64,6 +64,22 @@ to { opacity: 1; transform: translateY(0); }
 </header>
 
 <script src="/data/site-config.js"></script>
+<script>
+  // 从 localStorage 加载站点配置并覆盖 _AL_SITE 默认值
+  try {
+    const saved = localStorage.getItem('_AL_SITE_CONFIG');
+    if (saved) {
+      const config = JSON.parse(saved);
+      if (window._AL_SITE) {
+        if (config.brandName) window._AL_SITE.brandName = config.brandName;
+        if (config.phone) window._AL_SITE.phone = config.phone;
+        if (config.wechat) window._AL_SITE.wechat = config.wechat;
+        if (config.address) window._AL_SITE.address = config.address;
+        if (config.amapCoord) window._AL_SITE.amapCoord = config.amapCoord;
+      }
+    }
+  } catch (e) {}
+</script>
 <script src="/data/articles.js"></script>
 <script type="module">
   import { mountPageActions } from '/src/components/page-actions.js';
@@ -78,12 +94,12 @@ to { opacity: 1; transform: translateY(0); }
 <div class="flex items-start justify-between relative z-10">
 <div class="flex-1">
 <div class="flex items-center gap-2 mb-1">
-<div class="w-9 h-9 bg-green-brand rounded-lg flex items-center justify-center shadow-lg shadow-green-brand/20">
+<div id="siteLogoContainer" class="w-9 h-9 bg-green-brand rounded-lg flex items-center justify-center shadow-lg shadow-green-brand/20">
 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"></path></svg>
 </div>
-<h1 class="text-[22px] font-black text-gray-900 tracking-tight leading-none" style="font-family: 'Noto Serif SC', serif;">铝老板金属网</h1>
+<h1 id="siteNameTitle" class="text-[22px] font-black text-gray-900 tracking-tight leading-none" style="font-family: 'Noto Serif SC', serif;">铝老板金属网</h1>
 </div>
-<p class="text-[12.5px] text-gray-500 font-medium mt-1.5 leading-relaxed">卖货有参考不卖亏，收货有依据不踩坑。多年含银废料行情沉淀，一站查询更省心。</p>
+<p id="siteDescText" class="text-[12.5px] text-gray-500 font-medium mt-1.5 leading-relaxed">卖货有参考不卖亏，收货有依据不踩坑。多年含银废料行情沉淀，一站查询更省心。</p>
 </div>
 <div class="w-28 h-28 relative flex-shrink-0 float-anim">
 <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="w-full h-full" aria-label="金属废料回收插图">
@@ -342,7 +358,7 @@ to { opacity: 1; transform: translateY(0); }
   </div>
 
   <!-- 贵金属实时行情卡片 -->
-  <div class="grid grid-cols-2 gap-2">
+  <div id="quotesGrid" class="grid grid-cols-2 gap-2">
     <!-- 黄金 -->
     <div class="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100" data-metal="au">
       <div class="flex items-center justify-between mb-1.5">
@@ -406,6 +422,38 @@ to { opacity: 1; transform: translateY(0); }
       <p class="text-[18px] font-black text-fuchsia-600 font-mono leading-none" data-price>248.50</p>
       <p class="text-[10px] text-fuchsia-700/70 mt-1">元/克 · <span data-change>+2.12</span></p>
     </div>
+
+    <!-- 铜 -->
+    <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-3 border border-orange-100" data-metal="cu">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+          <span class="text-[11px] font-semibold text-orange-800">铜 Cu</span>
+        </div>
+        <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-0.5" data-pct>
+          <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+          <span data-pct-text>+1.25%</span>
+        </span>
+      </div>
+      <p class="text-[18px] font-black text-orange-600 font-mono leading-none" data-price>68.50</p>
+      <p class="text-[10px] text-orange-700/70 mt-1">元/公斤 · <span data-change>+0.85</span></p>
+    </div>
+
+    <!-- 铝 -->
+    <div class="bg-gradient-to-br from-sky-50 to-blue-50 rounded-xl p-3 border border-sky-100" data-metal="al">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+          <span class="text-[11px] font-semibold text-sky-800">铝 Al</span>
+        </div>
+        <span class="text-[10px] text-rose-600 font-bold flex items-center gap-0.5" data-pct>
+          <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+          <span data-pct-text>-0.32%</span>
+        </span>
+      </div>
+      <p class="text-[18px] font-black text-sky-600 font-mono leading-none" data-price>18.80</p>
+      <p class="text-[10px] text-sky-700/70 mt-1">元/公斤 · <span data-change>-0.06</span></p>
+    </div>
   </div>
 
   <!-- 底部：更多金属快捷查看 -->
@@ -423,10 +471,10 @@ to { opacity: 1; transform: translateY(0); }
         <img src="/icons/phone.svg" alt="电话" class="w-5 h-5" style="filter: invert(58%) sepia(85%) saturate(1761%) hue-rotate(337deg) brightness(101%) contrast(101%);">
       </div>
       <div>
-        <p class="text-sm font-bold text-gray-900">铝老板 13217121000</p>
+        <p id="contactPhoneLabel" class="text-sm font-bold text-gray-900">铝老板 13217121000</p>
       </div>
     </div>
-    <a href="tel:13217121000" class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors no-underline">拨打</a>
+    <a id="contactTelBtn" href="tel:13217121000" class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors no-underline">拨打</a>
   </div>
   <!-- 微信 -->
   <div class="flex items-center justify-between py-2">
@@ -442,24 +490,25 @@ to { opacity: 1; transform: translateY(0); }
   </div>
   <!-- 地址 -->
   <div class="flex items-center justify-between py-2">
-    <a href="https://uri.amap.com/marker?position=113.9268,30.9264&name=湖北省孝感市天下循环经济产业园&src=mypage&coordinate=gaode&callnative=1" class="flex items-center gap-3 flex-1 min-w-0 no-underline active:opacity-70 transition-opacity">
+    <a id="contactAddressLink" href="https://uri.amap.com/marker?position=113.9268,30.9264&name=湖北省孝感市天下循环经济产业园&src=mypage&coordinate=gaode&callnative=1" class="flex items-center gap-3 flex-1 min-w-0 no-underline active:opacity-70 transition-opacity">
       <div class="w-9 h-9 bg-red-surface rounded-xl flex items-center justify-center flex-shrink-0">
         <img src="/icons/location.svg" alt="地址" class="w-5 h-5" style="filter: invert(45%) sepia(85%) saturate(2476%) hue-rotate(335deg) brightness(99%) contrast(95%);">
       </div>
-      <p class="text-sm font-bold text-gray-900 leading-snug pr-2">湖北省孝感市天下循环经济产业园</p>
+      <p id="contactAddressText" class="text-sm font-bold text-gray-900 leading-snug pr-2">湖北省孝感市天下循环经济产业园</p>
     </a>
-    <a href="https://uri.amap.com/marker?position=113.9268,30.9264&name=湖北省孝感市天下循环经济产业园&src=mypage&coordinate=gaode&callnative=1" class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors flex-shrink-0 no-underline">导航</a>
+    <a id="contactNavLink" href="https://uri.amap.com/marker?position=113.9268,30.9264&name=湖北省孝感市天下循环经济产业园&src=mypage&coordinate=gaode&callnative=1" class="text-orange-brand text-sm font-bold px-3 py-1.5 rounded-lg hover:bg-orange-surface transition-colors flex-shrink-0 no-underline">导航</a>
   </div>
 </div>
 
-<!-- 用 _AL_SITE 同步联系我们区域的电话/微信显示，保证全站统一 -->
+<!-- 用 _AL_SITE 同步联系我们区域的电话/微信/地址显示，保证全站统一 -->
 <script>
   (function () {
     const S = window._AL_SITE;
     if (!S) return;
+
+    // 更新电话
     const phoneLabel = document.getElementById('contactPhoneLabel');
     const telBtn = document.getElementById('contactTelBtn');
-    const wechatLabel = document.getElementById('contactWechatLabel');
     if (phoneLabel) phoneLabel.textContent = (S.brandName ? S.brandName.replace(/金属网$/, '') : '铝老板') + ' ' + S.phone;
     if (telBtn) {
       telBtn.setAttribute('href', 'tel:' + S.phone);
@@ -472,7 +521,26 @@ to { opacity: 1; transform: translateY(0); }
         }
       });
     }
+
+    // 更新微信
+    const wechatLabel = document.getElementById('contactWechatLabel');
     if (wechatLabel) wechatLabel.textContent = S.wechat;
+
+    // 更新地址和地图链接
+    const addressText = document.getElementById('contactAddressText');
+    const addressLink = document.getElementById('contactAddressLink');
+    const navLink = document.getElementById('contactNavLink');
+    if (S.address) {
+      if (addressText) addressText.textContent = S.address;
+      if (addressLink) {
+        const coord = S.amapCoord || '113.9268,30.9264';
+        addressLink.href = 'https://uri.amap.com/marker?position=' + coord + '&name=' + encodeURIComponent(S.address) + '&src=mypage&coordinate=gaode&callnative=1';
+      }
+      if (navLink) {
+        const coord = S.amapCoord || '113.9268,30.9264';
+        navLink.href = 'https://uri.amap.com/marker?position=' + coord + '&name=' + encodeURIComponent(S.address) + '&src=mypage&coordinate=gaode&callnative=1';
+      }
+    }
   })();
 </script>
 </div>
@@ -540,13 +608,87 @@ to { opacity: 1; transform: translateY(0); }
     });
   })();
 
-  // 行情刷新（手动 + 10 秒自动）
+  // 应用行情展示配置（展示金属 + 展示样式）
   (function () {
+    try {
+      const saved = localStorage.getItem('_AL_QUOTES_CONFIG');
+      if (!saved) return;
+
+      const config = JSON.parse(saved);
+      const grid = document.getElementById('quotesGrid');
+      if (!grid) return;
+
+      // 应用展示金属：显示/隐藏对应的卡片
+      if (config.displayMetals && Array.isArray(config.displayMetals)) {
+        const allMetals = grid.querySelectorAll('[data-metal]');
+        allMetals.forEach(card => {
+          const metalKey = card.dataset.metal;
+          const shouldShow = config.displayMetals.some(m => m.toLowerCase() === metalKey.toLowerCase());
+          card.style.display = shouldShow ? '' : 'none';
+          // 清除可能的 banner 样式
+          if (!shouldShow) return;
+          card.classList.remove('flex-shrink-0');
+          card.style.width = '';
+        });
+      }
+
+      // 应用展示样式
+      if (config.displayStyle) {
+        // 先清除所有卡片的 banner 相关样式
+        const allCards = grid.querySelectorAll('[data-metal]');
+        allCards.forEach(card => {
+          card.classList.remove('flex-shrink-0');
+          card.style.width = '';
+        });
+
+        switch (config.displayStyle) {
+          case 'list':
+            grid.className = 'flex flex-col gap-2';
+            break;
+          case 'banner':
+            grid.className = 'flex gap-2 overflow-x-auto pb-2 hide-scrollbar';
+            // 让卡片有固定宽度
+            allCards.forEach(card => {
+              if (card.style.display !== 'none') {
+                card.classList.add('flex-shrink-0');
+                card.style.width = '280px';
+              }
+            });
+            break;
+          case 'grid':
+          default:
+            grid.className = 'grid grid-cols-2 gap-2';
+            break;
+        }
+      }
+    } catch (e) {
+      console.warn('应用行情展示配置失败:', e);
+    }
+  })();
+</script>
+
+<script>
+  // 行情刷新（手动 + 可配置自动）
+  (function () {
+    // 从 localStorage 读取行情配置
+    let refreshInterval = 10; // 默认 10 秒
+    try {
+      const saved = localStorage.getItem('_AL_QUOTES_CONFIG');
+      if (saved) {
+        const config = JSON.parse(saved);
+        if (config.refreshInterval !== undefined && config.refreshInterval > 0) {
+          refreshInterval = config.refreshInterval;
+        } else if (config.refreshInterval === 0) {
+          refreshInterval = 0; // 手动刷新
+        }
+      }
+    } catch (e) {}
+
     const btn = document.querySelector('[data-refresh]');
     const svg = btn?.querySelector('svg');
     if (svg) svg.style.transition = 'transform 0.6s ease';
 
-    // 4 个金属卡片数据
+    // 所有金属卡片数据
     const cards = document.querySelectorAll('[data-metal]');
     const state = {};
     cards.forEach(card => {
@@ -632,161 +774,39 @@ to { opacity: 1; transform: translateY(0); }
       if (svg) svg.style.transform = `rotate(${Date.now() % 360}deg)`;
       setTimeout(() => { if (svg) svg.style.transform = ''; }, 800);
       tick();
-      countdown = 10;
+      countdown = refreshInterval;
     });
 
-    // 自动刷新：10 秒一次
-    let countdown = 10;
-    const timer = setInterval(() => {
-      countdown -= 1;
-      if (countdown <= 0) {
-        tick();
-        countdown = 10;
-      }
-    }, 1000);
+    // 自动刷新：根据配置的频率
+    let countdown = refreshInterval;
+    let timer = null;
+    if (refreshInterval > 0) {
+      timer = setInterval(() => {
+        countdown -= 1;
+        if (countdown <= 0) {
+          tick();
+          countdown = refreshInterval;
+        }
+      }, 1000);
+    }
 
     // 页面隐藏时停止
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
-        clearInterval(timer);
+        if (timer) clearInterval(timer);
       } else {
         tick();
       }
     });
   })();
-
-  // 文章轮播（从 articles.js 随机 3 篇，仅展示 标签/主图/主标题/副标题）
-  (function () {
-    const carousel = document.getElementById('articleCarousel');
-    if (!carousel) return;
-    const track = carousel.querySelector('[data-carousel-track]');
-    const dotsWrap = document.querySelector('[data-carousel-dots]');
-    if (!track) return;
-
-    // 取随机 3 篇（合并 NEWS + KNOWLEDGE 池子）
-    const A = window._AL_ARTICLES || {};
-    const pool = []
-      .concat(A.NEWS || [])
-      .concat(A.KNOWLEDGE || [])
-      .filter(a => a && a.cover && a.title);
-    if (!pool.length) return;
-
-    function shuffle(arr) {
-      const a = arr.slice();
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-    const picked = shuffle(pool).slice(0, 3);
-
-    // 渲染 slide：左文右图（cover）+ 标签 + 主标题 + 副标题
-    const tagColors = [
-      'bg-green-surface text-green-dark',
-      'bg-orange-surface text-orange-dark',
-      'bg-blue-50 text-blue-700'
-    ];
-    track.innerHTML = picked.map((it, i) => {
-      const tagBg = tagColors[i % tagColors.length];
-      const safeTitle = String(it.title).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
-      const safeSummary = String(it.summary || '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
-      const safeTag = String(it.tag || (it.cat === 'knowledge' ? '回收知识' : '行业资讯')).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
-      const onErr = "this.style.display='none'";
-      return `
-        <a href="info-detail.html?id=${it.id}" class="block w-full flex-shrink-0 bg-white relative overflow-hidden no-underline" aria-label="查看文章：${safeTitle}">
-          <!-- 右侧主图（cover） -->
-          <div class="absolute right-0 top-0 bottom-0 w-[44%] bg-gray-bg overflow-hidden">
-            <img src="${it.cover}" alt="${safeTitle}" class="w-full h-full object-cover" onerror="${onErr}">
-          </div>
-          <!-- 左侧内容：标签 + 主标题 + 副标题 -->
-          <div class="relative z-10 p-4 pr-[44%] min-h-[120px] flex flex-col justify-center">
-            <div class="mb-2">
-              <span class="inline-block ${tagBg} text-[10px] font-bold px-2 py-0.5 rounded-full">${safeTag}</span>
-            </div>
-            <h3 class="text-green-dark text-[17px] font-black mb-1.5 leading-snug line-clamp-2">${safeTitle}</h3>
-            <p class="text-gray-500 text-[12px] leading-relaxed line-clamp-2">${safeSummary}</p>
-          </div>
-        </a>
-      `;
-    }).join('');
-
-    // 渲染指示器
-    if (dotsWrap) {
-      dotsWrap.innerHTML = picked.map((_, i) =>
-        `<div class="h-1.5 rounded-full transition-all duration-300 cursor-pointer" data-carousel-dot="${i}"></div>`
-      ).join('');
-    }
-    const slides = track.children;
-    const dots = dotsWrap ? dotsWrap.querySelectorAll('[data-carousel-dot]') : [];
-    if (slides.length === 0) return;
-
-    let index = 0;
-    const total = slides.length;
-    let timer = null;
-    const INTERVAL = 4000;
-
-    function go(i) {
-      index = (i + total) % total;
-      if (track) track.style.transform = `translateX(-${index * 100}%)`;
-      dots.forEach((d, k) => {
-        d.style.width = k === index ? '20px' : '6px';
-        d.style.background = k === index ? '#10B981' : '#D6D3D1';
-      });
-    }
-
-    function start() {
-      stop();
-      timer = setInterval(() => go(index + 1), INTERVAL);
-    }
-    function stop() {
-      if (timer) { clearInterval(timer); timer = null; }
-    }
-
-    // 指示器点击
-    dots.forEach((d, k) => d.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      go(k);
-      start(); // 重置计时
-    }));
-
-    // 触摸滑动支持
-    let startX = 0, dx = 0, isTouching = false;
-    carousel.addEventListener('touchstart', (e) => {
-      isTouching = true;
-      startX = e.touches[0].clientX;
-      dx = 0;
-      stop();
-    }, { passive: true });
-    carousel.addEventListener('touchmove', (e) => {
-      if (!isTouching) return;
-      dx = e.touches[0].clientX - startX;
-    }, { passive: true });
-    carousel.addEventListener('touchend', () => {
-      if (!isTouching) return;
-      isTouching = false;
-      if (Math.abs(dx) > 40) {
-        if (dx < 0) go(index + 1); else go(index - 1);
-      }
-      start();
-    });
-
-    // 页面隐藏时停止自动播放
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stop(); else start();
-    });
-
-    go(0);
-    start();
-  })();
 </script>
 
-<script type="module">
-  import { mountBottomNav } from '/src/components/bottom-nav.js';
-  const slot = document.getElementById('app-bottom-nav');
-  mountBottomNav(slot, { active: slot.dataset.activeNav || 'quotes' });
-</script>
+<!-- 轮播：技术交流文章（根据后台设置显示） -->
+<script src="/js/home-carousel.js"></script>
+
+<script src="/js/home-config.js"></script>
+
+<script type="module" src="home-nav.js"></script>
 
 
 </body></html>

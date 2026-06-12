@@ -37,6 +37,28 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .tab-indicator { position: relative; }
         .tab-indicator::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background: #10B981; border-radius: 2px; }
+
+        /* 公告轮播（固定高度，标题上下循环滚动） */
+        .notice-carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            height: 56px;              /* 固定单行高度 */
+        }
+        .notice-track {
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            flex-direction: column;
+        }
+        .notice-slide {
+            flex-shrink: 0;
+            height: 56px;             /* 与容器等高，每次只显示一条 */
+            display: flex;
+            align-items: center;
+        }
+        .notice-dots { position: absolute; bottom: 6px; right: 10px; display: flex; gap: 4px; z-index: 2; }
+        .notice-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.4); transition: all 0.3s; }
+        .notice-dot.active { width: 12px; border-radius: 3px; background: #fff; }
     </style>
 </head>
 <body class="bg-al-light min-h-screen">
@@ -54,14 +76,13 @@
     <!-- 主内容区（pb-20 留出底部 fixed nav 56px + 安全区的高度，避免最后一项被遮挡） -->
     <main class="px-4 pt-6 pb-20 space-y-4">
 
-        <!-- 通知栏：业务相关，链接到通知公告详情页 -->
-        <a href="info-detail.html?id=notice-silver-price" class="flex items-center gap-3 bg-white rounded-2xl p-4 shadow-sm no-underline active:scale-[0.99] transition-transform" id="noticeBar">
-            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-bell text-al-blue"></i>
+        <!-- 通知栏：业务相关，支持多条时自动滚动轮播 -->
+        <div class="notice-carousel bg-white rounded-2xl shadow-sm" id="noticeCarousel">
+            <div class="notice-track" id="noticeTrack">
+                <!-- 动态渲染 -->
             </div>
-            <p class="text-sm text-al-dark font-medium flex-1 truncate" id="noticeText">白银价格突破 8000 元/千克，行情组紧急上调参考报价</p>
-            <i class="fas fa-chevron-right text-al-gray text-xs"></i>
-        </a>
+            <div class="notice-dots" id="noticeDots" style="display:none;"></div>
+        </div>
 
         <!-- 卡片区域 -->
         <div class="grid grid-cols-3 gap-3">
@@ -161,7 +182,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-1.5 mb-1">
-                                <span class="text-[9px] bg-gray-100 text-al-gray px-1.5 py-0.5 rounded font-medium">${it.tag}</span>
+                                <span class="text-[9px] bg-gray-100 text-al-gray px-1.5 py-0.5 rounded font-medium">${it.tags ? it.tags[0] : (it.cat === 'knowledge' ? '回收知识' : '行业资讯')}</span>
                             </div>
                             <h4 class="text-sm font-bold text-al-dark leading-snug line-clamp-2 mb-1">${it.title}</h4>
                             <p class="text-xs text-al-gray leading-relaxed line-clamp-2 mb-2">${it.summary}</p>
@@ -179,10 +200,15 @@
             `;
         }
 
-        // 取当前分类下"代表性文章"：按热度(views)排序后取前 3
+        // 取当前分类下"代表性文章"（仅已发布）：按热度(views)排序后取前 3
         function pickPreviewList(cat) {
-            const list = (window._AL_ARTICLES.getList(cat) || []).slice();
-            return list.sort((a, b) => b.views - a.views).slice(0, 3);
+            var list = [];
+            if (window._AL_ARTICLES && window._AL_ARTICLES.getArticles) {
+                list = window._AL_ARTICLES.getArticles(cat) || []; // 默认已过滤草稿
+            } else {
+                list = (window._AL_ARTICLES.getList(cat) || []).filter(function(a) { return a.status !== 'draft'; });
+            }
+            return list.sort(function(a, b) { return b.views - a.views; }).slice(0, 3);
         }
 
         // 当前 tab 状态
@@ -210,16 +236,85 @@
             renderPreview();
         }
 
-        // 通知栏：绑定业务相关公告标题（如有则取最新一条）
+        // 通知栏：支持多条时自动滚动轮播
+        let _noticeTimer = null;
+        let _noticeIndex = 0;
+
         function bindNoticeBar() {
-            const list = (window._AL_ARTICLES && window._AL_ARTICLES.getList('notice')) || [];
-            const latest = list[0];
-            const txt = document.getElementById('noticeText');
-            const bar = document.getElementById('noticeBar');
-            if (latest) {
-                txt.textContent = latest.title;
-                bar.setAttribute('href', 'info-detail.html?id=' + latest.id);
+            const list = (window._AL_ARTICLES && window._AL_ARTICLES.getNoticeArticles
+                ? window._AL_ARTICLES.getNoticeArticles()
+                : (window._AL_ARTICLES && window._AL_ARTICLES.getList('notice')) || []
+            ).filter(function(a) { return a && a.status !== 'draft'; });
+
+            const track = document.getElementById('noticeTrack');
+            const dotsEl = document.getElementById('noticeDots');
+
+            if (!list.length) {
+                track.innerHTML = '<div class="notice-slide flex items-center gap-3 px-4"><div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0"><i class="fas fa-bell text-al-blue text-xs"></i></div><p class="text-sm text-al-gray font-medium">暂无公告</p></div>';
+                dotsEl.style.display = 'none';
+                return;
             }
+
+            // 渲染所有幻灯片
+            track.innerHTML = list.map(function(item) {
+                return '<a href="info-detail.html?id=' + item.id + '" class="notice-slide flex items-center gap-3 px-4 no-underline active:scale-[0.99] transition-transform">' +
+                    '<div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0"><i class="fas fa-bell text-al-blue text-xs"></i></div>' +
+                    '<p class="text-sm text-al-dark font-medium flex-1 truncate">' + item.title + '</p>' +
+                    '<i class="fas fa-chevron-right text-al-gray text-xs flex-shrink-0"></i></a>';
+            }).join('');
+
+            if (list.length >= 2) {
+                // 轮播模式：渲染指示点 + 启动自动滚动
+                dotsEl.style.display = 'flex';
+                dotsEl.innerHTML = list.map(function(_, i) {
+                    return '<span class="notice-dot' + (i === 0 ? ' active' : '') + '" data-nidx="' + i + '"></span>';
+                }).join('');
+                _noticeIndex = 0;
+                startNoticeCarousel(list.length);
+            } else {
+                // 静态模式（1~2条不滚动）
+                dotsEl.style.display = 'none';
+                track.style.transform = 'translateY(0)';
+                stopNoticeCarousel();
+            }
+
+            // 点击指示点跳转
+            dotsEl.addEventListener('click', function(e) {
+                var dot = e.target.closest('[data-nidx]');
+                if (!dot || list.length < 2) return;
+                var idx = parseInt(dot.getAttribute('data-nidx'), 10);
+                if (isNaN(idx)) return;
+                jumpToNoticeSlide(idx, list.length);
+            });
+        }
+
+        function startNoticeCarousel(total) {
+            stopNoticeCarousel();
+            _noticeTimer = setInterval(function() {
+                _noticeIndex = (_noticeIndex + 1) % total;
+                updateNoticePosition(total);
+            }, 3000);
+        }
+
+        function stopNoticeCarousel() {
+            if (_noticeTimer) { clearInterval(_noticeTimer); _noticeTimer = null; }
+        }
+
+        function jumpToNoticeSlide(idx, total) {
+            _noticeIndex = idx;
+            updateNoticePosition(total);
+            stopNoticeCarousel();
+            startNoticeCarousel(total); // 重置计时器
+        }
+
+        function updateNoticePosition(total) {
+            var track = document.getElementById('noticeTrack');
+            var slideH = 56; // 固定高度，与 CSS .notice-slide height 一致
+            track.style.transform = 'translateY(-' + (_noticeIndex * slideH) + 'px)';
+            // 更新指示点
+            document.querySelectorAll('#noticeDots .notice-dot').forEach(function(d, i) {
+                d.classList.toggle('active', i === _noticeIndex);
+            });
         }
 
         // 标签切换事件

@@ -129,8 +129,7 @@
     mountAdminTopbar('#admin-topbar', {
         title: '系统设置',
         back: false,
-        onMenu: () => openActionMenu(['检查更新', '关于系统', '刷新']),
-        onAvatar: () => location.href = 'system.html',
+        onAvatar: () => location.href = '/admin/manage.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'system' });
 
@@ -155,20 +154,22 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">站点名称</label>
-                            <input type="text" value="铝老板金属网" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
+                            <input type="text" id="siteNameInput" value="铝老板金属网" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
                         </div>
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">站点描述</label>
-                            <textarea rows="3" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500 resize-none">卖货有参考不卖亏，收货有依据不踩坑。多年含银废料行情沉淀，一站查询更省心。</textarea>
+                            <textarea id="siteDescInput" rows="3" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500 resize-none">卖货有参考不卖亏，收货有依据不踩坑。多年含银废料行情沉淀，一站查询更省心。</textarea>
                         </div>
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">Logo 图标</label>
                             <div class="flex items-center gap-3">
-                                <div class="w-14 h-14 bg-brand-500 rounded-xl flex items-center justify-center">
+                                <div id="siteLogoPreview" class="w-14 h-14 bg-brand-500 rounded-xl flex items-center justify-center overflow-hidden">
                                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                                 </div>
-                                <button class="px-4 py-2 text-[13px] font-semibold text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition">更换图标</button>
+                                <input type="file" id="siteLogoInput" accept="image/*" class="hidden">
+                                <button id="siteLogoBtn" class="px-4 py-2 text-[13px] font-semibold text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition">更换图标</button>
                             </div>
+                            <p class="text-[11px] text-metal-400 mt-1.5">建议尺寸 128×128px，支持 PNG/JPG/SVG</p>
                         </div>
                     </div>
                 `
@@ -179,19 +180,19 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">联系电话</label>
-                            <input type="tel" value="13217121000" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
+                            <input type="tel" id="contactPhoneInput" value="13217121000" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
                         </div>
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">微信号</label>
-                            <input type="text" value="13217121000" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
+                            <input type="text" id="contactWechatInput" value="13217121000" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
                         </div>
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">地址</label>
-                            <input type="text" value="湖北省孝感市天下循环经济产业园" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
+                            <input type="text" id="contactAddressInput" value="湖北省孝感市天下循环经济产业园" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500">
                         </div>
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">高德坐标</label>
-                            <input type="text" value="113.9268,30.9264" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500" placeholder="经度,纬度">
+                            <input type="text" id="contactAmapCoordInput" value="113.9268,30.9264" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500" placeholder="经度,纬度">
                         </div>
                     </div>
                 `
@@ -202,49 +203,49 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">刷新频率</label>
-                            <select class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500 bg-white">
-                                <option>每 5 分钟</option>
-                                <option selected>每 15 分钟</option>
-                                <option>每 30 分钟</option>
-                                <option>每 1 小时</option>
-                                <option>手动刷新</option>
+                            <select id="quotesRefreshInterval" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500 bg-white">
+                                <option value="300">每 5 分钟</option>
+                                <option value="900" selected>每 15 分钟</option>
+                                <option value="1800">每 30 分钟</option>
+                                <option value="3600">每 1 小时</option>
+                                <option value="0">手动刷新</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-2">首页展示金属</label>
                             <div class="space-y-2">
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <input type="checkbox" id="metalAu" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
                                     <span class="text-[14px] text-metal-800">黄金 (Au)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <input type="checkbox" id="metalAg" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
                                     <span class="text-[14px] text-metal-800">白银 (Ag)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <input type="checkbox" id="metalPt" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
                                     <span class="text-[14px] text-metal-800">铂金 (Pt)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <input type="checkbox" id="metalPd" checked class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
                                     <span class="text-[14px] text-metal-800">钯金 (Pd)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <input type="checkbox" id="metalCu" class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
                                     <span class="text-[14px] text-metal-800">铜 (Cu)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
+                                    <input type="checkbox" id="metalAl" class="w-4 h-4 rounded border-metal-300 text-brand-600 focus:ring-brand-500">
                                     <span class="text-[14px] text-metal-800">铝 (Al)</span>
                                 </label>
                             </div>
                         </div>
                         <div>
                             <label class="block text-[13px] font-semibold text-metal-700 mb-1.5">展示样式</label>
-                            <select class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500 bg-white">
-                                <option selected>卡片式（2列网格）</option>
-                                <option>列表式（单列）</option>
-                                <option>滚动横幅</option>
+                            <select id="quotesDisplayStyle" class="w-full px-3 py-2.5 text-[14px] border border-metal-200 rounded-xl focus:outline-none focus:border-brand-500 bg-white">
+                                <option value="grid" selected>卡片式（2列网格）</option>
+                                <option value="list">列表式（单列）</option>
+                                <option value="banner">滚动横幅</option>
                             </select>
                         </div>
                     </div>
@@ -273,27 +274,128 @@
         document.body.appendChild(el);
 
         el.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => el.remove()));
+
+        // 站点设置：绑定图标上传 + 加载已保存配置
+        if (type === 'site') {
+            const logoBtn = el.querySelector('#siteLogoBtn');
+            const logoInput = el.querySelector('#siteLogoInput');
+            const logoPreview = el.querySelector('#siteLogoPreview');
+
+            // 加载已保存的配置
+            try {
+                const saved = localStorage.getItem('_AL_SITE_CONFIG');
+                if (saved) {
+                    const config = JSON.parse(saved);
+                    if (config.logo) {
+                        logoPreview.innerHTML = `<img src="${config.logo}" alt="Logo" class="w-full h-full object-cover rounded-xl">`;
+                        logoPreview.dataset.logo = config.logo;
+                    }
+                    if (config.brandName) el.querySelector('#siteNameInput').value = config.brandName;
+                    if (config.siteDescription) el.querySelector('#siteDescInput').value = config.siteDescription;
+                }
+            } catch (e) {}
+
+            // 点击"更换图标"触发文件选择
+            if (logoBtn && logoInput) {
+                logoBtn.addEventListener('click', () => logoInput.click());
+            }
+
+            // 文件选择后预览并存储
+            if (logoInput && logoPreview) {
+                logoInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        logoPreview.innerHTML = `<img src="${ev.target.result}" alt="Logo" class="w-full h-full object-cover rounded-xl">`;
+                        logoPreview.dataset.logo = ev.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        // 联系方式设置：加载已保存配置
+        if (type === 'contact') {
+            try {
+                const saved = localStorage.getItem('_AL_SITE_CONFIG');
+                if (saved) {
+                    const config = JSON.parse(saved);
+                    if (config.phone) el.querySelector('#contactPhoneInput').value = config.phone;
+                    if (config.wechat) el.querySelector('#contactWechatInput').value = config.wechat;
+                    if (config.address) el.querySelector('#contactAddressInput').value = config.address;
+                    if (config.amapCoord) el.querySelector('#contactAmapCoordInput').value = config.amapCoord;
+                }
+            } catch (e) {}
+        }
+
+        // 行情刷新设置：加载已保存配置
+        if (type === 'quotes') {
+            try {
+                const saved = localStorage.getItem('_AL_QUOTES_CONFIG');
+                if (saved) {
+                    const config = JSON.parse(saved);
+                    if (config.refreshInterval !== undefined) {
+                        el.querySelector('#quotesRefreshInterval').value = config.refreshInterval;
+                    }
+                    if (config.displayMetals) {
+                        ['Au', 'Ag', 'Pt', 'Pd', 'Cu', 'Al'].forEach(metal => {
+                            const checkbox = el.querySelector('#metal' + metal);
+                            if (checkbox) checkbox.checked = config.displayMetals.includes(metal);
+                        });
+                    }
+                    if (config.displayStyle) {
+                        el.querySelector('#quotesDisplayStyle').value = config.displayStyle;
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // 保存按钮：读取已有配置，合并保存
         el.querySelector('[data-save]').addEventListener('click', () => {
+            let existing = {};
+            try {
+                const saved = localStorage.getItem('_AL_SITE_CONFIG');
+                if (saved) existing = JSON.parse(saved);
+            } catch (e) {}
+
+            if (type === 'site') {
+                const siteName = el.querySelector('#siteNameInput')?.value || '铝老板金属网';
+                const siteDesc = el.querySelector('#siteDescInput')?.value || '';
+                const logo = el.querySelector('#siteLogoPreview')?.dataset.logo || '';
+                Object.assign(existing, { brandName: siteName, siteDescription: siteDesc, logo: logo });
+            }
+
+            if (type === 'contact') {
+                const phone = el.querySelector('#contactPhoneInput')?.value || '13217121000';
+                const wechat = el.querySelector('#contactWechatInput')?.value || '13217121000';
+                const address = el.querySelector('#contactAddressInput')?.value || '湖北省孝感市天下循环经济产业园';
+                const amapCoord = el.querySelector('#contactAmapCoordInput')?.value || '113.9268,30.9264';
+                Object.assign(existing, { phone, wechat, address, amapCoord });
+            }
+
+            if (type === 'quotes') {
+                const refreshInterval = parseInt(el.querySelector('#quotesRefreshInterval')?.value || '900');
+                const displayStyle = el.querySelector('#quotesDisplayStyle')?.value || 'grid';
+                const displayMetals = [];
+                ['Au', 'Ag', 'Pt', 'Pd', 'Cu', 'Al'].forEach(metal => {
+                    const checkbox = el.querySelector('#metal' + metal);
+                    if (checkbox && checkbox.checked) displayMetals.push(metal);
+                });
+
+                const quotesConfig = {
+                    refreshInterval: refreshInterval,
+                    displayStyle: displayStyle,
+                    displayMetals: displayMetals
+                };
+                localStorage.setItem('_AL_QUOTES_CONFIG', JSON.stringify(quotesConfig));
+            }
+
+            localStorage.setItem('_AL_SITE_CONFIG', JSON.stringify(existing));
+
             if (window._AL_toast) window._AL_toast('保存成功', 1500);
             setTimeout(() => el.remove(), 300);
         });
-    }
-
-    function openActionMenu(items) {
-        const existing = document.getElementById('__action_menu__');
-        if (existing) existing.remove();
-        const menu = document.createElement('div');
-        menu.id = '__action_menu__';
-        menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
-        menu.innerHTML = `
-          <div class="absolute inset-0 bg-black/40" data-close></div>
-          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 animate-up">
-            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
-            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
-            <button class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 font-medium active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
-          </div>`;
-        document.body.appendChild(menu);
-        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
     }
 </script>
 

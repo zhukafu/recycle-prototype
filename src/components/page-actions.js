@@ -105,7 +105,7 @@ function build(opts) {
     parts.push(`<button type="button" class="app-page-actions__btn" data-action="menu" aria-label="更多操作">${ICONS.menu}</button>`);
   }
   if (showAvatar) {
-    parts.push(`<button type="button" class="app-page-actions__btn" data-action="avatar" aria-label="个人中心">${ICONS.avatar}</button>`);
+    parts.push(`<button type="button" class="app-page-actions__btn" data-action="avatar" aria-label="回到首页">${ICONS.avatar}</button>`);
   }
   return `<div class="app-page-actions" style="color:${color};" role="toolbar" aria-label="页面操作">${parts.join('')}</div>`;
 }
@@ -139,12 +139,21 @@ export function mountPageActions(target, options = {}) {
   // 事件绑定
   const menuBtn = container.querySelector('[data-action="menu"]');
   const avatarBtn = container.querySelector('[data-action="avatar"]');
+
   menuBtn?.addEventListener('click', (e) => {
     e.preventDefault();
     onMenu?.(e);
   });
+
+  // 头像按钮：点击回到首页
   avatarBtn?.addEventListener('click', (e) => {
     e.preventDefault();
-    onAvatar?.(e);
+    if (typeof onAvatar === 'function') {
+      onAvatar(e);
+    } else {
+      // 默认行为：根据当前路径判断首页位置
+      const isAdmin = location.pathname.includes('/admin/');
+      location.href = isAdmin ? '/admin/manage.html' : '/miniprogram/index.html';
+    }
   });
 }

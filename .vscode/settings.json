@@ -1,0 +1,7 @@
+{
+  "html.validate.scripts": false,
+  "javascript.validate.enable": false,
+  "[html]": {
+    "editor.defaultLanguage": "html"
+  }
+}

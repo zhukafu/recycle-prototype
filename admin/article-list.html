@@ -30,6 +30,39 @@
         .tab-item { scroll-snap-align: start; flex-shrink: 0; }
         .search-input { width: 100%; height: 38px; padding: 0 12px 0 36px; background: #f1f5f9; border-radius: 9999px; font-size: 13px; color: #0f172a; outline: none; border: 0; }
         .search-input:focus { background: #ffffff; box-shadow: 0 0 0 2px #22c55e; }
+        /* ====== 角色设置开关（iOS Toggle 样式）====== */
+        .role-switch { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; -webkit-user-select: none; }
+        .role-switch-label { font-size: 11px; font-weight: 600; white-space: nowrap; transition: color 0.2s; }
+        /* 开关轨道 */
+        .toggle-track {
+            position: relative; width: 34px; height: 20px; border-radius: 10px;
+            background: #d1d5db; transition: background 0.25s ease; flex-shrink: 0;
+            border: none; cursor: pointer; padding: 0;
+        }
+        /* 开关滑块 */
+        .toggle-knob {
+            position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+            border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* ---- 公告开关（青色）---- */
+        .role-switch--notice .role-switch-label { color: #6b7280; }
+        .role-switch--notice .toggle-track { background: #d1d5db; }
+        .role-switch--notice.active .role-switch-label { color: #0891b2; font-weight: 700; }
+        .role-switch--notice.active .toggle-track { background: #06b6d4; }
+        .role-switch--notice.active .toggle-knob { transform: translateX(14px); }
+        /* ---- 轮播开关（橙色）---- */
+        .role-switch--carousel .role-switch-label { color: #6b7280; }
+        .role-switch--carousel .toggle-track { background: #d1d5db; }
+        .role-switch--carousel.active .role-switch-label { color: #d97706; font-weight: 700; }
+        .role-switch--carousel.active .toggle-track { background: #f59e0b; }
+        .role-switch--carousel.active .toggle-knob { transform: translateX(14px); }
+        /* ---- 关于我们开关（紫色，单选）---- */
+        .role-switch--about .role-switch-label { color: #6b7280; }
+        .role-switch--about .toggle-track { background: #d1d5db; }
+        .role-switch--about.active .role-switch-label { color: #7c3aed; font-weight: 700; }
+        .role-switch--about.active .toggle-track { background: #8b5cf6; }
+        .role-switch--about.active .toggle-knob { transform: translateX(14px); }
         @media (min-width: 1024px) {
             .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
             .content-inner { padding: 0 24px; }
@@ -44,13 +77,11 @@
         <div id="admin-topbar"></div>
         <div class="bg-white border-b border-metal-100">
             <div class="tab-scroll flex overflow-x-auto scrollbar-hide px-4 lg:px-0">
-                <button class="tab-item px-4 py-2.5 text-[13px] font-semibold text-brand-600 relative whitespace-nowrap">
+                <button class="tab-item px-4 py-2.5 text-[13px] font-semibold text-brand-600 relative whitespace-nowrap" data-tab="all">
                     全部<div class="absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full"></div>
                 </button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">已发布</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">草稿箱</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">回收知识</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">行业资讯</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap" data-tab="published">已发布</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap" data-tab="draft">草稿箱</button>
             </div>
         </div>
     </header>
@@ -67,110 +98,22 @@
             <!-- 统计 -->
             <div class="grid grid-cols-3 gap-3 mt-3">
                 <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="text-[20px] font-black text-metal-900 font-mono">48</div>
+                    <div class="text-[20px] font-black text-metal-900 font-mono" id="totalCount">0</div>
                     <div class="text-[11px] text-metal-500 mt-0.5">资讯总数</div>
                 </div>
                 <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="text-[20px] font-black text-brand-600 font-mono">42</div>
+                    <div class="text-[20px] font-black text-brand-600 font-mono" id="publishedCount">0</div>
                     <div class="text-[11px] text-metal-500 mt-0.5">已发布</div>
                 </div>
                 <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="text-[20px] font-black text-amber-600 font-mono">6</div>
+                    <div class="text-[20px] font-black text-amber-600 font-mono" id="draftCount">0</div>
                     <div class="text-[11px] text-metal-500 mt-0.5">草稿</div>
                 </div>
             </div>
 
             <!-- 资讯列表 -->
-            <div class="mt-3 space-y-2">
-                <a href="article-edit.html" class="block bg-white rounded-[14px] p-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="flex gap-3">
-                        <div class="w-20 h-20 rounded-[10px] bg-gradient-to-br from-red-400 to-red-500 flex-shrink-0 flex items-center justify-center text-white text-2xl">
-                            🔧
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-1.5 py-0.5 bg-brand-50 text-brand-700 text-[10px] rounded">已发布</span>
-                                <span class="px-1.5 py-0.5 bg-red-50 text-red-600 text-[10px] rounded">回收技巧</span>
-                            </div>
-                            <h3 class="text-[14px] font-semibold text-metal-900 truncate">接触器银触点拆解完整流程：新手必学</h3>
-                            <p class="text-[11px] text-metal-500 mt-1 line-clamp-2">详细讲解接触器拆解步骤，从外壳拆除到银触点分离，每一步配图说明，适合刚入行的回收新手...</p>
-                            <div class="flex items-center gap-2 mt-1.5 text-[10px] text-metal-400">
-                                <span>张老板</span>
-                                <span>·</span>
-                                <span>2025-06-08</span>
-                                <span>·</span>
-                                <span>阅读 1.2k</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="article-edit.html" class="block bg-white rounded-[14px] p-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="flex gap-3">
-                        <div class="w-20 h-20 rounded-[10px] bg-gradient-to-br from-amber-400 to-amber-500 flex-shrink-0 flex items-center justify-center text-white text-2xl">
-                            📈
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-1.5 py-0.5 bg-brand-50 text-brand-700 text-[10px] rounded">已发布</span>
-                                <span class="px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] rounded">行业资讯</span>
-                            </div>
-                            <h3 class="text-[14px] font-semibold text-metal-900 truncate">2025年Q2金属回收行情深度分析</h3>
-                            <p class="text-[11px] text-metal-500 mt-1 line-clamp-2">白银价格持续走高，铝铜价格稳中有升，本季度废料回收市场总体活跃。深度分析各品种趋势...</p>
-                            <div class="flex items-center gap-2 mt-1.5 text-[10px] text-metal-400">
-                                <span>李老板</span>
-                                <span>·</span>
-                                <span>2025-06-05</span>
-                                <span>·</span>
-                                <span>阅读 856</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="article-edit.html" class="block bg-white rounded-[14px] p-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="flex gap-3">
-                        <div class="w-20 h-20 rounded-[10px] bg-gradient-to-br from-blue-400 to-blue-500 flex-shrink-0 flex items-center justify-center text-white text-2xl">
-                            💡
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-1.5 py-0.5 bg-metal-100 text-metal-600 text-[10px] rounded">草稿</span>
-                                <span class="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded">新手入门</span>
-                            </div>
-                            <h3 class="text-[14px] font-semibold text-metal-900 truncate">T5型号拆解实战：从入门到精通</h3>
-                            <p class="text-[11px] text-metal-500 mt-1 line-clamp-2">T5系列是回收市场最常见的型号之一，本教程从工具准备到废料分类，全程实拍讲解...</p>
-                            <div class="flex items-center gap-2 mt-1.5 text-[10px] text-metal-400">
-                                <span>张老板</span>
-                                <span>·</span>
-                                <span>未发布</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="article-edit.html" class="block bg-white rounded-[14px] p-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="flex gap-3">
-                        <div class="w-20 h-20 rounded-[10px] bg-gradient-to-br from-purple-400 to-purple-500 flex-shrink-0 flex items-center justify-center text-white text-2xl">
-                            📊
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-1.5 py-0.5 bg-brand-50 text-brand-700 text-[10px] rounded">已发布</span>
-                                <span class="px-1.5 py-0.5 bg-purple-50 text-purple-600 text-[10px] rounded">行情分析</span>
-                            </div>
-                            <h3 class="text-[14px] font-semibold text-metal-900 truncate">含银废料回收的利润最大化策略</h3>
-                            <p class="text-[11px] text-metal-500 mt-1 line-clamp-2">银触点、镀银件、含银合金等不同类型废料的回收策略和议价技巧分享...</p>
-                            <div class="flex items-center gap-2 mt-1.5 text-[10px] text-metal-400">
-                                <span>王老板</span>
-                                <span>·</span>
-                                <span>2025-05-28</span>
-                                <span>·</span>
-                                <span>阅读 2.3k</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
+            <div class="mt-3 space-y-2" id="articleList">
+                <!-- 动态渲染 -->
             </div>
 
             <a href="article-edit.html" class="fixed bottom-[88px] right-4 lg:bottom-24 lg:right-8 w-14 h-14 rounded-full bg-brand-500 text-white shadow-[0_8px_24px_rgba(34,197,94,0.4)] flex items-center justify-center tap-active no-underline z-30">
@@ -182,6 +125,235 @@
     <div id="admin-bottom-nav"></div>
 </div>
 
+<script src="/public/data/articles.js"></script>
+<script>
+    // 当前激活的 Tab
+    let activeTab = 'all';
+
+    // 获取当前 displayConfig
+    function _getDisplayConfig() {
+        if (window._AL_ARTICLES && window._AL_ARTICLES.getData) {
+            return (window._AL_ARTICLES.getData().displayConfig) || {};
+        }
+        return { noticeIds: [], carouselIds: [], aboutId: null };
+    }
+
+    // 切换文章的角色设置（公告/轮播/关于）
+    //  - notice / carousel：多选，切换加入或移除
+    //  - about：单选，选中后自动取消其他 about 文章
+    function toggleRole(event, articleId, role) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var data = window._AL_ARTICLES.getData();
+        if (!data.displayConfig) data.displayConfig = { noticeIds: [], carouselIds: [], aboutId: null };
+        var dc = data.displayConfig;
+
+        switch (role) {
+            case 'notice':
+                if (!dc.noticeIds) dc.noticeIds = [];
+                var nIdx = dc.noticeIds.indexOf(articleId);
+                if (nIdx !== -1) {
+                    dc.noticeIds.splice(nIdx, 1); // 取消
+                } else {
+                    dc.noticeIds.push(articleId); // 设为公告
+                }
+                break;
+            case 'carousel':
+                if (!dc.carouselIds) dc.carouselIds = [];
+                var cIdx = dc.carouselIds.indexOf(articleId);
+                if (cIdx !== -1) {
+                    dc.carouselIds.splice(cIdx, 1);
+                } else {
+                    dc.carouselIds.push(articleId);
+                }
+                break;
+            case 'about':
+                // 单选：如果已经是关于我们则取消，否则设为当前文章
+                if (dc.aboutId === articleId) {
+                    dc.aboutId = null;
+                } else {
+                    dc.aboutId = articleId;
+                }
+                break;
+        }
+
+        window._AL_ARTICLES.saveData(data);
+
+        // 刷新列表以反映状态变化
+        loadArticles(activeTab);
+
+        // 简短 Toast 提示
+        _showRoleToast(role, dc, articleId);
+    }
+
+    // 显示操作反馈 Toast
+    function _showRoleToast(role, dc, id) {
+        var msg = '';
+        if (role === 'notice') msg = (dc.noticeIds.indexOf(id) !== -1) ? '已设为公告' : '已取消公告';
+        else if (role === 'carousel') msg = (dc.carouselIds.indexOf(id) !== -1) ? '已设为轮播' : '已取消轮播';
+        else if (role === 'about') msg = (dc.aboutId === id) ? '已设为关于我们' : '已取消关于我们';
+
+        var el = document.getElementById('roleToast');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'roleToast';
+            el.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;background:rgba(0,0,0,0.75);color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;pointer-events:none;transition:opacity 0.2s;opacity:0;';
+            document.body.appendChild(el);
+        }
+        el.textContent = msg;
+        clearTimeout(_roleToastT);
+        el.style.opacity = '1';
+        _roleToastT = setTimeout(function() { el.style.opacity = '0'; }, 1200);
+    }
+    var _roleToastT = null;
+
+    // 获取所有文章（v2.0：从统一 articles 数组获取，包含全部板块和角色）
+    function getAllArticles() {
+        var all = [];
+        if (window._AL_ARTICLES && window._AL_ARTICLES.getData) {
+            var data = window._AL_ARTICLES.getData();
+            // v2.0 统一结构：所有文章在 data.articles 中
+            if (data.articles && Array.isArray(data.articles)) {
+                all = data.articles.slice();
+            }
+        } else if (window._AL_ARTICLES && window._AL_ARTICLES.getAllArticles) {
+            all = window._AL_ARTICLES.getAllArticles();
+        }
+        // 按 weight 降序 / sortOrder 升序排列
+        all.sort(function(a, b) {
+            if ((b.weight || 0) !== (a.weight || 0)) return (b.weight || 0) - (a.weight || 0);
+            return (a.sortOrder || 999) - (b.sortOrder || 999);
+        });
+        return all;
+    }
+
+    // 加载并渲染文章列表（根据当前 Tab 过滤）
+    function loadArticles(filter) {
+        filter = filter || activeTab;
+        var articles = getAllArticles();
+
+        // Tab 过滤
+        if (filter === 'published') {
+            articles = articles.filter(function(a) { return a.status !== 'draft'; });
+        } else if (filter === 'draft') {
+            articles = articles.filter(function(a) { return a.status === 'draft'; });
+        }
+
+        // 更新统计（基于全量数据，不受 Tab 影响）
+        var all = getAllArticles();
+        var total = all.length;
+        var published = all.filter(function(a) { return a.status !== 'draft'; }).length;
+        var draftCount = all.filter(function(a) { return a.status === 'draft'; }).length;
+
+        document.getElementById('totalCount').textContent = total;
+        document.getElementById('publishedCount').textContent = published;
+        document.getElementById('draftCount').textContent = draftCount;
+
+        var listEl = document.getElementById('articleList');
+
+        if (!articles.length) {
+            listEl.innerHTML = '<div class="text-center text-xs text-metal-400 py-8">暂无文章</div>';
+            return;
+        }
+
+        listEl.innerHTML = articles.map(function(article) {
+            var isDraft = article.status === 'draft';
+            var statusClass = isDraft ? 'bg-metal-100 text-metal-600' : 'bg-brand-50 text-brand-700';
+            var statusText = isDraft ? '草稿' : '已发布';
+            var dateText = isDraft ? '未发布' : (article.date || '');
+
+            // 分类标签颜色（v2.0: 优先 displayRole，其次 section）
+            var role = article.displayRole || '';
+            var sec = article.section || 'knowledge';
+            var catKey = (role === 'notice' ? 'notice' : (role === 'about' ? 'about' : sec));
+            var catMap = {
+                notice:    { label: '公告', cls: 'bg-cyan-50 text-cyan-600' },
+                news:      { label: '资讯', cls: 'bg-amber-50 text-amber-700' },
+                knowledge: { label: '知识', cls: 'bg-red-50 text-red-600' },
+                about:     { label: '关于', cls: 'bg-purple-50 text-purple-600' }
+            };
+            var catInfo = catMap[catKey] || { label: sec, cls: 'bg-gray-100 text-gray-600' };
+
+            // 封面区域：有图片则显示图片，无图显示分类 emoji
+            var coverArea = '';
+            if (article.cover && article.cover.startsWith('/')) {
+                coverArea = '<img src="' + article.cover + '" alt="" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML=\'<span class=\\\'text-white text-lg font-black\\\'>无图</span>\'">';
+            } else {
+                var emojis = { notice: '\uD83D\uDCE2', news: '\uD83D\uDCF0', knowledge: '\uD83D\uDCDA', about: '\u2139\uFE0F' };
+                coverArea = '<span class="text-white text-2xl">' + (emojis[catKey] || '\uD83D\uDCC4') + '</span>';
+            }
+
+            // 获取 displayConfig 当前状态
+            var dc = _getDisplayConfig();
+            var isNotice = (dc.noticeIds && dc.noticeIds.indexOf(article.id) !== -1);
+            var isCarousel = (dc.carouselIds && dc.carouselIds.indexOf(article.id) !== -1);
+            var isAbout = (dc.aboutId === article.id);
+
+            return [
+                '<div class="article-card bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">',
+                '  <a href="article-edit.html?id=' + article.id + '" class="flex gap-3 no-underline">',
+                '    <div class="w-20 h-20 rounded-[10px] bg-gradient-to-br from-brand-400 to-brand-500 flex-shrink-0 overflow-hidden flex items-center justify-center">',
+                coverArea,
+                '    </div>',
+                '    <div class="flex-1 min-w-0">',
+                '      <div class="flex items-center gap-2 mb-1">',
+                '        <span class="px-1.5 py-0.5 ' + statusClass + ' text-[10px] rounded">' + statusText + '</span>',
+                '        <span class="px-1.5 py-0.5 ' + catInfo.cls + ' text-[10px] rounded">' + ((Array.isArray(article.tags) ? article.tags[0] : article.tag) || catInfo.label) + '</span>',
+                '      </div>',
+                '      <h3 class="text-[14px] font-semibold text-metal-900 truncate">' + (article.title || '') + '</h3>',
+                '      <p class="text-[11px] text-metal-500 mt-1 line-clamp-2">' + (article.summary || '') + '</p>',
+                '      <div class="flex items-center gap-2 mt-1.5 text-[10px] text-metal-400">',
+                '        <span>' + (article.author || '') + '</span>',
+                '        <span>·</span>',
+                '        <span>' + dateText + '</span>',
+                !isDraft ? ['        <span>·</span><span>阅读 ' + (article.views || 0) + '</span>'].join('') : '',
+                '      </div>',
+                '    </div>',
+                '  </a>',
+            '  <!-- 角色设置开关行 -->',
+            '  <div class="flex items-center gap-3 mt-2 pt-2 border-t border-metal-100">',
+            '    <label class="role-switch role-switch--notice' + (isNotice ? ' active' : '') + '">',
+            '      <span class="role-switch-label">技术公告</span>',
+            '      <button type="button" class="toggle-track" onclick="toggleRole(event, \'' + article.id + '\', \'notice\')"><span class="toggle-knob"></span></button>',
+            '    </label>',
+            '    <label class="role-switch role-switch--carousel' + (isCarousel ? ' active' : '') + '">',
+            '      <span class="role-switch-label">首页轮播</span>',
+            '      <button type="button" class="toggle-track" onclick="toggleRole(event, \'' + article.id + '\', \'carousel\')"><span class="toggle-knob"></span></button>',
+            '    </label>',
+            '    <label class="role-switch role-switch--about' + (isAbout ? ' active' : '') + '">',
+            '      <span class="role-switch-label">关于我们</span>',
+            '      <button type="button" class="toggle-track" onclick="toggleRole(event, \'' + article.id + '\', \'about\')"><span class="toggle-knob"></span></button>',
+            '    </label>',
+            '  </div>',
+                '</div>'
+            ].join('\n');
+        }).join('');
+    }
+
+    // 切换 Tab 样式
+    function switchTab(tabKey) {
+        activeTab = tabKey;
+        document.querySelectorAll('[data-tab]').forEach(function(btn) {
+            var isActive = btn.dataset.tab === tabKey;
+            btn.className = 'tab-item px-4 py-2.5 text-[13px] relative whitespace-nowrap ' +
+                (isActive ? 'font-semibold text-brand-600' : 'text-metal-500');
+            btn.innerHTML = btn.textContent.trim() +
+                (isActive ? '<div class="absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full"></div>' : '');
+        });
+        loadArticles(tabKey);
+    }
+
+    // 页面加载
+    document.addEventListener('DOMContentLoaded', function() {
+        // 绑定 Tab 点击
+        document.querySelectorAll('[data-tab]').forEach(function(btn) {
+            btn.addEventListener('click', function() { switchTab(btn.dataset.tab); });
+        });
+        loadArticles();
+    });
+</script>
+
 <script type="module">
     import { mountAdminTopbar } from '/src/components/admin-topbar.js';
     import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
@@ -189,27 +361,9 @@
     mountAdminTopbar('#admin-topbar', {
         title: '资讯管理',
         back: true,
-        onMenu: () => openActionMenu(['批量发布', '导入文章', '分类管理', '刷新']),
         onAvatar: () => location.href = 'system.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
-
-    function openActionMenu(items) {
-        const existing = document.getElementById('__action_menu__');
-        if (existing) existing.remove();
-        const menu = document.createElement('div');
-        menu.id = '__action_menu__';
-        menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
-        menu.innerHTML = `
-          <div class="absolute inset-0 bg-black/40" data-close></div>
-          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 animate-up">
-            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
-            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
-            <button class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 font-medium active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
-          </div>`;
-        document.body.appendChild(menu);
-        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
-    }
 </script>
 
 </body>

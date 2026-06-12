@@ -23,11 +23,214 @@
         .admin-sticky-header { position: sticky; top: 0; z-index: 40; background: #ffffff; }
         .admin-content { padding-bottom: 80px; }
         .content-inner { max-width: 1200px; margin: 0 auto; }
-        .input { width: 100%; height: 40px; padding: 0 12px; background: #f1f5f9; border-radius: 10px; font-size: 13px; color: #0f172a; outline: none; border: 0; }
-        .input:focus { background: #ffffff; box-shadow: 0 0 0 2px #22c55e; }
-        textarea.input { height: auto; padding: 10px 12px; resize: vertical; min-height: 120px; }
+        .input { width: 100%; height: 40px; padding: 0 12px; background: #f1f5f9; border-radius: 10px; font-size: 13px; color: #0f172a; outline: none; border: 2px solid transparent; transition: all .15s; box-sizing: border-box; }
+        .input:focus { background: #ffffff; border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
+        textarea.input { height: auto; padding: 10px 12px; resize: vertical; min-height: 80px; }
+        select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
         .field-label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px; }
         .tag-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #f1f5f9; border-radius: 9999px; font-size: 12px; color: #334155; }
+
+        /* ===== 富文本编辑器样式（微信公众号风格） ===== */
+        .editor-wrapper { border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #fff; }
+        .editor-toolbar {
+            display: flex; flex-wrap: wrap; gap: 1px;
+            background: #fafafa; border-bottom: 1px solid #e2e8f0;
+            padding: 6px 8px; align-items: center;
+        }
+        .editor-toolbar .divider { width: 1px; height: 22px; background: #e2e8f0; margin: 0 4px; flex-shrink: 0; }
+        .toolbar-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 6px;
+            border: none; background: transparent; cursor: pointer;
+            color: #475569; font-size: 14px; transition: all .15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .toolbar-btn:hover { background: #e2e8f0; }
+        .toolbar-btn.active { background: #dcfce7; color: #16a34a; }
+        .toolbar-btn svg { width: 16px; height: 16px; pointer-events: none; }
+        .editor-body {
+            min-height: 350px; padding: 16px 20px;
+            font-size: 15px; line-height: 1.85; color: #1e293b;
+            outline: none; overflow-wrap: break-word;
+        }
+        .editor-body:empty::before {
+            content: attr(data-placeholder);
+            color: #94a3b8; pointer-events: none;
+        }
+        /* 编辑器内排版 */
+        .editor-body h2 { font-size: 19px; font-weight: 700; margin: 18px 0 10px; color: #0f172a; line-height: 1.5; }
+        .editor-body h3 { font-size: 17px; font-weight: 700; margin: 14px 0 8px; color: #1e293b; line-height: 1.5; }
+        .editor-body p { margin: 0 0 10px; }
+        .editor-body strong { font-weight: 700; color: #0f172a; }
+        .editor-body em { font-style: italic; }
+        .editor-body u { text-decoration: underline; text-decoration-color: #22c55e; }
+        .editor-body blockquote {
+            margin: 12px 0; padding: 10px 14px; border-left: 3.5px solid #22c55e;
+            background: #f0fdf4; border-radius: 0 8px 8px 0; color: #334155;
+        }
+        .editor-body ul, .editor-body ol { margin: 8px 0; padding-left: 22px; }
+        .editor-body li { margin-bottom: 4px; }
+        .editor-body ul li { list-style-type: disc; }
+        .editor-body ol li { list-style-type: decimal; }
+        .editor-body a { color: #16a34a; text-decoration: underline; }
+        .editor-body img { max-width: 100%; border-radius: 8px; margin: 8px 0; display: block; }
+        .editor-body hr { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+        .editor-body table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 13px; }
+        .editor-body th, .editor-body td { border: 1px solid #e2e8f0; padding: 6px 10px; text-align: left; }
+        .editor-body th { background: #f8fafc; font-weight: 600; }
+        .editor-body .inline-image-caption {
+            text-align: center; font-size: 12px; color: #64748b;
+            margin-top: -6px; margin-bottom: 10px;
+        }
+
+        /* ===== 预览弹窗 ===== */
+        .preview-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,.45);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all .25s;
+        }
+        .preview-overlay.show { opacity: 1; visibility: visible; }
+        .preview-panel {
+            width: 92%; max-width: 480px; max-height: 88vh;
+            background: #fff; border-radius: 16px; overflow: hidden;
+            display: flex; flex-direction: column;
+            transform: translateY(30px); transition: transform .3s cubic-bezier(.22,1,.36,1);
+        }
+        .preview-overlay.show .preview-panel { transform: translateY(0); }
+        .preview-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px; border-bottom: 1px solid #f1f5f9;
+            position: sticky; top: 0; background: #fff; z-index: 2;
+        }
+        .preview-body {
+            flex: 1; overflow-y: auto; padding: 20px 18px 30px;
+            font-size: 15px; line-height: 1.85; color: #333;
+        }
+        .preview-body h2 { font-size: 20px; font-weight: 700; margin: 20px 0 10px; color: #111; }
+        .preview-body h3 { font-size: 17px; font-weight: 700; margin: 16px 0 8px; color: #222; }
+        .preview-body p { margin: 0 0 12px; }
+        .preview-body strong { font-weight: 700; }
+        .preview-body blockquote { margin: 12px 0; padding: 10px 14px; border-left: 3.5px solid #22c55e; background: #f0fdf4; border-radius: 0 8px 8px 0; color: #444; }
+        .preview-body ul, .preview-body ol { margin: 8px 0; padding-left: 22px; }
+        .preview-body li { margin-bottom: 4px; }
+        .preview-body img { max-width: 100%; border-radius: 8px; margin: 8px 0; display: block; }
+        .preview-body hr { border: none; border-top: 1px solid #eee; margin: 16px 0; }
+        .preview-body .caption { text-align: center; font-size: 12px; color: #999; margin-top: -4px; margin-bottom: 12px; }
+        .preview-cover { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 10px; margin-bottom: 14px; }
+        .preview-meta { display: flex; gap: 10px; margin-bottom: 14px; font-size: 12px; color: #999; }
+        .preview-tag { display: inline-block; padding: 2px 8px; background: #dcfce7; color: #16a34a; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+
+        /* ===== Toast 提示 ===== */
+        .toast {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            padding: 10px 20px; background: #0f172a; color: #fff;
+            border-radius: 9999px; font-size: 13px; font-weight: 500;
+            z-index: 200; opacity: 0; transition: all .3s; pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== 插入图片弹窗（增强版） ===== */
+        .img-dialog-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,.45);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all .25s;
+        }
+        .img-dialog-overlay.show { opacity: 1; visibility: visible; }
+        .img-dialog-panel {
+            width: 92%; max-width: 520px; max-height: 85vh;
+            background: #fff; border-radius: 16px; overflow: hidden;
+            display: flex; flex-direction: column;
+            transform: translateY(30px); transition: transform .3s cubic-bezier(.22,1,.36,1);
+        }
+        .img-dialog-overlay.show .img-dialog-panel { transform: translateY(0); }
+        .img-dialog-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; border-bottom: 1px solid #f1f5f9;
+            background: #fff;
+        }
+        .img-dialog-tabs {
+            display: flex; gap: 0; padding: 0 18px; border-bottom: 1px solid #e2e8f0; background: #fafafa;
+        }
+        .img-tab-btn {
+            padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748b;
+            border: none; background: transparent; cursor: pointer;
+            border-bottom: 2px solid transparent; transition: all .2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .img-tab-btn:hover { color: #334155; background: rgba(0,0,0,.03); }
+        .img-tab-btn.active { color: #16a34a; border-bottom-color: #16a34a; background: transparent; }
+        .img-dialog-body { flex: 1; overflow-y: auto; padding: 16px 18px 20px; }
+        .img-upload-zone {
+            border: 2px dashed #cbd5e1; border-radius: 12px;
+            padding: 28px 20px; text-align: center;
+            cursor: pointer; transition: all .2s; background: #f8fafc;
+        }
+        .img-upload-zone:hover { border-color: #22c55e; background: #f0fdf4; }
+        .img-upload-zone.has-image { border-style: solid; border-color: #22c55e; padding: 12px; }
+        .img-upload-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-bottom: 8px; }
+        .img-url-preview { margin-top: 10px; border-radius: 10px; overflow: hidden; background: #f1f5f9; display: none; }
+        .img-url-preview img { width: 100%; max-height: 220px; object-fit: contain; display: block; }
+        .img-url-preview.show { display: block; }
+        /* 图片库网格 */
+        .img-gallery-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+        }
+        .img-gallery-item {
+            aspect-ratio: 1; border-radius: 8px; overflow: hidden; cursor: pointer;
+            border: 2px solid transparent; transition: all .15s; background: #f1f5f9;
+            position: relative;
+        }
+        .img-gallery-item:hover { border-color: #86efac; transform: scale(1.03); }
+        .img-gallery-item.selected { border-color: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,.25); }
+        .img-gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .img-gallery-item .check-icon {
+            position: absolute; top: 4px; right: 4px; width: 20px; height: 20px;
+            background: #22c55e; border-radius: 50%;
+            display: none; align-items: center; justify-content: center;
+            color: white; font-size: 12px;
+        }
+        .img-gallery-item.selected .check-icon { display: flex; }
+        .img-gallery-name { font-size: 10px; color: #94a3b8; text-align: center; margin-top: 2px; line-height: 1.2; word-break: break-all; }
+
+        /* ===== 底部操作栏（专业设计） ===== */
+        .action-bar {
+            position: sticky; bottom: 0;
+            background: linear-gradient(to top, rgba(255,255,255,.98) 70%, rgba(255,255,255,0));
+            padding: 20px 0 8px;
+            margin: 0 -16px -4px;
+        }
+        .action-bar-inner {
+            display: flex; gap: 10px; align-items: center;
+            max-width: 560px; margin: 0 auto; padding: 0 16px;
+        }
+        .btn-action {
+            height: 44px; border-radius: 11px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all .2s; border: none;
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+            -webkit-tap-highlight-color: transparent; letter-spacing: .3px;
+        }
+        .btn-action:active { transform: scale(.97); }
+        .btn-preview {
+            flex-shrink: 0; padding: 0 18px;
+            background: #fff; color: #475569; border: 1.5px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,.04);
+        }
+        .btn-preview:hover { background: #f8fafc; border-color: #cbd5e1; color: #334155; }
+        .btn-draft {
+            flex: 1; background: #f1f5f9; color: #475569;
+            box-shadow: 0 1px 3px rgba(0,0,0,.05);
+        }
+        .btn-draft:hover { background: #e2e8f0; color: #334155; }
+        .btn-publish {
+            flex: 1.2; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: #fff; box-shadow: 0 4px 14px rgba(34,197,94,.35);
+        }
+        .btn-publish:hover { box-shadow: 0 6px 20px rgba(34,197,94,.45); }
+        .action-hint { text-align: center; font-size: 11px; color: #cbd5e1; margin-top: 8px; }
+
         @media (min-width: 1024px) {
             .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
             .content-inner { padding: 0 24px; }
@@ -50,110 +253,163 @@
                 <div class="space-y-3">
                     <div>
                         <label class="field-label">资讯标题 *</label>
-                        <input class="input" value="接触器银触点拆解完整流程：新手必学">
+                        <input class="input" id="fieldTitle" placeholder="请输入文章标题">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="field-label">资讯分类</label>
-                            <select class="input">
-                                <option>回收技巧</option>
-                                <option>行业资讯</option>
-                                <option>新手入门</option>
-                                <option>行情分析</option>
+                            <label class="field-label">文章分类</label>
+                            <select class="input" id="fieldCat">
+                                <option value="notice">公告</option>
+                                <option value="news">行业资讯</option>
+                                <option value="knowledge" selected>回收知识</option>
+                                <option value="about">关于我们</option>
                             </select>
                         </div>
                         <div>
                             <label class="field-label">作者</label>
-                            <input class="input" value="张老板">
+                            <input class="input" id="fieldAuthor" placeholder="作者名称">
                         </div>
                     </div>
                     <div>
                         <label class="field-label">封面图</label>
-                        <div class="flex gap-2">
-                            <div class="w-20 h-20 rounded-[10px] bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center text-white text-2xl flex-shrink-0">
-                                🔧
+                        <div class="flex gap-3 items-center" id="coverArea">
+                            <div class="w-20 h-20 rounded-[10px] bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200" id="coverPreviewBox">
+                                <img id="coverPreviewImg" src="" alt="" class="w-full h-full object-cover hidden">
+                                <div id="coverPlaceholder" class="w-full h-full flex items-center justify-center text-metal-300 text-2xl">📷</div>
                             </div>
-                            <button class="w-20 h-20 rounded-[10px] border-2 border-dashed border-metal-200 text-metal-400 flex flex-col items-center justify-center gap-1 text-[11px] tap-active">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                更换
-                            </button>
+                            <input type="file" id="coverInput" accept="image/*" class="hidden">
+                            <div class="flex-1 space-y-2">
+                                <button type="button" id="btnUploadCover" class="w-full h-9 rounded-lg border border-dashed border-metal-200 text-metal-500 text-[12px] hover:bg-gray-50 active:bg-gray-100 transition-colors">
+                                    📁 上传封面图片
+                                </button>
+                                <input type="text" id="fieldCover" class="input !h-8 !text-[12px]" placeholder="或输入图片 URL 路径">
+                            </div>
                         </div>
                     </div>
                     <div>
                         <label class="field-label">摘要</label>
-                        <textarea class="input" rows="2">详细讲解接触器拆解步骤，从外壳拆除到银触点分离，每一步配图说明，适合刚入行的回收新手。</textarea>
+                        <textarea class="input" id="fieldSummary" rows="2" placeholder="请输入文章摘要，用于列表展示和 SEO"></textarea>
                     </div>
                 </div>
             </section>
 
-            <!-- 正文内容 -->
+            <!-- 正文内容（富文本编辑器） -->
             <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
                 <h3 class="text-[14px] font-bold text-metal-900 mb-3">正文内容</h3>
-                <textarea class="input font-mono" rows="10" placeholder="请输入资讯正文，支持 Markdown 格式"># 接触器银触点拆解完整流程
-
-## 一、准备工作
-- 螺丝刀套装（十字、一字）
-- 尖嘴钳
-- 收纳盒分类
-- 防割手套
-
-## 二、拆解步骤
-1. **外壳拆除**：用螺丝刀卸下固定螺丝，分离上下壳体
-2. **线圈取出**：小心取下电磁线圈，避免损坏铜线
-3. **触点分离**：识别银触点位置，使用尖嘴钳小心取下
-4. **分类存放**：将银触点、漆包线、塑胶件分类存放
-
-## 三、注意事项
-- 银触点极小，避免丢失
-- 漆包线应保持完整便于回收
-- 操作时注意安全，避免触电</textarea>
+                <div class="editor-wrapper" id="editorWrapper">
+                    <div class="editor-toolbar" id="editorToolbar">
+                        <!-- 段落格式 -->
+                        <button type="button" class="toolbar-btn" data-cmd="formatBlock" data-value="H2" title="标题 H2"><b>H2</b></button>
+                        <button type="button" class="toolbar-btn" data-cmd="formatBlock" data-value="H3" title="标题 H3"><b>H3</b></button>
+                        <span class="divider"></span>
+                        <!-- 字体格式 -->
+                        <button type="button" class="toolbar-btn" data-cmd="bold" title="加粗 (Ctrl+B)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z"/><path d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" data-cmd="italic" title="斜体 (Ctrl+I)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" data-cmd="underline" title="下划线 (Ctrl+U)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v6a6 6 0 1012 0V4"/><line x1="4" y1="20" x2="20" y2="20"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" data-cmd="strikeThrough" title="删除线">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.3 4.9c-2.3-.6-4.4-1-6.2-.9-2.7 0-5.3.7-5.3 3.6 0 1.5 1.1 2.4 3.2 3.1L17 12"/><path d="M3 12h18"/><path d="M15 12h4c1.7 0 3 1.3 3 3s-1.3 3-3 3c-2 0-4.5-1.5-6-3"/></svg>
+                        </button>
+                        <span class="divider"></span>
+                        <!-- 列表 -->
+                        <button type="button" class="toolbar-btn" data-cmd="insertUnorderedList" title="无序列表">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" data-cmd="insertOrderedList" title="有序列表">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="3" y="7" font-size="7" fill="currentColor" stroke="none" font-weight="700">1</text><text x="3" y="13" font-size="7" fill="currentColor" stroke="none" font-weight="700">2</text><text x="3" y="19" font-size="7" fill="currentColor" stroke="none" font-weight="700">3</text></svg>
+                        </button>
+                        <span class="divider"></span>
+                        <!-- 引用 / 分割线 -->
+                        <button type="button" class="toolbar-btn" data-cmd="formatBlock" data-value="BLOCKQUOTE" title="引用">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" id="btnInsertHR" title="分割线">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>
+                        </button>
+                        <span class="divider"></span>
+                        <!-- 插入图片 -->
+                        <button type="button" class="toolbar-btn" id="btnInsertImg" title="插入图片">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" data-cmd="createLink" title="插入链接">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                        </button>
+                        <span class="divider"></span>
+                        <!-- 对齐 -->
+                        <button type="button" class="toolbar-btn" data-cmd="justifyLeft" title="左对齐">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" data-cmd="justifyCenter" title="居中">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                        </button>
+                        <button type="body" class="toolbar-btn" data-cmd="removeFormat" title="清除格式" style="margin-left:auto">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/><line x1="3" y1="21" x2="21" y2="3"/></svg>
+                        </button>
+                    </div>
+                    <div class="editor-body" contenteditable="true" id="editorBody" data-placeholder="开始编写正文内容...&#10;&#10;支持：标题、粗体、斜体、下划线、引用、列表、图片、链接等富文本格式。"></div>
+                </div>
+                <p class="text-[11px] text-metal-400 mt-2">提示：使用工具栏进行格式化编辑；按 Ctrl+Enter 可快速预览效果。</p>
             </section>
 
             <!-- 标签与发布 -->
             <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                <h3 class="text-[14px] font-bold text-metal-900 mb-3">标签与发布</h3>
+                <h3 class="text-[14px] font-bold text-metal-900 mb-3">标签与发布设置</h3>
                 <div class="space-y-3">
                     <div>
                         <label class="field-label">标签</label>
-                        <div class="flex flex-wrap gap-2 mb-2">
-                            <span class="tag-chip"># 银触点<button class="text-metal-400">×</button></span>
-                            <span class="tag-chip"># 拆解教程<button class="text-metal-400">×</button></span>
-                            <span class="tag-chip"># 新手必看<button class="text-metal-400">×</button></span>
-                            <span class="tag-chip"># 接触器<button class="text-metal-400">×</button></span>
+                        <div class="flex flex-wrap gap-2 mb-2" id="tagContainer"></div>
+                        <div class="flex gap-2">
+                            <input class="input flex-1" id="tagInput" placeholder="输入标签名后按回车添加">
+                            <button type="button" id="btnAddTag" class="px-3 h-[38px] rounded-lg bg-brand-50 text-brand-700 text-[12px] font-semibold whitespace-nowrap">+ 添加</button>
                         </div>
-                        <input class="input" placeholder="输入标签后按回车">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="field-label">阅读量</label>
-                            <input class="input font-mono" value="1,234">
+                            <input class="input font-mono" id="fieldViews" type="number" placeholder="0">
                         </div>
                         <div>
                             <label class="field-label">点赞数</label>
-                            <input class="input font-mono" value="86">
+                            <input class="input font-mono" id="fieldLikes" type="number" placeholder="0">
                         </div>
                     </div>
                     <div>
-                        <label class="field-label">状态</label>
-                        <div class="flex gap-2">
-                            <label class="flex-1 flex items-center justify-center gap-2 h-10 rounded-full bg-brand-50 text-brand-700 text-[13px] font-medium cursor-pointer">
-                                <input type="radio" name="status" checked class="hidden">
-                                <span class="w-2 h-2 rounded-full bg-brand-500"></span>已发布
+                        <label class="field-label">发布状态</label>
+                        <div class="flex gap-2" id="statusGroup">
+                            <label class="status-opt flex-1 flex items-center justify-center gap-2 h-10 rounded-full text-[13px] font-medium cursor-pointer transition-all" data-val="published">
+                                <input type="radio" name="status" value="published" class="hidden">
+                                <span class="w-2.5 h-2.5 rounded-full bg-brand-500 ring-2 ring-brand-200 status-dot"></span>已发布
                             </label>
-                            <label class="flex-1 flex items-center justify-center gap-2 h-10 rounded-full bg-metal-50 text-metal-600 text-[13px] font-medium cursor-pointer">
-                                <input type="radio" name="status" class="hidden">
-                                <span class="w-2 h-2 rounded-full bg-metal-300"></span>草稿
+                            <label class="status-opt flex-1 flex items-center justify-center gap-2 h-10 rounded-full text-[13px] font-medium cursor-pointer transition-all" data-val="draft">
+                                <input type="radio" name="status" value="draft" class="hidden">
+                                <span class="w-2.5 h-2.5 rounded-full bg-metal-300 ring-2 ring-metal-100 status-dot"></span>草稿箱
                             </label>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 操作 -->
-            <div class="flex gap-3 pt-2">
-                <button class="h-11 px-5 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold tap-active">预览</button>
-                <button class="flex-1 h-11 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold tap-active">存草稿</button>
-                <button class="flex-1 h-11 rounded-full bg-brand-500 text-white text-[14px] font-semibold tap-active shadow-[0_4px_12px_rgba(34,197,94,0.25)]">发布</button>
+            <!-- 操作按钮（专业设计版） -->
+            <div class="action-bar">
+                <div class="action-bar-inner">
+                    <button type="button" id="btnPreview" class="btn-action btn-preview">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        预览
+                    </button>
+                    <button type="button" id="btnDraft" class="btn-action btn-draft">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                        存草稿
+                    </button>
+                    <button type="button" id="btnPublish" class="btn-action btn-publish">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9 22,2"/></svg>
+                        发布文章
+                    </button>
+                </div>
             </div>
             <div class="h-4"></div>
         </div>
@@ -162,34 +418,948 @@
     <div id="admin-bottom-nav"></div>
 </div>
 
+<!-- 预览弹窗 -->
+<div class="preview-overlay" id="previewOverlay">
+    <div class="preview-panel">
+        <div class="preview-header">
+            <span class="font-bold text-[14px] text-metal-800">📱 手机预览</span>
+            <button type="button" id="btnClosePreview" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 text-metal-400 text-lg">&times;</button>
+        </div>
+        <div class="preview-body" id="previewBody"></div>
+    </div>
+</div>
+
+<!-- 插入图片弹窗（增强版：支持上传 / URL / 图片库） -->
+<div class="img-dialog-overlay" id="imgDialogOverlay">
+    <div class="img-dialog-panel">
+        <div class="img-dialog-header">
+            <span class="font-bold text-[14px] text-metal-800">📷 插入图片</span>
+            <button type="button" id="btnCloseImgDlg" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 text-metal-400 text-lg transition-colors">&times;</button>
+        </div>
+
+        <!-- Tab 切换栏 -->
+        <div class="img-dialog-tabs">
+            <button type="button" class="img-tab-btn active" data-tab="upload">📁 本地上传</button>
+            <button type="button" class="img-tab-btn" data-tab="url">🔗 URL 地址</button>
+            <button type="button" class="img-tab-btn" data-tab="gallery">🖼️ 图片库</button>
+        </div>
+
+        <div class="img-dialog-body">
+
+            <!-- Tab 1: 本地上传 -->
+            <div class="img-tab-content" id="tabUpload">
+                <div class="img-upload-zone" id="imgUploadZone">
+                    <input type="file" id="imgFileInput" accept="image/*" class="hidden">
+                    <div id="uploadPlaceholder">
+                        <div class="text-4xl mb-2">📤</div>
+                        <p class="text-[13px] font-medium text-metal-600 mb-1">点击或拖拽上传图片</p>
+                        <p class="text-[11px] text-metal-400">支持 JPG、PNG、GIF、WebP，最大 10MB</p>
+                    </div>
+                    <div id="uploadPreviewArea" class="hidden">
+                        <img id="uploadPreviewImg" class="img-upload-preview" alt="预览">
+                        <p class="text-[12px] text-brand-600 font-medium mt-1" id="uploadFileName"></p>
+                        <button type="button" id="btnReUpload" class="mt-2 px-3 py-1.5 text-[12px] rounded-lg bg-metal-100 text-metal-600 hover:bg-metal-200">重新选择</button>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="field-label">图片说明（可选）</label>
+                    <input type="text" id="imgCaptionInput" class="input" placeholder="输入图片说明文字">
+                </div>
+            </div>
+
+            <!-- Tab 2: URL 输入 -->
+            <div class="img-tab-content hidden" id="tabUrl">
+                <div>
+                    <label class="field-label">图片 URL 地址</label>
+                    <input type="text" id="imgUrlInput" class="input" placeholder="/images/articles/xxx.jpg 或完整 https:// 链接">
+                </div>
+                <div class="img-url-preview" id="imgUrlPreviewBox">
+                    <img id="imgUrlPreviewImg" alt="预览">
+                    <p class="text-center text-[11px] text-metal-400 mt-1 pb-2">图片预览</p>
+                </div>
+                <div class="mt-3">
+                    <label class="field-label">图片说明（可选）</label>
+                    <input type="text" id="imgUrlCaptionInput" class="input" placeholder="输入图片说明文字">
+                </div>
+            </div>
+
+            <!-- Tab 3: 图片库（快速选取已存在的文章配图） -->
+            <div class="img-tab-content hidden" id="tabGallery">
+                <p class="text-[12px] text-metal-400 mb-3">从已有图片中快速选择，点击即可选中并插入</p>
+                <div class="img-gallery-grid" id="imgGalleryGrid"></div>
+                <div class="mt-3">
+                    <label class="field-label">图片说明（可选）</label>
+                    <input type="text" id="imgGalleryCaptionInput" class="input" placeholder="输入图片说明文字">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="px-5 pb-5 pt-2">
+            <button type="button" id="btnConfirmImg" class="w-full h-10 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-semibold text-[14px] shadow-[0_4px_12px_rgba(34,197,94,0.25)] active:scale-[0.98] transition-transform">
+                ✓ 确认插入
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="/public/data/articles.js"></script>
+
 <script type="module">
     import { mountAdminTopbar } from '/src/components/admin-topbar.js';
     import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
 
+    // ========== 初始化顶部栏和底部导航 ==========
     mountAdminTopbar('#admin-topbar', {
         title: '编辑资讯',
         back: true,
-        onMenu: () => openActionMenu(['保存草稿', '预览', '查看数据', '刷新']),
-        onAvatar: () => location.href = 'system.html',
+        onAvatar: () => location.href = '/admin/manage.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
 
-    function openActionMenu(items) {
-        const existing = document.getElementById('__action_menu__');
-        if (existing) existing.remove();
-        const menu = document.createElement('div');
-        menu.id = '__action_menu__';
-        menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
-        menu.innerHTML = `
-          <div class="absolute inset-0 bg-black/40" data-close></div>
-          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 animate-up">
-            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
-            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
-            <button class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 font-medium active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
-          </div>`;
-        document.body.appendChild(menu);
-        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
+
+    // ========== 状态变量 ==========
+    let currentArticleId = null;   // 当前编辑的文章 ID
+    let isNewArticle = false;       // 是否新建模式
+    let tags = [];                  // 标签数组
+
+    // DOM 引用
+    const $ = (sel) => document.querySelector(sel);
+    const fieldTitle     = $('#fieldTitle');
+    const fieldCat       = $('#fieldCat');
+    const fieldAuthor    = $('#fieldAuthor');
+    const fieldCover     = $('#fieldCover');
+    const fieldSummary   = $('#fieldSummary');
+    const fieldViews     = $('#fieldViews');
+    const fieldLikes     = $('#fieldLikes');
+    const editorBody     = $('#editorBody');
+    const tagContainer   = $('#tagContainer');
+    const tagInput       = $('#tagInput');
+    const coverPreviewImg = $('#coverPreviewImg');
+    const coverPlaceholder = $('#coverPlaceholder');
+
+
+    // ========== 从 URL 参数获取文章 ID ==========
+    function parseArticleId() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id') || null;
     }
+
+
+    // ========== 将 body 内容转换为编辑器可用的 HTML ==========
+    // 1) 如果已经是 HTML（包含 <p> <h2> 等标签）→ 直接使用
+    // 2) 如果是纯文本（来自 DEFAULT_DATA）→ 解析标记并转为 HTML
+    // 3) 如果是双重编码的脏数据（&lt;p&gt;...）→ 先解码再使用
+    function prepareBodyForEditor(text) {
+        if (!text) return '';
+        var str = String(text);
+
+        // 情况 3：检测是否已被双重编码（连续出现 &amp;&lt; 或 &lt;  后面跟标签名）
+        // 典型模式：&lt;p&gt; 或 &amp;lt;p&amp;gt;
+        if (/&(amp;)?lt;\s*\/?\s*(p|h[1-6]|div|li|ul|ol|br|hr|blockquote|img|strong|b|em|u|table|tr|td)/i.test(str)) {
+            // 多次解码直到不再变化（防止多层编码）
+            var prev;
+            do {
+                prev = str;
+                str = str.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+            } while (str !== prev);
+        }
+
+        // 情况 1：已经包含 HTML 标签 → 直接返回（信任内容）
+        if (/<(p|h[1-6]|div|li|ul|ol|br|hr|blockquote|img)\b/i.test(str)) {
+            return str.trim();
+        }
+
+        // 情况 2：纯文本 → 解析 Markdown 风格标记转 HTML
+        return plainTextToHtmlRaw(str);
+    }
+
+    // 纯文本解析器（仅用于尚未保存过的原始纯文本数据）
+    function plainTextToHtmlRaw(text) {
+        if (!text) return '';
+        let html = String(text)
+            // 处理分隔线 ━━
+            .replace(/━+/g, '<hr>')
+            // 处理 H2 标题 【xxx】 或 ## xxx
+            .replace(/^【([^】]+)】/gm, '<h2>$1</h2>')
+            .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
+            // 处理 H3 标题
+            .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
+            // 处理 **加粗**
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            // 处理 • 无序列表
+            .replace(/^•\s+(.+)$/gm, '<li>$1</li>')
+            // 处理数字有序列表 1. 2.
+            .replace(/^(\d+)\.\s+(.+)$/gm, '<li>$2</li>')
+            // 段落：连续的 \n\n 分段
+            .split(/\n\s*\n/)
+            .map(block => {
+                const trimmed = block.trim();
+                if (!trimmed) return '';
+                // 如果已经包含标签则原样返回
+                if (/^<(h[23]|li|hr|blockquote|strong)/i.test(trimmed)) return trimmed;
+                // 否则包裹成段落
+                return '<p>' + trimmed.replace(/\n/g, '<br>') + '</p>';
+            })
+            .join('\n');
+        // 把连续的 <li> 包裹在 <ul> 中
+        html = html.replace(/(<li>[\s\S]*?<\/li>(?:\s*(?:<li>|$))?)/g, function(m) {
+            if (!m.includes('<ul>')) return '<ul>' + m + '</ul>';
+            return m;
+        });
+        // 清理空标签
+        html = html.replace(/<p>\s*<\/p>/g, '');
+        return html.trim();
+    }
+
+
+    // ========== 加载文章数据到表单（v2.0 适配） ==========
+    function loadArticleToForm(article) {
+        if (!article) {
+            isNewArticle = true;
+            fieldTitle.value = '';
+            fieldCat.value = 'knowledge';
+            fieldAuthor.value = '';
+            fieldCover.value = '';
+            fieldSummary.value = '';
+            fieldViews.value = '0';
+            fieldLikes.value = '0';
+            editorBody.innerHTML = '';
+            setRadioStatus('draft');
+            tags = [];
+            renderTags();
+            updateCoverPreview('');
+            return;
+        }
+
+        isNewArticle = false;
+        currentArticleId = article.id;
+
+        fieldTitle.value   = article.title || '';
+        // v2.0: article.section ('news'|'knowledge') 映射到 cat 下拉框值
+        fieldCat.value     = (article.section === 'news') ? 'news' : 'knowledge';
+        fieldAuthor.value  = article.author || '';
+        fieldCover.value   = article.cover || '';
+        fieldSummary.value = article.summary || '';
+        fieldViews.value   = article.views || '0';
+        fieldLikes.value   = article.likes || '0';
+        editorBody.innerHTML = prepareBodyForEditor(article.body);
+
+        // 发布状态
+        const st = article.status === 'draft' ? 'draft' : 'published';
+        setRadioStatus(st);
+
+        // 标签（v2.0: tags 是数组）
+        tags = [];
+        if (Array.isArray(article.tags)) {
+            tags = article.tags.slice();
+        } else if (article.tag) {
+            // 兼容旧版 tag 字符串
+            tags.push(article.tag);
+        }
+        renderTags();
+
+        // 封面预览
+        updateCoverPreview(article.cover);
+    }
+
+
+    // ========== 设置发布状态单选按钮样式 ==========
+    function setRadioStatus(val) {
+        document.querySelectorAll('#statusGroup input[name="status"]').forEach(r => {
+            r.checked = (r.value === val);
+        });
+        document.querySelectorAll('.status-opt').forEach(lbl => {
+            const isActive = lbl.dataset.val === val;
+            if (isActive) {
+                lbl.className = 'status-opt flex-1 flex items-center justify-center gap-2 h-10 rounded-full bg-brand-50 text-brand-700 text-[13px] font-medium cursor-pointer transition-all ring-1 ring-brand-200';
+            } else {
+                lbl.className = 'status-opt flex-1 flex items-center justify-center gap-2 h-10 rounded-full bg-metal-50 text-metal-600 text-[13px] font-medium cursor-pointer transition-all';
+            }
+        });
+    }
+
+
+    // ========== 更新封面预览 ==========
+    function updateCoverPreview(url) {
+        if (url && url.trim()) {
+            coverPreviewImg.src = url;
+            coverPreviewImg.classList.remove('hidden');
+            coverPlaceholder.classList.add('hidden');
+            // 图片加载失败回退
+            coverPreviewImg.onerror = function() {
+                this.classList.add('hidden');
+                coverPlaceholder.classList.remove('hidden');
+                coverPlaceholder.textContent = '❌';
+            };
+        } else {
+            coverPreviewImg.classList.add('hidden');
+            coverPlaceholder.classList.remove('hidden');
+            coverPlaceholder.textContent = '📷';
+        }
+    }
+
+
+    // ========== 渲染标签 ==========
+    function renderTags() {
+        tagContainer.innerHTML = tags.map(function(t, i) {
+            return '<span class="tag-chip">#' + escapeHtml(t) + '<button type="button" data-idx="' + i + '" class="ml-1 text-metal-400 hover:text-rose-500 font-bold">&times;</button></span>';
+        }).join('');
+
+        tagContainer.querySelectorAll('button').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var idx = parseInt(this.dataset.idx);
+                tags.splice(idx, 1);
+                renderTags();
+            });
+        });
+    }
+
+    function addTag() {
+        var val = tagInput.value.trim();
+        if (!val) return;
+        if (tags.indexOf(val) === -1) {
+            tags.push(val);
+            renderTags();
+        }
+        tagInput.value = '';
+    }
+
+
+    // ========== 收集表单数据 ==========
+    function collectFormData() {
+        var title = fieldTitle.value.trim();
+        if (!title) {
+            showToast('⚠️ 请输入文章标题'); fieldTitle.focus(); return null;
+        }
+
+        var summary = fieldSummary.value.trim();
+        if (!summary) {
+            showToast('⚠️ 请输入文章摘要'); fieldSummary.focus(); return null;
+        }
+
+        var bodyHtml = editorBody.innerHTML.trim();
+        if (!bodyHtml || bodyHtml === '<br>') {
+            showToast('⚠️ 请输入正文内容'); editorBody.focus(); return null;
+        }
+
+        var cat = fieldCat.value;
+        var author = fieldAuthor.value.trim();
+        var cover = fieldCover.value.trim();
+
+        // 读取状态
+        var statusEl = document.querySelector('input[name="status"]:checked');
+        var status = statusEl ? statusEl.value : 'published';
+
+        var data = {
+            title: title,
+            cat: cat,
+            author: author,
+            cover: cover,
+            summary: summary,
+            body: bodyHtml,
+            views: parseInt(fieldViews.value) || 0,
+            likes: parseInt(fieldLikes.value) || 0,
+            tag: tags.length > 0 ? tags.join(',') : '',
+            status: status,
+            date: status === 'published' ? formatDate(new Date()) : ''
+        };
+
+        return data;
+    }
+
+
+    // ========== 保存到 localStorage _AL_ARTICLES（v2.0 统一结构） ==========
+    function saveToStorage(status) {
+        var formData = collectFormData();
+        if (!formData) return false;
+
+        formData.status = status;
+
+        try {
+            if (window._AL_ARTICLES && window._AL_ARTICLES.getData) {
+                var storageData = window._AL_ARTICLES.getData();
+
+                // 确保 v2.0 结构存在
+                if (!storageData.articles) storageData.articles = [];
+                if (!storageData.displayConfig) {
+                    storageData.displayConfig = { noticeIds: [], carouselIds: [], aboutId: null };
+                }
+
+                // 将表单的 cat 值映射为 v2.0 的 section + displayRole
+                var catVal = formData.cat || 'knowledge';
+                formData.section = (catVal === 'news' ? 'news' : 'knowledge');
+                formData.displayRole = '';  // 默认普通文章
+                formData.weight = typeof formData.weight === 'number' ? formData.weight : 50;
+                formData.inlineImages = extractInlineImages(formData.body);
+                formData.tags = tags.length > 0 ? tags.slice() : [];
+                delete formData.tag;       // 移除旧版 tag 字段
+                delete formData.showInNotice;
+                delete formData.showInCarousel;
+                delete formData.coverMode;
+                delete formData.coverTitle;
+                formData.updatedAt = new Date().toISOString();
+
+                if (isNewArticle) {
+                    // ---- 新建文章 ----
+                    formData.id = generateId(formData.section);
+                    formData.createdAt = formData.updatedAt;
+                    formData.sortOrder = getNextSortOrder(storageData);
+
+                    storageData.articles.push(formData);
+
+                    currentArticleId = formData.id;
+                    isNewArticle = false;
+
+                } else {
+                    // ---- 更新已有文章 ----
+                    formData.id = currentArticleId;
+                    var found = false;
+                    for (var i = 0; i < storageData.articles.length; i++) {
+                        if (storageData.articles[i].id === currentArticleId) {
+                            // 合并更新：保留不可变字段(id, createdAt)，覆盖其余
+                            var oldArt = storageData.articles[i];
+                            formData.createdAt = oldArt.createdAt || formData.createdAt;
+                            Object.assign(storageData.articles[i], formData);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        storageData.articles.push(formData);
+                    }
+                }
+
+                // 写回 localStorage
+                var saved = window._AL_ARTICLES.saveData(storageData);
+                if (saved) {
+                    showToast(status === 'draft' ? '✅ 草稿已保存' : '✅ 已成功发布！');
+                    return true;
+                } else {
+                    showToast('❌ 保存失败，请检查浏览器存储');
+                    return false;
+                }
+            }
+        } catch(e) {
+            console.error('[saveToStorage]', e);
+            showToast('❌ 保存出错: ' + e.message);
+            return false;
+        }
+        return false;
+    }
+
+
+    // ========== 辅助函数 ==========
+    function generateId(section) {
+        return section + '-' + Date.now().toString(36);
+    }
+
+    function getNextSortOrder(storageData) {
+        var maxSort = 0;
+        var arts = storageData.articles || [];
+        for (var i = 0; i < arts.length; i++) {
+            if (arts[i].sortOrder > maxSort) maxSort = arts[i].sortOrder;
+        }
+        return maxSort + 1;
+    }
+
+    function extractInlineImages(html) {
+        var imgs = [];
+        var matches = html.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/g) || [];
+        for (var i = 0; i < matches.length; i++) {
+            var srcMatch = matches[i].match(/src=["']([^"']+)["']/);
+            if (srcMatch && srcMatch[1]) imgs.push({ url: srcMatch[1], caption: '', after: i });
+        }
+        return imgs;
+    }
+
+    function formatDate(d) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+    }
+
+    function escapeHtml(s) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(s));
+        return div.innerHTML;
+    }
+
+    function showToast(msg) {
+        var t = $('#toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+    var toastTimer = 0;
+
+
+    // ========== 预览功能 ==========
+    function openPreview() {
+        var formData = collectFormData();
+        if (!formData) return;
+
+        var previewContent = '';
+
+        // 封面
+        if (formData.cover) {
+            previewContent += '<img class="preview-cover" src="' + formData.cover + '" alt="">';
+        }
+
+        // 元信息
+        previewContent += '<div class="preview-meta">';
+        if (formData.tag) previewContent += '<span class="preview-tag">' + escapeHtml(formData.tag) + '</span>';
+        previewContent += '<span>' + (formData.author || '') + '</span>';
+        previewContent += '<span>' + (formData.date || formatDate(new Date())) + '</span>';
+        previewContent += '</div>';
+
+        // 正文（直接复用编辑器的 HTML，但做样式映射）
+        previewContent += formatPreviewHtml(editorBody.innerHTML);
+
+        $('#previewBody').innerHTML = previewContent;
+        $('#previewOverlay').classList.add('show');
+    }
+
+    function closePreview() {
+        $('#previewOverlay').classList.remove('show');
+    }
+
+    function formatPreviewHtml(html) {
+        // 确保换行正确显示
+        return html;
+    }
+
+
+    // ========== 编辑器工具栏命令绑定 ==========
+    function initToolbar() {
+        $('#editorToolbar').addEventListener('click', function(e) {
+            var btn = e.target.closest('[data-cmd]');
+            if (!btn) return;
+
+            var cmd = btn.dataset.cmd;
+            var val = btn.dataset.value || null;
+
+            if (cmd === 'createLink') {
+                var linkUrl = prompt('请输入链接地址：', 'https://');
+                if (linkUrl) {
+                    document.execCommand(cmd, false, linkUrl);
+                }
+            } else {
+                document.execCommand(cmd, false, val);
+            }
+            editorBody.focus();
+            refreshToolbarState();
+        });
+
+        // 插入分割线
+        $('#btnInsertHR').addEventListener('click', function() {
+            document.execCommand('insertHTML', false, '<hr>');
+            editorBody.focus();
+        });
+
+        // ========== 插入图片功能（增强版：上传 / URL / 图片库） ==========
+        let activeImgTab = 'upload';
+        let uploadedImageData = null;  // base64 数据
+        let gallerySelectedImage = null; // 图片库选中的路径
+        let savedSelection = null;      // 打开弹窗前保存的编辑器选区
+
+        // 可用图片库列表
+        const GALLERY_IMAGES = [
+            { url: '/images/articles/n1-cover.jpg', name: 'n1-cover' },
+            { url: '/images/articles/n1-inline.jpg', name: 'n1-inline' },
+            { url: '/images/articles/n2-cover.jpg', name: 'n2-cover' },
+            { url: '/images/articles/n2-inline.jpg', name: 'n2-inline' },
+            { url: '/images/articles/n3-cover.jpg', name: 'n3-cover' },
+            { url: '/images/articles/n3-inline.jpg', name: 'n3-inline' },
+            { url: '/images/articles/n4-cover.jpg', name: 'n4-cover' },
+            { url: '/images/articles/n5-cover.jpg', name: 'n5-cover' },
+            { url: '/images/articles/k1-cover.jpg', name: 'k1-cover' },
+            { url: '/images/articles/k1-inline.jpg', name: 'k1-inline' },
+            { url: '/images/articles/k2-cover.jpg', name: 'k2-cover' },
+            { url: '/images/articles/k2-inline.jpg', name: 'k2-inline' },
+            { url: '/images/articles/k3-cover.jpg', name: 'k3-cover' },
+            { url: '/images/articles/k3-inline.jpg', name: 'k3-inline' },
+            { url: '/images/articles/notice-inline.jpg', name: 'notice-inline' },
+        ];
+
+        function initImageDialog() {
+            // ---- Tab 切换 ----
+            document.querySelectorAll('.img-tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var tab = this.dataset.tab;
+                    switchImgTab(tab);
+                });
+            });
+
+            // ---- 打开弹窗 ----
+            $('#btnInsertImg').addEventListener('click', function() {
+                resetImageDialog();
+                savedSelection = saveEditorSelection();
+                $('#imgDialogOverlay').classList.add('show');
+                buildGalleryGrid();
+            });
+
+            // ---- 关闭弹窗 ----
+            $('#btnCloseImgDlg').addEventListener('click', function() {
+                $('#imgDialogOverlay').classList.remove('show');
+            });
+            $('#imgDialogOverlay').addEventListener('click', function(e) {
+                if (e.target === this) $(this).classList.remove('show');
+            });
+
+            // ---- Tab 1: 本地上传 ----
+            var uploadZone = $('#imgUploadZone');
+            uploadZone.addEventListener('click', function() { $('#imgFileInput').click(); });
+            $('#imgFileInput').addEventListener('change', handleFileSelect);
+            $('#btnReUpload').addEventListener('click', function(e) {
+                e.stopPropagation();
+                $('#imgFileInput').value = '';
+                resetUploadUI();
+                $('#imgFileInput').click();
+            });
+
+            // 拖拽上传
+            uploadZone.addEventListener('dragover', function(e) { e.preventDefault(); this.classList.add('border-brand-500', 'bg-green-50'); });
+            uploadZone.addEventListener('dragleave', function(e) { e.preventDefault(); this.classList.remove('border-brand-500', 'bg-green-50'); });
+            uploadZone.addEventListener('drop', function(e) {
+                e.preventDefault(); this.classList.remove('border-brand-500', 'bg-green-50');
+                var file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) processUploadFile(file);
+                else showToast('请选择图片文件');
+            });
+
+            // ---- Tab 2: URL 输入（带实时预览） ----
+            var urlPreviewTimer = null;
+            $('#imgUrlInput').addEventListener('input', function() {
+                clearTimeout(urlPreviewTimer);
+                var val = this.value.trim();
+                if (!val) { $('#imgUrlPreviewBox').classList.remove('show'); return; }
+                urlPreviewTimer = setTimeout(function() {
+                    var previewBox = $('#imgUrlPreviewBox');
+                    var img = $('#imgUrlPreviewImg');
+                    img.onload = function() { previewBox.classList.add('show'); };
+                    img.onerror = function() { previewBox.classList.remove('show'); };
+                    img.src = val;
+                }, 400);
+            });
+
+            // ---- 确认插入 ----
+            $('#btnConfirmImg').addEventListener('click', confirmInsertImage);
+        }
+
+        function switchImgTab(tab) {
+            activeImgTab = tab;
+            document.querySelectorAll('.img-tab-btn').forEach(function(b) {
+                b.classList.toggle('active', b.dataset.tab === tab);
+            });
+            document.querySelectorAll('.img-tab-content').forEach(function(c) { c.classList.add('hidden'); });
+            if (tab === 'upload') $('#tabUpload').classList.remove('hidden');
+            else if (tab === 'url') $('#tabUrl').classList.remove('hidden');
+            else if (tab === 'gallery') $('#tabGallery').classList.remove('hidden');
+        }
+
+        function resetImageDialog() {
+            switchImgTab('upload');
+            uploadedImageData = null;
+            gallerySelectedImage = null;
+            resetUploadUI();
+            $('#imgUrlInput').value = '';
+            $('#imgUrlCaptionInput').value = '';
+            $('#imgGalleryCaptionInput').value = '';
+            $('#imgCaptionInput').value = '';
+            $('#imgUrlPreviewBox').classList.remove('show');
+        }
+
+        function resetUploadUI() {
+            $('#uploadPlaceholder').classList.remove('hidden');
+            $('#uploadPreviewArea').classList.add('hidden');
+            $('#imgUploadZone').classList.remove('has-image');
+            uploadedImageData = null;
+        }
+
+        function handleFileSelect(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); return; }
+            if (file.size > 10 * 1024 * 1024) { showToast('图片大小不能超过 10MB'); return; }
+            processUploadFile(file);
+        }
+
+        function processUploadFile(file) {
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                uploadedImageData = ev.target.result; // base64
+                $('#uploadPreviewImg').src = uploadedImageData;
+                $('#uploadFileName').textContent = file.name + (' (' + formatFileSize(file.size) + ')');
+                $('#uploadPlaceholder').classList.add('hidden');
+                $('#uploadPreviewArea').classList.remove('hidden');
+                $('#imgUploadZone').classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function buildGalleryGrid() {
+            var grid = $('#imgGalleryGrid');
+            grid.innerHTML = GALLERY_IMAGES.map(function(item, idx) {
+                return '<div class="img-gallery-item" data-url="' + item.url + '" data-idx="' + idx + '">' +
+                    '<img src="' + item.url + '" alt="' + item.name + '" loading="lazy">' +
+                    '<span class="check-icon">✓</span></div>' +
+                    '<div class="img-gallery-name">' + item.name.replace(/\.[^.]+$/, '') + '</div>';
+            }).join('</div><div class="img-gallery-item"') + '';
+
+            // 修复上面的拼接，重新生成正确的HTML
+            grid.innerHTML = GALLERY_IMAGES.map(function(item, idx) {
+                return '<div style="display:flex;flex-direction:column;"><div class="img-gallery-item" data-url="' + item.url + '" data-idx="' + idx + '">' +
+                    '<img src="' + item.url + '" alt="' + item.name + '" loading="lazy">' +
+                    '<span class="check-icon">✓</span></div>' +
+                    '<span class="img-gallery-name">' + item.name.replace(/\.[^.]+$/, '') + '</span></div>';
+            }).join('');
+
+            grid.querySelectorAll('.img-gallery-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    grid.querySelectorAll('.img-gallery-item').forEach(i => i.classList.remove('selected'));
+                    this.classList.add('selected');
+                    gallerySelectedImage = this.dataset.url;
+                });
+            });
+        }
+
+        function confirmInsertImage() {
+            var imgSrc = '';
+            var caption = '';
+
+            if (activeImgTab === 'upload') {
+                if (!uploadedImageData) { showToast('请先上传图片'); return; }
+                imgSrc = uploadedImageData;
+                caption = $('#imgCaptionInput').value.trim();
+            } else if (activeImgTab === 'url') {
+                imgSrc = $('#imgUrlInput').value.trim();
+                if (!imgSrc) { showToast('请输入图片地址'); return; }
+                caption = $('#imgUrlCaptionInput').value.trim();
+            } else if (activeImgTab === 'gallery') {
+                if (!gallerySelectedImage) { showToast('请从图片库选择一张图片'); return; }
+                imgSrc = gallerySelectedImage;
+                caption = $('#imgGalleryCaptionInput').value.trim();
+            }
+
+            // 构建插入 HTML：图片 + 可选说明
+            var imgHtml = '<figure style="margin:12px 0;">' +
+                '<img src="' + imgSrc + '" alt="' + (caption || '') + '" style="max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto;">';
+            if (caption) {
+                imgHtml += '<figcaption class="inline-image-caption" style="text-align:center;font-size:12px;color:#64748b;margin-top:6px;margin-bottom:4px;">' + escapeHtml(caption) + '</figcaption>';
+            }
+            imgHtml += '</figure>';
+
+            // 关闭弹窗
+            $('#imgDialogOverlay').classList.remove('show');
+
+            // 先聚焦编辑器，再尝试恢复选区，最后执行插入
+            editorBody.focus();
+
+            // 尝试恢复之前保存的选区
+            var restored = false;
+            if (savedSelection) {
+                restored = restoreEditorSelection(savedSelection);
+            }
+
+            // 执行插入
+            if (restored) {
+                // 有有效选区 → 在光标位置插入
+                document.execCommand('insertHTML', false, imgHtml);
+            } else {
+                // 无选区或恢复失败 → 追加到编辑器末尾（常见场景：空编辑器）
+                editorBody.innerHTML += imgHtml;
+            }
+
+            savedSelection = null;
+            showToast('✅ 图片已插入');
+        }
+
+        // ====== 编辑器选区保存 / 恢复 ======
+        function saveEditorSelection() {
+            var sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) return null;
+
+            // 确保选区在编辑器内
+            var range = sel.getRangeAt(0);
+            var container = editorBody;
+            if (!container.contains(range.commonAncestorContainer)) {
+                // 选区不在编辑器内 → 将光标移到编辑器末尾
+                var newRange = document.createRange();
+                newRange.selectNodeContents(container);
+                newRange.collapse(false); // 折叠到末尾
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+                range = newRange;
+            }
+
+            try {
+                return {
+                    startContainer: range.startContainer,
+                    startOffset: range.startOffset,
+                    endContainer: range.endContainer,
+                    endOffset: range.endOffset
+                };
+            } catch(e) {
+                return null;
+            }
+        }
+
+        function restoreEditorSelection(saved) {
+            try {
+                var sel = window.getSelection();
+                var range = document.createRange();
+
+                // 检查节点是否仍在文档中（可能已被 innerHTML 修改破坏）
+                var nodeExists = function(n) {
+                    while (n && n !== document.body) n = n.parentNode;
+                    return n === document.body;
+                };
+
+                if (!nodeExists(saved.startContainer) || !nodeExists(saved.endContainer)) {
+                    return false; // 节点已失效
+                }
+
+                range.setStart(saved.startContainer, saved.startOffset);
+                range.setEnd(saved.endContainer, saved.endOffset);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                return true;
+            } catch(e) {
+                console.warn('[restoreEditorSelection]', e.message);
+                return false;
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        initImageDialog();
+
+        // ========== 编辑器工具栏命令绑定（其余部分不变） ==========
+
+        // 选区变化时更新 toolbar 按钮状态
+        document.addEventListener('selectionchange', function() {
+            setTimeout(refreshToolbarState, 10);
+        });
+
+        // 快捷键 Ctrl+B / I / U
+        editorBody.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key.toLowerCase()) {
+                    case 'b': e.preventDefault(); document.execCommand('bold'); refreshToolbarState(); break;
+                    case 'i': e.preventDefault(); document.execCommand('italic'); refreshToolbarState(); break;
+                    case 'u': e.preventDefault(); document.execCommand('underline'); refreshToolbarState(); break;
+                    case 'enter': e.preventDefault(); openPreview(); break;
+                }
+            }
+        });
+    }
+
+    function refreshToolbarState() {
+        $('#editorToolbar [data-cmd]').forEach(function(btn) {
+            var cmd = btn.dataset.cmd;
+            if (cmd && document.queryCommandState(cmd)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+
+    // ========== 封面图上传（本地文件转 Base64）==========
+    function initCoverUpload() {
+        $('#btnUploadCover').addEventListener('click', function() {
+            $('#coverInput').click();
+        });
+
+        $('#coverInput').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                showToast('请选择图片文件');
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                fieldCover.value = ev.target.result;
+                updateCoverPreview(ev.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // 手动输入 URL 时同步预览
+        fieldCover.addEventListener('input', function() {
+            updateCoverPreview(this.value);
+        });
+    }
+
+
+    // ========== 页面初始化 ==========
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // 1. 解析文章 ID 并加载
+        var articleId = parseArticleId();
+        currentArticleId = articleId;
+        var article = null;
+
+        if (articleId && window._AL_ARTICLES && window._AL_ARTICLES.getDetail) {
+            article = window._AL_ARTICLES.getDetail(articleId);
+        }
+        loadArticleToForm(article);
+
+        // 2. 初始化工具栏
+        initToolbar();
+
+        // 3. 初始化封面上传
+        initCoverUpload();
+
+        // 4. 标签操作
+        $('#btnAddTag').addEventListener('click', addTag);
+        tagInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); addTag(); }
+        });
+
+        // 5. 发布状态切换
+        document.querySelectorAll('.status-opt').forEach(function(lbl) {
+            lbl.addEventListener('click', function() {
+                setRadioStatus(this.dataset.val);
+            });
+        });
+
+        // 6. 预览按钮
+        $('#btnPreview').addEventListener('click', openPreview);
+        $('#btnClosePreview').addEventListener('click', closePreview);
+        $('#previewOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closePreview();
+        });
+
+        // 7. 存草稿
+        $('#btnDraft').addEventListener('click', function() {
+            saveToStorage('draft');
+        });
+
+        // 8. 发布
+        $('#btnPublish').addEventListener('click', function() {
+            if (saveToStorage('published')) {
+                // 延迟跳转回列表页
+                setTimeout(function() {
+                    location.href = 'article-list.html';
+                }, 1200);
+            }
+        });
+
+    });
 </script>
 
 </body>
