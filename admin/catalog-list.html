@@ -82,8 +82,11 @@
 
             <!-- 搜索 -->
             <div class="mt-3 relative">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-metal-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                <input class="search-input" id="search-input" placeholder="搜索型号 / 品牌 / 规格">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-metal-400 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input class="search-input pr-9" id="search-input" placeholder="搜索型号 / 品牌 / 规格">
+                <button class="absolute right-3 top-1/2 -translate-y-1/2 text-metal-400 hidden" id="search-clear">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
 
             <!-- 产品列表 -->
@@ -271,7 +274,32 @@
     });
 
     // ── 搜索 ──────────────────────────────────────────────
-    document.getElementById('search-input').addEventListener('input', renderList);
+    var searchInput = document.getElementById('search-input');
+    var searchClear = document.getElementById('search-clear');
+
+    // 显示/隐藏清除按钮
+    searchInput.addEventListener('input', function () {
+        searchClear.classList.toggle('hidden', !searchInput.value);
+        renderList();
+    });
+
+    // 点击清除
+    searchClear.addEventListener('click', function () {
+        searchInput.value = '';
+        searchClear.classList.add('hidden');
+        searchInput.focus();
+        renderList();
+    });
+
+    // 读取 URL 中的 ?q= 参数并自动填入搜索
+    (function () {
+        var params = new URLSearchParams(location.search);
+        var q = params.get('q');
+        if (q) {
+            searchInput.value = q;
+            searchClear.classList.remove('hidden');
+        }
+    })();
 
     // ── 操作菜单 ──────────────────────────────────────────
     var actionSheet = document.getElementById('action-sheet');

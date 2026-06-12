@@ -8,6 +8,7 @@
     <link href="/lib/fonts/fonts-mp-category.css" rel="stylesheet">
     <link rel="stylesheet" href="/lib/font-awesome/6.5.1/css/all.min.css">
     <script src="/data/contacts.js"></script>
+    <script src="/data/categories.js"></script>
     <script src="/data/site-config.js"></script>
     <script>
         tailwind.config = {
@@ -139,6 +140,10 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+        .left-nav-item.active {
+            background: linear-gradient(135deg, #00C853 0%, #22c55e 100%);
+            box-shadow: 0 2px 8px rgba(34,197,94,0.4);
+        }
     </style>
 </head>
 <body class="bg-brand-surface min-h-screen pb-20">
@@ -169,45 +174,7 @@
         <!-- Left Category Navigation -->
         <aside class="w-20 flex-shrink-0 bg-white border-r border-brand-border/40 overflow-y-auto hide-scrollbar">
             <div class="py-2" id="leftNav">
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="富士" data-cat="contactor" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">富士<br>接触器</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="三菱,士林,伊顿" data-cat="contactor" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">三菱 士林<br>伊顿接触器</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="正泰,德力西,人民电器,常熟" data-cat="contactor" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">国产<br>接触器</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="常熟,人民电器" data-cat="breaker" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">常熟 人民<br>品牌断路器</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="" data-cat="" data-tag-match="熔断器,万能断路器">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">熔断器<br>万能断路器</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="" data-cat="" data-tag-match="银触点价格">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">银触点<br>价格</span>
-                </div>
-                <div class="left-nav-item active px-2 py-3 text-center cursor-pointer rounded-lg mx-1 my-0.5" data-brand="正泰" data-cat="contactor" data-tag-match="">
-                    <span class="text-xs font-bold text-white leading-tight block">正泰<br>接触器</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="正泰" data-cat="switch" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">正泰<br>开关</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="德力西" data-cat="contactor" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">德力西<br>接触器</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="德力西" data-cat="switch" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">德力西<br>开关</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="施耐德" data-cat="contactor" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">施耐德<br>接触器</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="施耐德" data-cat="switch" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">施耐德<br>开关</span>
-                </div>
-                <div class="left-nav-item px-2 py-3 text-center cursor-pointer" data-brand="西门子" data-cat="contactor" data-tag-match="">
-                    <span class="text-xs font-medium text-brand-muted leading-tight block">西门子<br>接触器</span>
-                </div>
+                <!-- 由 JS 根据 categories.js 动态渲染 -->
             </div>
         </aside>
 
@@ -238,14 +205,38 @@
       (function () {
         const all = window._AL_PRODUCTS || [];
         const listEl = document.getElementById('productList');
-        const navItems = document.querySelectorAll('.left-nav-item[data-brand]');
+        const leftNav = document.getElementById('leftNav');
+        const cats = (window._AL_CATS && window._AL_CATS.getVisible()) || [];
+        const typeLabel = { contactor: '接触器', breaker: '断路器', relay: '继电器', button: '按钮', switch: '开关' };
 
         // 当前激活的筛选条件
         const state = {
-          brands: null,      // null=不限，string=单品牌，array=多品牌
-          cat: null,         // 'contactor'/'breaker'/'switch'/'button'/'relay' 或 null
-          tagMatch: null     // string|array|null
+          brands: null,
+          cat: null,
+          tagMatch: null
         };
+
+        // 动态渲染左侧导航
+        function renderLeftNav(activeId) {
+          leftNav.innerHTML = cats.map(function (c) {
+            const isActive = c.id === activeId;
+            const activeClass = isActive ? 'active rounded-lg mx-1 my-0.5' : '';
+            const spanClass = isActive
+              ? 'text-xs font-bold text-white leading-tight block'
+              : 'text-xs font-medium text-brand-muted leading-tight block';
+            // 生成显示文字：品牌 + 类型
+            const line1 = c.brand || c.name;
+            const line2 = c.tagMatch ? c.name : (typeLabel[c.type] || '');
+            const displayText = line2 ? line1 + '<br>' + line2 : line1;
+            // data 属性用于筛选
+            const dataBrand = c.brand || '';
+            const dataCat = c.type || '';
+            const dataTagMatch = c.tagMatch || '';
+            return '<div class="left-nav-item px-2 py-3 text-center cursor-pointer ' + activeClass + '" data-id="' + c.id + '" data-brand="' + dataBrand + '" data-cat="' + dataCat + '" data-tag-match="' + dataTagMatch + '">' +
+              '<span class="' + spanClass + '">' + displayText + '</span>' +
+            '</div>';
+          }).join('');
+        }
 
         // 按品牌列表 + 分类 + tag 列表筛选
         function matchItem(item) {
@@ -277,7 +268,6 @@
           listEl.innerHTML = filtered.map((it, idx) => {
             const imgUrl = it.img || (window._AL_CAT_IMG || {})[it.cat] || '';
             const catLabel = (window._AL_CAT_LABEL || {})[it.cat] || '产品';
-            // 分类列表价格：会员可见；非会员显示「开通会员查看」锁标
             const displayPrice = it.price || it.silverCopperPrice || '';
             const canViewMember = !!(window._AL_canView && window._AL_canView('member'));
             const priceHtml = (canViewMember && displayPrice)
@@ -302,30 +292,31 @@
         }
 
         // 左侧导航点击
-        function activateNav(item) {
-          navItems.forEach(el => {
-            const span = el.querySelector('span');
-            if (el === item) {
-              el.classList.add('active', 'rounded-lg', 'mx-1', 'my-0.5');
-              span.className = 'text-xs font-bold text-white leading-tight block';
-            } else {
-              el.classList.remove('active', 'rounded-lg', 'mx-1', 'my-0.5');
-              span.className = 'text-xs font-medium text-brand-muted leading-tight block';
-            }
-          });
-          // 解析 data-brand（逗号分隔 → array）
-          const brandStr = (item.dataset.brand || '').trim();
+        function activateNav(navEl) {
+          const id = navEl.dataset.id;
+          renderLeftNav(id);
+          // 解析 data 属性
+          const brandStr = (navEl.dataset.brand || '').trim();
           state.brands = brandStr ? brandStr.split(',').map(s => s.trim()).filter(Boolean) : null;
-          state.cat = (item.dataset.cat || '').trim() || null;
-          const tagStr = (item.dataset.tagMatch || '').trim();
+          state.cat = (navEl.dataset.cat || '').trim() || null;
+          const tagStr = (navEl.dataset.tagMatch || '').trim();
           state.tagMatch = tagStr ? tagStr.split(',').map(s => s.trim()).filter(Boolean) : null;
+          // 更新 URL（不刷新）
+          const params = new URLSearchParams();
+          if (brandStr) params.set('brand', brandStr);
+          if (state.cat) params.set('cat', state.cat);
+          if (tagStr) params.set('tag', tagStr);
+          history.replaceState(null, '', '?' + params.toString());
           render();
         }
 
-        // 绑定事件
-        navItems.forEach(n => n.addEventListener('click', () => activateNav(n)));
+        // 事件委托：左侧导航点击
+        leftNav.addEventListener('click', function (e) {
+          const item = e.target.closest('.left-nav-item');
+          if (item) activateNav(item);
+        });
 
-        // 初始化：优先从 URL 参数 ?brand= 匹配左侧导航，否则用 .active 默认项
+        // 初始化：从 URL 参数匹配导航项，否则默认第一项
         function getUrlParam(name) {
           try { return new URLSearchParams(window.location.search).get(name) || ''; }
           catch (e) { return ''; }
@@ -333,15 +324,24 @@
 
         let initialNav = null;
         const urlBrand = getUrlParam('brand').trim();
-        if (urlBrand) {
-          initialNav = Array.from(navItems).find(n => {
-            const brands = (n.dataset.brand || '').split(',').map(s => s.trim());
-            return brands.includes(urlBrand);
+        const urlCat = getUrlParam('cat').trim();
+        const urlTag = getUrlParam('tag').trim();
+
+        // 确定初始激活的分类 ID
+        let activeId = cats.length ? cats[0].id : '';
+        if (urlBrand || urlCat || urlTag) {
+          const matchCat = cats.find(c => {
+            if (urlBrand && c.brand !== urlBrand) return false;
+            if (urlCat && c.type !== urlCat) return false;
+            if (urlTag && c.tagMatch !== urlTag) return false;
+            return true;
           });
+          if (matchCat) activeId = matchCat.id;
         }
-        if (!initialNav) {
-          initialNav = document.querySelector('.left-nav-item.active[data-brand]') || navItems[0];
-        }
+
+        // 先渲染左侧导航，再设置激活态和筛选
+        renderLeftNav(activeId);
+        initialNav = leftNav.querySelector('[data-id="' + activeId + '"]');
         if (initialNav) activateNav(initialNav);
         else render();
       })();

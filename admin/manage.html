@@ -167,12 +167,14 @@
 
             <!-- 搜索栏 -->
             <div class="flex items-center gap-3 px-4 py-2.5 bg-white border-b border-metal-100 search-bar">
-                <!-- 搜索框 -->
-                <div class="flex-1 flex items-center gap-2 bg-metal-50 rounded-full px-4 py-2.5">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="flex-1 relative">
+                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-metal-400 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                     </svg>
-                    <span class="text-[13px] text-metal-400">搜索型号/参数/回收价...</span>
+                    <input class="w-full h-10 pl-9 pr-9 bg-metal-50 rounded-full text-[13px] text-metal-800 outline-none border-0 placeholder:text-metal-400 focus:bg-white focus:shadow-[0_0_0_2px_#22c55e] transition-all" id="home-search" placeholder="搜索型号/参数/回收价...">
+                    <button class="absolute right-3 top-1/2 -translate-y-1/2 text-metal-400 hidden" id="home-search-clear">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
                 </div>
             </div>
 
@@ -431,8 +433,32 @@
     </script>
 
     <script>
-        // Tab 切换为直接跳转，无需 JS 切换样式（默认链接样式即可）
-        // 当前 Tab 由页面 URL 服务端高亮（这里通过 class text-brand-600 标识）
+        (function () {
+            var input = document.getElementById('home-search');
+            var clearBtn = document.getElementById('home-search-clear');
+
+            // 显示/隐藏清除按钮
+            input.addEventListener('input', function () {
+                clearBtn.classList.toggle('hidden', !input.value);
+            });
+
+            // 点击清除
+            clearBtn.addEventListener('click', function () {
+                input.value = '';
+                clearBtn.classList.add('hidden');
+                input.focus();
+            });
+
+            // 回车跳转型号管理
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    var q = input.value.trim();
+                    if (q) {
+                        location.href = 'catalog-list.html?q=' + encodeURIComponent(q);
+                    }
+                }
+            });
+        })();
     </script>
 </body>
 </html>
