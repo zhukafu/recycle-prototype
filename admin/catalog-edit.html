@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>编辑型号 - 铝老板管理后台</title>
+    <script src="/data/contacts.js"></script>
+    <script src="/data/categories.js"></script>
     <script src="/lib/tailwind/tailwind.js"></script>
     <link href="/lib/fonts/fonts-admin-main.css" rel="stylesheet">
     <script>
@@ -11,7 +13,8 @@
             theme: { extend: {
                 colors: {
                     brand: { 50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',500:'#22c55e',600:'#16a34a',700:'#15803d' },
-                    metal: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a' }
+                    metal: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a' },
+                    amber: { 50:'#fffbeb',100:'#fef3c7',600:'#d97706',700:'#b45309' }
                 },
                 fontFamily: { sans: ['Noto Sans SC','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] }
             } }
@@ -21,15 +24,175 @@
         body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
         .admin-app { min-height: 100vh; background: #f5f5f5; }
         .admin-sticky-header { position: sticky; top: 0; z-index: 40; background: #ffffff; }
-        .admin-content { padding-bottom: 80px; }
+        .admin-content { padding-bottom: 100px; }
         .content-inner { max-width: 1200px; margin: 0 auto; }
         .input { width: 100%; height: 40px; padding: 0 12px; background: #f1f5f9; border-radius: 10px; font-size: 13px; color: #0f172a; outline: none; border: 0; }
         .input:focus { background: #ffffff; box-shadow: 0 0 0 2px #22c55e; }
         textarea.input { height: auto; padding: 10px 12px; resize: none; }
         .field-label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px; }
         @media (min-width: 1024px) {
-            .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
+            .admin-content { min-height: calc(100vh - 44px); padding-bottom: 80px; }
             .content-inner { padding: 0 24px; }
+        }
+
+        /* ===== 富文本编辑器样式 ===== */
+        .editor-wrapper { border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #fff; }
+        .editor-toolbar {
+            display: flex; flex-wrap: wrap; gap: 1px;
+            background: #fafafa; border-bottom: 1px solid #e2e8f0;
+            padding: 6px 8px; align-items: center;
+        }
+        .editor-toolbar .divider { width: 1px; height: 22px; background: #e2e8f0; margin: 0 4px; flex-shrink: 0; }
+        .toolbar-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 6px;
+            border: none; background: transparent; cursor: pointer;
+            color: #475569; font-size: 14px; transition: all .15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .toolbar-btn:hover { background: #e2e8f0; }
+        .toolbar-btn.active { background: #dcfce7; color: #16a34a; }
+        .toolbar-btn svg { width: 16px; height: 16px; pointer-events: none; }
+        .editor-body {
+            min-height: 200px; padding: 16px 20px;
+            font-size: 15px; line-height: 1.85; color: #1e293b;
+            outline: none; overflow-wrap: break-word;
+        }
+        .editor-body:empty::before {
+            content: attr(data-placeholder);
+            color: #94a3b8; pointer-events: none;
+        }
+        .editor-body h2 { font-size: 19px; font-weight: 700; margin: 18px 0 10px; color: #0f172a; line-height: 1.5; }
+        .editor-body h3 { font-size: 17px; font-weight: 700; margin: 14px 0 8px; color: #1e293b; line-height: 1.5; }
+        .editor-body p { margin: 0 0 10px; }
+        .editor-body strong { font-weight: 700; color: #0f172a; }
+        .editor-body em { font-style: italic; }
+        .editor-body blockquote {
+            margin: 12px 0; padding: 10px 14px; border-left: 3.5px solid #22c55e;
+            background: #f0fdf4; border-radius: 0 8px 8px 0; color: #334155;
+        }
+        .editor-body ul, .editor-body ol { margin: 8px 0; padding-left: 22px; }
+        .editor-body li { margin-bottom: 4px; }
+        .editor-body ul li { list-style-type: disc; }
+        .editor-body ol li { list-style-type: decimal; }
+        .editor-body a { color: #16a34a; text-decoration: underline; }
+        .editor-body img { max-width: 100%; border-radius: 8px; margin: 8px 0; display: block; }
+        .editor-body hr { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            padding: 10px 20px; background: #0f172a; color: #fff;
+            border-radius: 9999px; font-size: 13px; font-weight: 500;
+            z-index: 200; opacity: 0; transition: all .3s; pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== 图片弹窗 ===== */
+        .img-dialog-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,.45);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all .25s;
+        }
+        .img-dialog-overlay.show { opacity: 1; visibility: visible; }
+        .img-dialog-panel {
+            width: 92%; max-width: 520px; max-height: 85vh;
+            background: #fff; border-radius: 16px; overflow: hidden;
+            display: flex; flex-direction: column;
+            transform: translateY(30px); transition: transform .3s cubic-bezier(.22,1,.36,1);
+        }
+        .img-dialog-overlay.show .img-dialog-panel { transform: translateY(0); }
+        .img-dialog-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; border-bottom: 1px solid #f1f5f9; background: #fff;
+        }
+        .img-dialog-tabs {
+            display: flex; gap: 0; padding: 0 18px; border-bottom: 1px solid #e2e8f0; background: #fafafa;
+        }
+        .img-tab-btn {
+            padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748b;
+            border: none; background: transparent; cursor: pointer;
+            border-bottom: 2px solid transparent; transition: all .2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .img-tab-btn:hover { color: #334155; background: rgba(0,0,0,.03); }
+        .img-tab-btn.active { color: #16a34a; border-bottom-color: #16a34a; background: transparent; }
+        .img-dialog-body { flex: 1; overflow-y: auto; padding: 16px 18px 20px; }
+        .img-upload-zone {
+            border: 2px dashed #cbd5e1; border-radius: 12px;
+            padding: 28px 20px; text-align: center;
+            cursor: pointer; transition: all .2s; background: #f8fafc;
+        }
+        .img-upload-zone:hover { border-color: #22c55e; background: #f0fdf4; }
+        .img-upload-zone.has-image { border-style: solid; border-color: #22c55e; padding: 12px; }
+        .img-upload-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-bottom: 8px; }
+        .img-url-preview { margin-top: 10px; border-radius: 10px; overflow: hidden; background: #f1f5f9; display: none; }
+        .img-url-preview img { width: 100%; max-height: 220px; object-fit: contain; display: block; }
+        .img-url-preview.show { display: block; }
+        .img-gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .img-gallery-item {
+            aspect-ratio: 1; border-radius: 8px; overflow: hidden; cursor: pointer;
+            border: 2px solid transparent; transition: all .15s; background: #f1f5f9;
+            position: relative;
+        }
+        .img-gallery-item:hover { border-color: #86efac; transform: scale(1.03); }
+        .img-gallery-item.selected { border-color: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,.25); }
+        .img-gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .img-gallery-item .check-icon {
+            position: absolute; top: 4px; right: 4px; width: 20px; height: 20px;
+            background: #22c55e; border-radius: 50%;
+            display: none; align-items: center; justify-content: center;
+            color: white; font-size: 12px;
+        }
+        .img-gallery-item.selected .check-icon { display: flex; }
+        .img-gallery-name { font-size: 10px; color: #94a3b8; text-align: center; margin-top: 2px; line-height: 1.2; word-break: break-all; }
+
+        /* ===== 分类选择器 ===== */
+        .cat-picker-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,.45);
+            display: flex; align-items: flex-end; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all .25s;
+        }
+        .cat-picker-overlay.show { opacity: 1; visibility: visible; }
+        .cat-picker-panel {
+            width: 100%; max-width: 520px; max-height: 75vh;
+            background: #fff; border-radius: 16px 16px 0 0; overflow: hidden;
+            display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform .3s cubic-bezier(.22,1,.36,1);
+        }
+        .cat-picker-overlay.show .cat-picker-panel { transform: translateY(0); }
+        .cat-picker-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; border-bottom: 1px solid #f1f5f9;
+        }
+        .cat-picker-search {
+            margin: 10px 18px; padding: 0 12px; height: 36px;
+            background: #f1f5f9; border-radius: 10px; border: 0;
+            font-size: 13px; outline: none; width: calc(100% - 36px);
+        }
+        .cat-picker-search:focus { background: #fff; box-shadow: 0 0 0 2px #22c55e; }
+        .cat-picker-body { flex: 1; overflow-y: auto; padding: 4px 18px 20px; }
+        .cat-picker-group-label {
+            font-size: 11px; font-weight: 700; color: #94a3b8;
+            padding: 10px 0 4px; text-transform: uppercase; letter-spacing: .5px;
+        }
+        .cat-picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .cat-pick-item {
+            padding: 10px 6px; border-radius: 10px; text-align: center;
+            font-size: 12px; font-weight: 500; color: #334155;
+            background: #f8fafc; border: 1.5px solid transparent;
+            cursor: pointer; transition: all .15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .cat-pick-item:hover { border-color: #86efac; background: #f0fdf4; }
+        .cat-pick-item.current { border-color: #22c55e; background: #dcfce7; color: #16a34a; font-weight: 600; }
+        .cat-pick-item .cat-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 8px;
+            font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px;
         }
     </style>
 </head>
@@ -40,7 +203,23 @@
         <div id="admin-topbar"></div>
     </header>
 
-    <main class="admin-content">
+    <!-- 加载中 -->
+    <div id="loading" class="px-4 py-16 text-center">
+        <div class="inline-flex items-center gap-1 text-metal-400 text-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" style="animation-delay:.2s"></span>
+            <span class="ml-2">加载中...</span>
+        </div>
+    </div>
+
+    <!-- 找不到 -->
+    <div id="notFound" class="px-4 py-16 text-center hidden">
+        <p class="text-metal-900 font-bold text-base">未找到该型号</p>
+        <a href="catalog-list.html" class="inline-block mt-4 text-brand-600 font-semibold text-sm">返回型号管理 →</a>
+    </div>
+
+    <!-- 主表单 -->
+    <main id="mainForm" class="admin-content hidden">
         <div class="content-inner px-4 lg:px-0 py-4 space-y-3">
 
             <!-- 基本信息 -->
@@ -49,89 +228,196 @@
                 <div class="space-y-3">
                     <div>
                         <label class="field-label">型号名称 *</label>
-                        <input class="input" placeholder="如：CJX2-1210" value="CJX2-1210">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="field-label">品牌</label>
-                            <select class="input">
-                                <option>正泰</option><option>德力西</option><option>人民</option><option>施耐德</option><option>西门子</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="field-label">类型</label>
-                            <select class="input">
-                                <option>交流接触器</option><option>直流接触器</option><option>银触点</option>
-                            </select>
-                        </div>
+                        <input class="input" id="f_model" placeholder="如：CJX2-1210">
                     </div>
                     <div>
                         <label class="field-label">所属分类</label>
-                        <select class="input">
-                            <option>正泰接触器</option><option>德力西接触器</option><option>施耐德接触器</option>
-                        </select>
+                        <input type="hidden" id="f_cat">
+                        <button type="button" id="catPickerBtn" class="input text-left flex items-center justify-between" style="cursor:pointer;background:#f1f5f9">
+                            <span id="catPickerLabel" class="truncate">选择分类...</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="flex-shrink:0"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                    <div>
+                        <label class="field-label">规格</label>
+                        <input class="input" id="f_spec" placeholder="如：AC380V 95A 老款设计">
+                    </div>
+                    <div>
+                        <label class="field-label">标签</label>
+                        <input class="input" id="f_tag" placeholder="如：老款、新款">
                     </div>
                     <div>
                         <label class="field-label">产品图片</label>
-                        <div class="flex gap-2">
-                            <div class="w-20 h-20 rounded-[10px] bg-metal-50 overflow-hidden border border-metal-100">
-                                <img src="/images/products/c08-zhengtai-cjx2-1210.jpg" class="w-full h-full object-cover" alt="">
+                        <div class="flex gap-3 items-center" id="coverArea">
+                            <div class="w-20 h-20 rounded-[10px] bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200" id="coverPreviewBox">
+                                <img id="coverPreviewImg" src="" alt="" class="w-full h-full object-cover hidden">
+                                <div id="coverPlaceholder" class="w-full h-full flex items-center justify-center text-metal-300 text-2xl">📷</div>
                             </div>
-                            <button class="w-20 h-20 rounded-[10px] border-2 border-dashed border-metal-200 text-metal-400 flex flex-col items-center justify-center gap-1 text-[11px] tap-active">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                添加
-                            </button>
+                            <input type="hidden" id="fieldImg">
+                            <div class="flex-1 space-y-2">
+                                <button type="button" id="btnSelectCover" class="w-full h-9 rounded-lg border border-dashed border-metal-200 text-metal-500 text-[12px] hover:bg-gray-50 active:bg-gray-100 transition-colors">
+                                    🖼️ 从图片库选择 / 上传产品图
+                                </button>
+                                <button type="button" id="btnClearCover" class="hidden w-full h-8 rounded-lg border border-metal-200 text-metal-400 text-[11px] hover:bg-red-50 hover:text-red-500 hover:border-red-200 active:bg-red-100 transition-colors">
+                                    ✕ 移除产品图
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 回收价与付费信息 -->
+            <!-- 回收价信息 -->
             <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                <h3 class="text-[14px] font-bold text-metal-900 mb-3">回收价与付费信息</h3>
+                <h3 class="text-[14px] font-bold text-metal-900 mb-3">回收价信息</h3>
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-3">
-                        <div><label class="field-label">普通展示价</label><input class="input font-mono" value="160.00"></div>
-                        <div><label class="field-label">银点铜回收价</label><input class="input font-mono" value="7.36/g"></div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div><label class="field-label">白银重量(g)</label><input class="input font-mono" value="12.5000"></div>
-                        <div><label class="field-label">白银纯度</label><input class="input font-mono" value="76%"></div>
-                        <div><label class="field-label">白银价值</label><input class="input font-mono" value="149.15"></div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div><label class="field-label">烤点铜(g)</label><input class="input font-mono" value="0.0970"></div>
-                        <div><label class="field-label">纯度</label><input class="input font-mono" value="50%"></div>
-                        <div><label class="field-label">价值</label><input class="input font-mono" value="4.37"></div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div><label class="field-label">漆包铜(g)</label><input class="input font-mono" value="0.0900"></div>
-                        <div><label class="field-label">纯度</label><input class="input font-mono" value="90%"></div>
-                        <div><label class="field-label">价值</label><input class="input font-mono" value="6.48"></div>
+                        <div>
+                            <label class="field-label">回收价（元/件）</label>
+                            <input class="input font-mono" id="f_price" placeholder="如：190.46">
+                        </div>
+                        <div>
+                            <label class="field-label">银点铜回收价（元/公斤）</label>
+                            <input class="input font-mono" id="f_silverCopperPrice" placeholder="如：185.60">
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 付费说明与权限 -->
+
+            <!-- 单位重量 -->
             <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                <h3 class="text-[14px] font-bold text-metal-900 mb-3">付费说明与权限</h3>
-                <textarea class="input" rows="3" placeholder="请输入拆解说明、含量说明或会员可见说明">总重1.4 银铜110 线圈90 考点12.5</textarea>
-                <div class="grid grid-cols-2 gap-3 mt-3">
-                    <div><label class="field-label">会员可见</label><select class="input"><option>是</option><option>否</option></select></div>
-                    <div><label class="field-label">上架状态</label><select class="input"><option>已上架</option><option>已下架</option></select></div>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-[14px] font-bold text-metal-900">单位重量</h3>
+                    <button type="button" id="btnAddRow" class="text-[12px] text-brand-600 font-semibold px-2 py-1 rounded-lg bg-brand-50 tap-active">+ 添加行</button>
                 </div>
+                <div class="space-y-3" id="unitWeightRows"></div>
+            </section>
+
+            <!-- 产品说明（富文本编辑器） -->
+            <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+                <h3 class="text-[14px] font-bold text-metal-900 mb-3">产品说明</h3>
+                <div class="editor-wrapper" id="editorWrapper">
+                    <div class="editor-toolbar" id="editorToolbar">
+                        <button type="button" class="toolbar-btn" data-cmd="formatBlock" data-value="H2" title="标题 H2"><b>H2</b></button>
+                        <button type="button" class="toolbar-btn" data-cmd="formatBlock" data-value="H3" title="标题 H3"><b>H3</b></button>
+                        <span class="divider"></span>
+                        <button type="button" class="toolbar-btn" data-cmd="bold" title="加粗">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z"/><path d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" data-cmd="italic" title="斜体">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+                        </button>
+                        <span class="divider"></span>
+                        <button type="button" class="toolbar-btn" data-cmd="insertUnorderedList" title="无序列表">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
+                        </button>
+                        <span class="divider"></span>
+                        <button type="button" class="toolbar-btn" data-cmd="formatBlock" data-value="BLOCKQUOTE" title="引用">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+                        </button>
+                        <span class="divider"></span>
+                        <button type="button" class="toolbar-btn" id="btnInsertImg" title="插入图片">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" data-cmd="createLink" title="插入链接">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                        </button>
+                        <button type="button" class="toolbar-btn" data-cmd="removeFormat" title="清除格式" style="margin-left:auto">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/><line x1="3" y1="21" x2="21" y2="3"/></svg>
+                        </button>
+                    </div>
+                    <div class="editor-body" contenteditable="true" id="editorBody" data-placeholder="输入产品说明、拆解说明或含量说明..."></div>
+                </div>
+                <p class="text-[11px] text-metal-400 mt-2">提示：使用工具栏进行格式化编辑。</p>
             </section>
 
             <!-- 操作 -->
             <div class="flex gap-3 pt-2">
-                <button class="flex-1 h-11 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold tap-active">取消</button>
-                <button class="flex-1 h-11 rounded-full bg-brand-500 text-white text-[14px] font-semibold tap-active shadow-[0_4px_12px_rgba(34,197,94,0.25)]">保存</button>
+                <button type="button" class="flex-1 h-11 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold tap-active" onclick="history.back()">取消</button>
+                <button type="button" id="btnSave" class="flex-1 h-11 rounded-full bg-brand-500 text-white text-[14px] font-semibold tap-active shadow-[0_4px_12px_rgba(34,197,94,0.25)]">保存</button>
             </div>
+
+            <!-- 跳转到详情页 -->
+            <div class="text-center pt-1 pb-4">
+                <a id="detailLink" href="catalog-detail.html" class="text-[12px] text-brand-600 font-medium no-underline">查看型号详情 →</a>
+            </div>
+
             <div class="h-4"></div>
         </div>
     </main>
 
     <div id="admin-bottom-nav"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- 图片弹窗 -->
+<div class="img-dialog-overlay" id="imgDialogOverlay">
+    <div class="img-dialog-panel">
+        <div class="img-dialog-header">
+            <span class="font-bold text-[14px] text-metal-800">📷 插入图片</span>
+            <button type="button" id="btnCloseImgDlg" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 text-metal-400 text-lg transition-colors">&times;</button>
+        </div>
+        <div class="img-dialog-tabs">
+            <button type="button" class="img-tab-btn active" data-tab="upload">📁 本地上传</button>
+            <button type="button" class="img-tab-btn" data-tab="url">🔗 URL 地址</button>
+            <button type="button" class="img-tab-btn" data-tab="gallery">🖼️ 图片库</button>
+        </div>
+        <div class="img-dialog-body">
+            <div class="img-tab-content" id="tabUpload">
+                <div class="img-upload-zone" id="imgUploadZone">
+                    <input type="file" id="imgFileInput" accept="image/*" class="hidden">
+                    <div id="uploadPlaceholder">
+                        <div class="text-4xl mb-2">📤</div>
+                        <p class="text-[13px] font-medium text-metal-600 mb-1">点击或拖拽上传图片</p>
+                        <p class="text-[11px] text-metal-400">支持 JPG、PNG、GIF、WebP，最大 10MB</p>
+                    </div>
+                    <div id="uploadPreviewArea" class="hidden">
+                        <img id="uploadPreviewImg" class="img-upload-preview" alt="预览">
+                        <p class="text-[12px] text-brand-600 font-medium mt-1" id="uploadFileName"></p>
+                        <button type="button" id="btnReUpload" class="mt-2 px-3 py-1.5 text-[12px] rounded-lg bg-metal-100 text-metal-600 hover:bg-metal-200">重新选择</button>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="field-label">图片说明（可选）</label>
+                    <input type="text" id="imgCaptionInput" class="input" placeholder="输入图片说明文字">
+                </div>
+            </div>
+            <div class="img-tab-content hidden" id="tabUrl">
+                <div>
+                    <label class="field-label">图片 URL 地址</label>
+                    <input type="text" id="imgUrlInput" class="input" placeholder="/images/products/xxx.jpg 或完整链接">
+                </div>
+                <div class="img-url-preview" id="imgUrlPreviewBox">
+                    <img id="imgUrlPreviewImg" alt="预览">
+                    <p class="text-center text-[11px] text-metal-400 mt-1 pb-2">图片预览</p>
+                </div>
+            </div>
+            <div class="img-tab-content hidden" id="tabGallery">
+                <p class="text-[12px] text-metal-400 mb-3">从已有图片中快速选择</p>
+                <div class="img-gallery-grid" id="imgGalleryGrid"></div>
+            </div>
+        </div>
+        <div class="px-5 pb-5 pt-2">
+            <button type="button" id="btnConfirmImg" class="w-full h-10 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-semibold text-[14px] shadow-[0_4px_12px_rgba(34,197,94,0.25)] active:scale-[0.98] transition-transform">
+                ✓ 确认插入
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 分类选择器弹窗 -->
+<div class="cat-picker-overlay" id="catPickerOverlay">
+    <div class="cat-picker-panel">
+        <div class="cat-picker-header">
+            <span class="font-bold text-[14px] text-metal-800">📁 选择所属分类</span>
+            <button type="button" id="btnCloseCatPicker" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 text-metal-400 text-lg transition-colors">&times;</button>
+        </div>
+        <input type="text" class="cat-picker-search" id="catPickerSearch" placeholder="搜索分类...">
+        <div class="cat-picker-body" id="catPickerBody"></div>
+    </div>
 </div>
 
 <script type="module">
@@ -143,7 +429,370 @@
         back: true,
         onAvatar: () => location.href = '/admin/manage.html',
     });
-    mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
+    mountAdminBottomNav('#admin-bottom-nav', { active: 'business' });
+</script>
+
+<script>
+(function () {
+    var PRODUCTS = window._AL_PRODUCTS || [];
+    var CAT_IMG = window._AL_CAT_IMG || {};
+    var typeLabel = { contactor: '接触器', breaker: '断路器', relay: '继电器', button: '按钮开关', switch: '隔离开关' };
+
+    var id = new URLSearchParams(location.search).get('id');
+    var isNew = !id;
+    var it = id ? PRODUCTS.find(function (x) { return x.id === id; }) : null;
+
+    if (id && !it) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('notFound').classList.remove('hidden');
+        return;
+    }
+
+    // 如果是新建，生成一个临时 id
+    if (isNew) {
+        it = { id: 'new_' + Date.now(), cat: 'contactor', model: '', brand: '', spec: '', price: '', silverCopperPrice: '', unitWeight: [], desc: '', img: '', tag: '' };
+    }
+
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('mainForm').classList.remove('hidden');
+    document.title = (isNew ? '新增型号' : '编辑 ' + it.model) + ' - 铝老板管理后台';
+
+    // 封面预览管理
+    var coverPreviewImg = document.getElementById('coverPreviewImg');
+    var coverPlaceholder = document.getElementById('coverPlaceholder');
+    var fieldImg = document.getElementById('fieldImg');
+    function updateCoverPreview(url) {
+        var clearBtn = document.getElementById('btnClearCover');
+        if (url && url.trim()) {
+            coverPreviewImg.src = url;
+            coverPreviewImg.classList.remove('hidden');
+            coverPlaceholder.classList.add('hidden');
+            if (clearBtn) clearBtn.classList.remove('hidden');
+            coverPreviewImg.onerror = function() { this.classList.add('hidden'); coverPlaceholder.classList.remove('hidden'); coverPlaceholder.textContent = '❌'; };
+        } else {
+            coverPreviewImg.classList.add('hidden');
+            coverPlaceholder.classList.remove('hidden');
+            coverPlaceholder.textContent = '📷';
+            if (clearBtn) clearBtn.classList.add('hidden');
+        }
+    }
+
+    // 填充表单
+    document.getElementById('f_model').value = it.model || '';
+    var currentBrand = it.brand || '';
+    var fCat = document.getElementById('f_cat');
+    fCat.value = it.cat || 'contactor';
+    document.getElementById('f_spec').value = it.spec || '';
+    document.getElementById('f_tag').value = it.tag || '';
+    fieldImg.value = it.img || '';
+    document.getElementById('f_price').value = it.price || '';
+    document.getElementById('f_silverCopperPrice').value = it.silverCopperPrice || '';
+    var editorBody = document.getElementById('editorBody');
+    if (it.desc && /<[a-z]/i.test(it.desc)) {
+        editorBody.innerHTML = it.desc;
+    } else {
+        editorBody.innerHTML = it.desc ? '<p>' + it.desc.replace(/\n/g, '</p><p>') + '</p>' : '';
+    }
+    updateCoverPreview(it.img);
+    document.getElementById('btnClearCover').addEventListener('click', function() {
+        fieldImg.value = '';
+        updateCoverPreview('');
+        showToast('产品图已移除');
+    });
+
+    // Toast 提示
+    var toastTimer = 0;
+    function showToast(msg) {
+        var t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg; t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2200);
+    }
+
+    // 图片弹窗（复用文章编辑的交互模式）
+    var GALLERY_IMAGES = [
+        { url: '/images/products/c01-zhengtai-cjx2-9511-old.jpg', name: 'cjx2-9511-old' },
+        { url: '/images/products/c02-zhengtai-cjx2-9511-new.jpg', name: 'cjx2-9511-new' },
+        { url: '/images/products/c05-zhengtai-cjx2-9511-2022-new.jpg', name: 'cjx2-2022' },
+        { url: '/images/products/c07-zhengtai-cjx2-5011-iron-base.jpg', name: 'cjx2-5011' },
+        { url: '/images/products/c08-zhengtai-cjx2-1210.jpg', name: 'cjx2-1210' },
+        { url: '/images/products/c10-zhengtai-contactor-w.jpg', name: 'contactor-w' },
+        { url: '/images/products/c12-schneider-breaker-silver.jpg', name: 'schneider' },
+        { url: '/images/products/c13-delixi-breaker-8claw.jpg', name: 'delixi-8' },
+        { url: '/images/products/c16-fuji-sc-e03.png', name: 'fuji-sc' },
+        { url: '/images/products/c17-mitsubishi-s-t21.png', name: 'mitsubishi' },
+        { url: '/images/products/c19-eaton-xtce.png', name: 'eaton' },
+        { url: '/images/products/c20-siemens-3rt.png', name: 'siemens' },
+        { url: '/images/products/cat-contactor.png', name: 'cat-contactor' },
+        { url: '/images/products/cat-breaker.png', name: 'cat-breaker' },
+        { url: '/images/products/cat-relay.png', name: 'cat-relay' },
+        { url: '/images/products/cat-button.png', name: 'cat-button' }
+    ];
+    var activeImgTab = 'upload', uploadedImageData = null, gallerySelectedImage = null, imageDialogMode = 'inline';
+    function switchImgTab(tab) {
+        activeImgTab = tab;
+        document.querySelectorAll('.img-tab-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.tab === tab); });
+        document.querySelectorAll('.img-tab-content').forEach(function(c) { c.classList.add('hidden'); });
+        document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+    }
+    // 绑定图片弹窗 tab 点击事件
+    document.querySelectorAll('.img-tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { switchImgTab(this.dataset.tab); });
+    });
+    function resetImageDialog() {
+        switchImgTab('upload'); uploadedImageData = null; gallerySelectedImage = null;
+        document.getElementById('uploadPlaceholder').classList.remove('hidden');
+        document.getElementById('uploadPreviewArea').classList.add('hidden');
+        document.getElementById('imgUploadZone').classList.remove('has-image');
+        document.getElementById('imgUrlInput').value = '';
+        document.getElementById('imgUrlPreviewBox').classList.remove('show');
+        document.getElementById('imgCaptionInput').value = '';
+    }
+    document.getElementById('btnSelectCover').addEventListener('click', function() {
+        resetImageDialog(); imageDialogMode = 'cover';
+        document.querySelector('.img-dialog-header span').textContent = '📷 选择产品图';
+        document.getElementById('btnConfirmImg').textContent = '✓ 确认选择';
+        document.getElementById('imgDialogOverlay').classList.add('show');
+        buildGalleryGrid();
+    });
+    document.getElementById('btnCloseImgDlg').addEventListener('click', closeImageDialog);
+    document.getElementById('imgDialogOverlay').addEventListener('click', function(e) { if (e.target === this) closeImageDialog(); });
+    function closeImageDialog() {
+        document.getElementById('imgDialogOverlay').classList.remove('show');
+        document.querySelector('.img-dialog-header span').textContent = '📷 插入图片';
+        document.getElementById('btnConfirmImg').textContent = '✓ 确认插入';
+    }
+    document.getElementById('imgUploadZone').addEventListener('click', function() { document.getElementById('imgFileInput').click(); });
+    document.getElementById('imgFileInput').addEventListener('change', function(e) {
+        var file = e.target.files[0]; if (!file) return;
+        if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); return; }
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            uploadedImageData = ev.target.result;
+            document.getElementById('uploadPreviewImg').src = uploadedImageData;
+            document.getElementById('uploadFileName').textContent = file.name;
+            document.getElementById('uploadPlaceholder').classList.add('hidden');
+            document.getElementById('uploadPreviewArea').classList.remove('hidden');
+            document.getElementById('imgUploadZone').classList.add('has-image');
+        };
+        reader.readAsDataURL(file);
+    });
+    document.getElementById('btnReUpload').addEventListener('click', function(e) {
+        e.stopPropagation(); document.getElementById('imgFileInput').value = '';
+        document.getElementById('uploadPlaceholder').classList.remove('hidden');
+        document.getElementById('uploadPreviewArea').classList.add('hidden');
+        document.getElementById('imgUploadZone').classList.remove('has-image');
+        uploadedImageData = null;
+        document.getElementById('imgFileInput').click();
+    });
+    var urlPreviewTimer = null;
+    document.getElementById('imgUrlInput').addEventListener('input', function() {
+        clearTimeout(urlPreviewTimer);
+        var val = this.value.trim();
+        if (!val) { document.getElementById('imgUrlPreviewBox').classList.remove('show'); return; }
+        urlPreviewTimer = setTimeout(function() {
+            var img = document.getElementById('imgUrlPreviewImg');
+            img.onload = function() { document.getElementById('imgUrlPreviewBox').classList.add('show'); };
+            img.onerror = function() { document.getElementById('imgUrlPreviewBox').classList.remove('show'); };
+            img.src = val;
+        }, 400);
+    });
+    function buildGalleryGrid() {
+        var grid = document.getElementById('imgGalleryGrid');
+        grid.innerHTML = GALLERY_IMAGES.map(function(item) {
+            return '<div style="display:flex;flex-direction:column;"><div class="img-gallery-item" data-url="' + item.url + '">' +
+                '<img src="' + item.url + '" alt="' + item.name + '" loading="lazy">' +
+                '<span class="check-icon">✓</span></div>' +
+                '<span class="img-gallery-name">' + item.name + '</span></div>';
+        }).join('');
+        grid.querySelectorAll('.img-gallery-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                grid.querySelectorAll('.img-gallery-item').forEach(function(i) { i.classList.remove('selected'); });
+                this.classList.add('selected'); gallerySelectedImage = this.dataset.url;
+            });
+        });
+    }
+    document.getElementById('btnConfirmImg').addEventListener('click', function() {
+        var imgSrc = '';
+        if (activeImgTab === 'upload') { if (!uploadedImageData) { showToast('请先上传图片'); return; } imgSrc = uploadedImageData; }
+        else if (activeImgTab === 'url') { imgSrc = document.getElementById('imgUrlInput').value.trim(); if (!imgSrc) { showToast('请输入图片地址'); return; } }
+        else if (activeImgTab === 'gallery') { if (!gallerySelectedImage) { showToast('请选择图片'); return; } imgSrc = gallerySelectedImage; }
+        fieldImg.value = imgSrc; updateCoverPreview(imgSrc); closeImageDialog(); showToast('✅ 产品图已设置');
+    });
+
+    // ===== 分类选择器 =====
+    var ALL_CATS = (window._AL_CATS && window._AL_CATS.getVisible()) ? window._AL_CATS.getVisible() : [];
+    var GRADIENT_MAP = {
+        'gradient-red': '#ef4444', 'gradient-orange': '#f97316', 'gradient-green': '#22c55e',
+        'gradient-teal': '#14b8a6', 'gradient-purple': '#a855f7', 'gradient-blue': '#3b82f6',
+        'gradient-yellow': '#eab308'
+    };
+    function updateCatLabel() {
+        var cat = fCat.value;
+        var matched = ALL_CATS.filter(function(c) { return c.type === cat; });
+        if (currentBrand) matched = matched.filter(function(c) { return c.brand === currentBrand; });
+        var label = matched.length ? matched[0].name : (currentBrand ? currentBrand + ' · ' + cat : cat);
+        document.getElementById('catPickerLabel').textContent = label;
+    }
+    function renderCatPicker(filter) {
+        filter = (filter || '').toLowerCase();
+        var body = document.getElementById('catPickerBody');
+        var filtered = ALL_CATS.filter(function(c) {
+            if (!c.type) return false;
+            return !filter || c.name.toLowerCase().indexOf(filter) >= 0 || c.brand.toLowerCase().indexOf(filter) >= 0;
+        });
+        var groups = {};
+        filtered.forEach(function(c) {
+            var brand = c.brand || '其他';
+            if (!groups[brand]) groups[brand] = [];
+            groups[brand].push(c);
+        });
+        var html = '';
+        Object.keys(groups).forEach(function(brand) {
+            html += '<div class="cat-picker-group-label">' + brand + '</div>';
+            html += '<div class="cat-picker-grid">';
+            groups[brand].forEach(function(c) {
+                var isCurrent = c.type === fCat.value && c.brand === currentBrand;
+                var iconColor = GRADIENT_MAP[c.gradient] || '#94a3b8';
+                html += '<div class="cat-pick-item' + (isCurrent ? ' current' : '') + '" data-brand="' + c.brand + '" data-type="' + c.type + '">';
+                html += '<div class="cat-icon" style="background:' + iconColor + '">' + (c.icon || c.name.charAt(0)) + '</div>';
+                html += '<div>' + c.name + '</div></div>';
+            });
+            html += '</div>';
+        });
+        body.innerHTML = html || '<p class="text-center text-metal-400 py-8 text-[13px]">无匹配分类</p>';
+        body.querySelectorAll('.cat-pick-item').forEach(function(el) {
+            el.addEventListener('click', function() {
+                currentBrand = this.dataset.brand;
+                fCat.value = this.dataset.type;
+                updateCatLabel();
+                closeCatPicker();
+                showToast('\u2705 已选择：' + this.querySelector('div:last-child').textContent);
+            });
+        });
+    }
+    function openCatPicker() {
+        document.getElementById('catPickerSearch').value = '';
+        renderCatPicker();
+        document.getElementById('catPickerOverlay').classList.add('show');
+    }
+    function closeCatPicker() { document.getElementById('catPickerOverlay').classList.remove('show'); }
+    document.getElementById('catPickerBtn').addEventListener('click', openCatPicker);
+    document.getElementById('btnCloseCatPicker').addEventListener('click', closeCatPicker);
+    document.getElementById('catPickerOverlay').addEventListener('click', function(e) { if (e.target === this) closeCatPicker(); });
+    document.getElementById('catPickerSearch').addEventListener('input', function() { renderCatPicker(this.value); });
+    updateCatLabel();
+
+    // 富文本编辑器工具栏
+    document.getElementById('editorToolbar').addEventListener('click', function(e) {
+        var btn = e.target.closest('[data-cmd]'); if (!btn) return;
+        var cmd = btn.dataset.cmd, val = btn.dataset.value || null;
+        if (cmd === 'createLink') { var url = prompt('请输入链接地址：', 'https://'); if (url) document.execCommand(cmd, false, url); }
+        else { document.execCommand(cmd, false, val); }
+        editorBody.focus();
+    });
+    document.getElementById('btnInsertImg').addEventListener('click', function() {
+        resetImageDialog(); imageDialogMode = 'inline';
+        document.querySelector('.img-dialog-header span').textContent = '📷 插入图片';
+        document.getElementById('btnConfirmImg').textContent = '✓ 确认插入';
+        document.getElementById('imgDialogOverlay').classList.add('show');
+        buildGalleryGrid();
+    });
+
+    // 单位重量行
+    var uwContainer = document.getElementById('unitWeightRows');
+    var unitWeights = Array.isArray(it.unitWeight) ? it.unitWeight.slice() : [];
+
+    function renderUWRows() {
+        if (!unitWeights.length) {
+            uwContainer.innerHTML = '<p class="text-[12px] text-metal-400 text-center py-4">暂无单位重量数据，点击上方"添加行"</p>';
+            return;
+        }
+        uwContainer.innerHTML = unitWeights.map(function (row, idx) {
+            return '<div class="grid grid-cols-[1fr_1fr_1fr_32px] gap-2 items-end" data-idx="' + idx + '">' +
+                '<div><label class="field-label">名称</label><input class="input uw-name" value="' + (row.name || '') + '"></div>' +
+                '<div><label class="field-label">重量</label><input class="input font-mono uw-weight" value="' + (row.weight || '') + '"></div>' +
+                '<div><label class="field-label">纯度</label><input class="input font-mono uw-purity" value="' + (row.purity || '') + '"></div>' +
+                '<button type="button" class="h-10 w-8 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center tap-active uw-del" data-idx="' + idx + '">' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                '</button>' +
+            '</div>';
+        }).join('');
+
+        // 绑定删除
+        uwContainer.querySelectorAll('.uw-del').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                unitWeights.splice(parseInt(btn.dataset.idx), 1);
+                renderUWRows();
+            });
+        });
+    }
+    renderUWRows();
+
+    document.getElementById('btnAddRow').addEventListener('click', function () {
+        unitWeights.push({ name: '', weight: '', purity: '', value: '0' });
+        renderUWRows();
+    });
+
+    // 详情页链接
+    document.getElementById('detailLink').href = 'catalog-detail.html?id=' + it.id;
+
+    // 保存
+    document.getElementById('btnSave').addEventListener('click', function () {
+        // 收集单位重量
+        var rows = uwContainer.querySelectorAll('[data-idx]');
+        var newUW = [];
+        rows.forEach(function (row) {
+            var name = row.querySelector('.uw-name').value.trim();
+            var weight = row.querySelector('.uw-weight').value.trim();
+            var purity = row.querySelector('.uw-purity').value.trim();
+            if (name || weight) {
+                // 简单估值
+                var wNum = parseFloat(weight) || 0;
+                var pNum = parseInt(purity) || 0;
+                var val = (wNum * pNum / 100 * 5.6).toFixed(2); // 简化估值
+                newUW.push({ name: name, weight: weight, purity: purity, value: val });
+            }
+        });
+
+        var updated = {
+            id: it.id,
+            cat: document.getElementById('f_cat').value,
+            model: document.getElementById('f_model').value.trim(),
+            brand: currentBrand,
+            spec: document.getElementById('f_spec').value.trim(),
+            tag: document.getElementById('f_tag').value.trim(),
+            img: fieldImg.value.trim(),
+            price: document.getElementById('f_price').value.trim(),
+            silverCopperPrice: document.getElementById('f_silverCopperPrice').value.trim(),
+            desc: editorBody.innerHTML.trim(),
+            unitWeight: newUW
+        };
+
+        if (!updated.model) {
+            alert('请填写型号名称');
+            return;
+        }
+
+        // 更新 PRODUCTS 数组
+        var idx = PRODUCTS.findIndex(function (p) { return p.id === it.id; });
+        if (idx >= 0) {
+            PRODUCTS[idx] = updated;
+        } else {
+            PRODUCTS.push(updated);
+        }
+        window._AL_PRODUCTS = PRODUCTS;
+
+        // 保存到 localStorage
+        try {
+            localStorage.setItem('al_products', JSON.stringify(PRODUCTS));
+        } catch (e) { /* ignore */ }
+
+        // 跳转详情页
+        location.href = 'catalog-detail.html?id=' + updated.id;
+    });
+})();
 </script>
 
 </body>
