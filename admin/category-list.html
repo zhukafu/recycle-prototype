@@ -6,6 +6,8 @@
     <title>分类管理 - 铝老板管理后台</title>
     <script src="/lib/tailwind/tailwind.js"></script>
     <link href="/lib/fonts/fonts-admin-main.css" rel="stylesheet">
+    <script src="/data/categories.js"></script>
+    <script src="/data/contacts.js"></script>
     <script>
         tailwind.config = {
             theme: { extend: {
@@ -32,6 +34,22 @@
         .grad-yellow { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
         .grad-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
         .grad-pink { background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); }
+        .gradient-red { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
+        .gradient-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+        .gradient-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+        .gradient-teal { background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%); }
+        .gradient-purple { background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+        .gradient-yellow { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
+        .toggle-track { width: 36px; height: 20px; border-radius: 10px; background: #d1d5db; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .toggle-track.on { background: #22c55e; }
+        .toggle-thumb { width: 16px; height: 16px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .toggle-track.on .toggle-thumb { transform: translateX(16px); }
+        /* 底部弹窗动画 */
+        .sheet-overlay { animation: fadeIn .2s ease; }
+        .sheet-panel  { animation: slideUp .25s ease; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
         @media (min-width: 1024px) {
             .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
             .content-inner { padding: 0 24px; }
@@ -51,93 +69,19 @@
             <!-- 统计 -->
             <div class="grid grid-cols-2 gap-3 mb-3">
                 <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="text-[20px] font-black text-metal-900 font-mono">26</div>
+                    <div class="text-[20px] font-black text-metal-900 font-mono" id="stat-total">0</div>
                     <div class="text-[11px] text-metal-500 mt-0.5">分类总数</div>
                 </div>
                 <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="text-[20px] font-black text-brand-600 font-mono">12</div>
-                    <div class="text-[11px] text-metal-500 mt-0.5">含子项</div>
+                    <div class="text-[20px] font-black text-brand-600 font-mono" id="stat-visible">0</div>
+                    <div class="text-[11px] text-metal-500 mt-0.5">已展示</div>
                 </div>
             </div>
 
-            <!-- 分类网格 -->
-            <div class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                <div class="grid grid-cols-3 gap-3">
-                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
-                        <div class="w-14 h-14 rounded-full grad-blue flex items-center justify-center text-white shadow-md">
-                            <i class="text-lg">🛡️</i>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[12px] font-medium text-metal-800">常见品牌</p>
-                            <p class="text-[10px] text-metal-400">8 个子项</p>
-                        </div>
-                    </a>
-                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
-                        <div class="w-14 h-14 rounded-full grad-orange flex items-center justify-center text-white shadow-md">
-                            <i class="text-lg">🔌</i>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[12px] font-medium text-metal-800">常见接触器</p>
-                            <p class="text-[10px] text-metal-400">12 个子项</p>
-                        </div>
-                    </a>
-                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
-                        <div class="w-14 h-14 rounded-full grad-teal flex items-center justify-center text-white shadow-md">
-                            <p class="text-[11px] font-bold">ΔJ8</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[12px] font-medium text-metal-800">断路器</p>
-                            <p class="text-[10px] text-metal-400">3 个子项</p>
-                        </div>
-                    </a>
-                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
-                        <div class="w-14 h-14 rounded-full grad-red flex items-center justify-center text-white shadow-md">
-                            <i class="text-lg">⚡</i>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[12px] font-medium text-metal-800">直流价器</p>
-                            <p class="text-[10px] text-metal-400">5 个子项</p>
-                        </div>
-                    </a>
-                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
-                        <div class="w-14 h-14 rounded-full grad-purple flex items-center justify-center text-white shadow-md">
-                            <i class="text-lg">🏷️</i>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[12px] font-medium text-metal-800">触点价格</p>
-                            <p class="text-[10px] text-metal-400">6 个子项</p>
-                        </div>
-                    </a>
-                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
-                        <div class="w-14 h-14 rounded-full grad-yellow flex items-center justify-center text-white shadow-md">
-                            <p class="text-[11px] font-bold">ZIM</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[12px] font-medium text-metal-800">ZIMBR</p>
-                            <p class="text-[10px] text-metal-400">4 个子项</p>
-                        </div>
-                    </a>
-                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
-                        <div class="w-14 h-14 rounded-full grad-green flex items-center justify-center text-white shadow-md">
-                            <i class="text-lg">✅</i>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[12px] font-medium text-metal-800">开关类</p>
-                            <p class="text-[10px] text-metal-400">2 个子项</p>
-                        </div>
-                    </a>
-                    <a href="category-edit.html" class="flex flex-col items-center gap-2 tap-active no-underline">
-                        <div class="w-14 h-14 rounded-full grad-pink flex items-center justify-center text-white shadow-md">
-                            <p class="text-[11px] font-bold">AP</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[12px] font-medium text-metal-800">APPA</p>
-                            <p class="text-[10px] text-metal-400">3 个子项</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
+            <!-- 分类列表 -->
+            <div class="space-y-2" id="cat-list"></div>
 
+            <!-- 新增按钮 -->
             <a href="category-edit.html" class="fixed bottom-[88px] right-4 lg:bottom-24 lg:right-8 w-14 h-14 rounded-full bg-brand-500 text-white shadow-[0_8px_24px_rgba(34,197,94,0.4)] flex items-center justify-center tap-active no-underline z-30">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </a>
@@ -145,6 +89,64 @@
     </main>
 
     <div id="admin-bottom-nav"></div>
+</div>
+
+<!-- 编辑弹窗（底部弹出） -->
+<div id="edit-sheet" class="fixed inset-0 z-[70] hidden">
+    <div class="sheet-overlay absolute inset-0 bg-black/40" id="edit-overlay"></div>
+    <div class="sheet-panel absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-4 pb-8 max-h-[80vh] overflow-y-auto">
+        <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-1 mb-4"></div>
+        <h3 class="text-[16px] font-bold text-metal-900 mb-4">编辑分类</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-[12px] text-metal-500 mb-1">分类名称</label>
+                <input id="edit-name" class="w-full h-10 px-3 bg-white rounded-xl text-[14px] text-metal-800 border border-metal-200 outline-none" placeholder="如：正泰接触器">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[12px] text-metal-500 mb-1">品牌</label>
+                    <input id="edit-brand" class="w-full h-10 px-3 bg-white rounded-xl text-[14px] text-metal-800 border border-metal-200 outline-none" placeholder="如：正泰">
+                </div>
+                <div>
+                    <label class="block text-[12px] text-metal-500 mb-1">产品类型</label>
+                    <select id="edit-type" class="w-full h-10 px-3 bg-white rounded-xl text-[14px] text-metal-800 border border-metal-200 outline-none appearance-none">
+                        <option value="">无</option>
+                        <option value="contactor">接触器</option>
+                        <option value="breaker">断路器</option>
+                        <option value="relay">继电器</option>
+                        <option value="button">按钮开关</option>
+                        <option value="switch">隔离开关</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[12px] text-metal-500 mb-1">图标文字</label>
+                    <input id="edit-icon" class="w-full h-10 px-3 bg-white rounded-xl text-[14px] text-metal-800 border border-metal-200 outline-none" placeholder="单字" maxlength="2">
+                </div>
+                <div>
+                    <label class="block text-[12px] text-metal-500 mb-1">渐变色</label>
+                    <select id="edit-gradient" class="w-full h-10 px-3 bg-white rounded-xl text-[14px] text-metal-800 border border-metal-200 outline-none appearance-none">
+                        <option value="gradient-red">红色</option>
+                        <option value="gradient-orange">橙色</option>
+                        <option value="gradient-green">绿色</option>
+                        <option value="gradient-teal">青色</option>
+                        <option value="gradient-blue">蓝色</option>
+                        <option value="gradient-purple">紫色</option>
+                        <option value="gradient-yellow">黄色</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-[12px] text-metal-500 mb-1">标签匹配（特殊分类用，逗号分隔）</label>
+                <input id="edit-tagmatch" class="w-full h-10 px-3 bg-white rounded-xl text-[14px] text-metal-800 border border-metal-200 outline-none" placeholder="如：银触点价格">
+            </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button id="btn-edit-cancel" class="flex-1 h-11 rounded-xl bg-metal-100 text-metal-600 text-[14px] font-medium tap-active">取消</button>
+            <button id="btn-edit-save" class="flex-1 h-11 rounded-xl bg-brand-500 text-white text-[14px] font-semibold tap-active shadow-[0_4px_12px_rgba(34,197,94,0.3)]">保存</button>
+        </div>
+    </div>
 </div>
 
 <script type="module">
@@ -156,7 +158,130 @@
         back: true,
         onAvatar: () => location.href = '/admin/manage.html',
     });
-    mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
+    mountAdminBottomNav('#admin-bottom-nav', { active: 'business' });
+</script>
+
+<script>
+(function () {
+    var CATS = window._AL_CATS;
+    var PRODUCTS = window._AL_PRODUCTS || [];
+    var currentEditId = null;
+
+    function typeLabel(t) {
+        return { contactor: '接触器', breaker: '断路器', relay: '继电器', button: '按钮开关', switch: '隔离开关' }[t] || '';
+    }
+
+    function countProducts(cat) {
+        return PRODUCTS.filter(function (p) {
+            if (cat.tagMatch) {
+                var tags = cat.tagMatch.split(',');
+                return tags.indexOf(p.tag) !== -1;
+            }
+            if (cat.brand && cat.type) return p.brand === cat.brand && p.cat === cat.type;
+            if (cat.brand) return p.brand === cat.brand;
+            if (cat.type) return p.cat === cat.type;
+            return false;
+        }).length;
+    }
+
+    function refreshStats() {
+        var all = CATS.getAll();
+        var vis = CATS.getVisible();
+        document.getElementById('stat-total').textContent = all.length;
+        document.getElementById('stat-visible').textContent = vis.length;
+    }
+
+    function renderList() {
+        var container = document.getElementById('cat-list');
+        var cats = CATS.getAll();
+        if (!cats.length) {
+            container.innerHTML = '<div class="text-center py-12 text-metal-400 text-sm">暂无分类</div>';
+            return;
+        }
+        container.innerHTML = cats.map(function (c) {
+            var count = countProducts(c);
+            var toggleClass = c.visible !== false ? 'on' : '';
+            return '<div class="bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex items-center gap-3" data-id="' + c.id + '">' +
+                '<div class="w-11 h-11 rounded-full ' + (c.gradient || 'gradient-red') + ' flex items-center justify-center text-white flex-shrink-0 shadow-md">' +
+                    '<span class="text-sm font-black">' + (c.icon || c.name[0]) + '</span>' +
+                '</div>' +
+                '<div class="flex-1 min-w-0">' +
+                    '<div class="flex items-center gap-2 flex-wrap mb-0.5">' +
+                        '<span class="text-[14px] font-semibold text-metal-900">' + c.name + '</span>' +
+                        (c.type ? '<span class="px-1.5 py-0.5 bg-metal-100 text-metal-500 text-[10px] rounded font-medium">' + typeLabel(c.type) + '</span>' : '') +
+                        (c.tagMatch ? '<span class="px-1.5 py-0.5 bg-amber-50 text-amber-600 text-[10px] rounded font-medium">标签</span>' : '') +
+                    '</div>' +
+                    '<p class="text-[11px] text-metal-400">' + (c.brand || '特殊') + ' · ' + count + ' 个产品 · 排序 ' + (c.sort || 0) + '</p>' +
+                '</div>' +
+                '<div class="flex items-center gap-2 flex-shrink-0">' +
+                    '<div class="toggle-track ' + toggleClass + '" data-toggle="' + c.id + '"><div class="toggle-thumb"></div></div>' +
+                    '<button class="text-metal-400 tap-active px-1" data-edit="' + c.id + '">' +
+                        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>' +
+                    '</button>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+
+        // 绑定 toggle
+        container.querySelectorAll('[data-toggle]').forEach(function (el) {
+            el.addEventListener('click', function () {
+                var id = el.getAttribute('data-toggle');
+                CATS.toggleVisible(id);
+                el.classList.toggle('on');
+                refreshStats();
+            });
+        });
+
+        // 绑定编辑
+        container.querySelectorAll('[data-edit]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                openEdit(btn.getAttribute('data-edit'));
+            });
+        });
+    }
+
+    // ── 编辑弹窗 ──────────────────────────────────────────
+    var editSheet = document.getElementById('edit-sheet');
+
+    function openEdit(id) {
+        currentEditId = id;
+        var c = CATS.getById(id);
+        if (!c) return;
+        document.getElementById('edit-name').value = c.name || '';
+        document.getElementById('edit-brand').value = c.brand || '';
+        document.getElementById('edit-type').value = c.type || '';
+        document.getElementById('edit-icon').value = c.icon || '';
+        document.getElementById('edit-gradient').value = c.gradient || 'gradient-red';
+        document.getElementById('edit-tagmatch').value = c.tagMatch || '';
+        editSheet.classList.remove('hidden');
+    }
+
+    function closeEdit() { editSheet.classList.add('hidden'); }
+
+    document.getElementById('edit-overlay').addEventListener('click', closeEdit);
+    document.getElementById('btn-edit-cancel').addEventListener('click', closeEdit);
+
+    document.getElementById('btn-edit-save').addEventListener('click', function () {
+        if (!currentEditId) return;
+        var patch = {
+            name: document.getElementById('edit-name').value.trim(),
+            brand: document.getElementById('edit-brand').value.trim(),
+            type: document.getElementById('edit-type').value,
+            icon: document.getElementById('edit-icon').value.trim() || '?',
+            gradient: document.getElementById('edit-gradient').value,
+            tagMatch: document.getElementById('edit-tagmatch').value.trim() || ''
+        };
+        CATS.update(currentEditId, patch);
+        closeEdit();
+        refreshStats();
+        renderList();
+    });
+
+    // ── 初始化 ────────────────────────────────────────────
+    refreshStats();
+    renderList();
+})();
 </script>
 
 </body>

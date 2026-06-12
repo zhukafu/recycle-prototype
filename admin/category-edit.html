@@ -6,6 +6,7 @@
     <title>编辑分类 - 铝老板管理后台</title>
     <script src="/lib/tailwind/tailwind.js"></script>
     <link href="/lib/fonts/fonts-admin-main.css" rel="stylesheet">
+    <script src="/data/categories.js"></script>
     <script>
         tailwind.config = {
             theme: { extend: {
@@ -23,20 +24,30 @@
         .admin-sticky-header { position: sticky; top: 0; z-index: 40; background: #ffffff; }
         .admin-content { padding-bottom: 80px; }
         .content-inner { max-width: 1200px; margin: 0 auto; }
+        .tap-active:active { transform: scale(0.97); }
         .input { width: 100%; height: 40px; padding: 0 12px; background: #f1f5f9; border-radius: 10px; font-size: 13px; color: #0f172a; outline: none; border: 0; }
         .input:focus { background: #ffffff; box-shadow: 0 0 0 2px #22c55e; }
-        textarea.input { height: auto; padding: 10px 12px; resize: none; }
+        select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
         .field-label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px; }
-        .color-swatch { width: 36px; height: 36px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
-        .color-swatch.active { border-color: #22c55e; transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .grad-blue { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
-        .grad-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
-        .grad-teal { background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%); }
-        .grad-red { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
-        .grad-purple { background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); }
-        .grad-yellow { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
-        .grad-green { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
-        .grad-pink { background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); }
+        .color-swatch { width: 36px; height: 36px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 3px solid transparent; transition: all 0.15s; font-size: 10px; font-weight: 700; }
+        .color-swatch.active { border-color: #22c55e; transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .gradient-red    { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
+        .gradient-orange { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+        .gradient-green  { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+        .gradient-teal   { background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%); }
+        .gradient-blue   { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+        .gradient-purple { background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); }
+        .gradient-yellow { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
+        .toggle-track { width: 44px; height: 24px; border-radius: 12px; background: #d1d5db; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .toggle-track.on { background: #22c55e; }
+        .toggle-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .toggle-track.on .toggle-thumb { transform: translateX(20px); }
+        /* toast */
+        .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; color: #fff; z-index: 999; animation: toastIn 0.3s ease, toastOut 0.3s ease 1.5s forwards; pointer-events: none; }
+        .toast.success { background: #22c55e; }
+        .toast.error { background: #ef4444; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
         @media (min-width: 1024px) {
             .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
             .content-inner { padding: 0 24px; }
@@ -59,36 +70,38 @@
                 <div class="space-y-3">
                     <div>
                         <label class="field-label">分类名称 *</label>
-                        <input class="input" value="常见品牌">
+                        <input class="input" id="f-name" placeholder="如：正泰接触器">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="field-label">分类编码</label>
-                            <input class="input font-mono" value="BRAND-001">
+                            <label class="field-label">品牌</label>
+                            <input class="input" id="f-brand" placeholder="如：正泰">
                         </div>
                         <div>
-                            <label class="field-label">排序</label>
-                            <input class="input font-mono" type="number" value="1">
+                            <label class="field-label">产品类型</label>
+                            <select class="input" id="f-type">
+                                <option value="">无</option>
+                                <option value="contactor">接触器</option>
+                                <option value="breaker">断路器</option>
+                                <option value="relay">继电器</option>
+                                <option value="button">按钮开关</option>
+                                <option value="switch">隔离开关</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="field-label">图标文字</label>
+                            <input class="input" id="f-icon" placeholder="单字，如：正" maxlength="2">
+                        </div>
+                        <div>
+                            <label class="field-label">排序权重</label>
+                            <input class="input font-mono" id="f-sort" type="number" min="0" step="1" placeholder="数字越小越靠前" value="50">
                         </div>
                     </div>
                     <div>
-                        <label class="field-label">所属父分类</label>
-                        <select class="input">
-                            <option>顶级分类</option>
-                            <option>接触器</option>
-                            <option>断路器</option>
-                            <option>继电器</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="field-label">分类图标</label>
-                        <div class="flex items-center gap-3">
-                            <div class="w-14 h-14 rounded-full grad-blue flex items-center justify-center text-white text-xl shadow-md">
-                                🛡️
-                            </div>
-                            <button class="h-9 px-3 rounded-full bg-metal-100 text-metal-700 text-[12px] font-medium tap-active">选择图标</button>
-                            <span class="text-[11px] text-metal-400">建议使用 emoji</span>
-                        </div>
+                        <label class="field-label">标签匹配（特殊分类用，可选）</label>
+                        <input class="input" id="f-tagmatch" placeholder="如：银触点价格">
                     </div>
                 </div>
             </section>
@@ -96,70 +109,178 @@
             <!-- 主题色 -->
             <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
                 <h3 class="text-[14px] font-bold text-metal-900 mb-3">主题色</h3>
-                <div class="flex flex-wrap gap-3">
-                    <div class="color-swatch grad-blue active" data-color="blue"></div>
-                    <div class="color-swatch grad-orange" data-color="orange"></div>
-                    <div class="color-swatch grad-teal" data-color="teal"></div>
-                    <div class="color-swatch grad-red" data-color="red"></div>
-                    <div class="color-swatch grad-purple" data-color="purple"></div>
-                    <div class="color-swatch grad-yellow" data-color="yellow"></div>
-                    <div class="color-swatch grad-green" data-color="green"></div>
-                    <div class="color-swatch grad-pink" data-color="pink"></div>
+                <div class="flex flex-wrap gap-3" id="color-picker">
+                    <div class="color-swatch gradient-red active" data-gradient="gradient-red">红</div>
+                    <div class="color-swatch gradient-orange" data-gradient="gradient-orange">橙</div>
+                    <div class="color-swatch gradient-green" data-gradient="gradient-green">绿</div>
+                    <div class="color-swatch gradient-teal" data-gradient="gradient-teal">青</div>
+                    <div class="color-swatch gradient-blue" data-gradient="gradient-blue">蓝</div>
+                    <div class="color-swatch gradient-purple" data-gradient="gradient-purple">紫</div>
+                    <div class="color-swatch gradient-yellow" data-gradient="gradient-yellow">黄</div>
                 </div>
             </section>
 
-            <!-- 关联信息 -->
+            <!-- 可见性 -->
             <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                <h3 class="text-[14px] font-bold text-metal-900 mb-3">关联信息</h3>
-                <div class="space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="field-label">子项数量</label>
-                            <input class="input font-mono" type="number" value="8">
-                        </div>
-                        <div>
-                            <label class="field-label">关联型号数</label>
-                            <input class="input font-mono" type="number" value="42">
-                        </div>
-                    </div>
+                <div class="flex items-center justify-between">
                     <div>
-                        <label class="field-label">分类描述</label>
-                        <textarea class="input" rows="3" placeholder="请输入分类描述">常见接触器品牌分类：包含正泰、德力西、人民、施耐德、西门子等主流品牌。</textarea>
+                        <h3 class="text-[14px] font-bold text-metal-900">在小程序展示</h3>
+                        <p class="text-[11px] text-metal-400 mt-0.5">关闭后将不在接触器数据库网格中显示</p>
+                    </div>
+                    <div class="toggle-track on" id="f-visible">
+                        <div class="toggle-thumb"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- 操作 -->
+            <!-- 操作按钮 -->
             <div class="flex gap-3 pt-2">
-                <button class="flex-1 h-11 rounded-full bg-rose-50 text-rose-600 text-[14px] font-semibold tap-active">删除分类</button>
-                <button class="flex-1 h-11 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold tap-active">取消</button>
-                <button class="flex-1 h-11 rounded-full bg-brand-500 text-white text-[14px] font-semibold tap-active shadow-[0_4px_12px_rgba(34,197,94,0.25)]">保存</button>
+                <a href="category-list.html" class="flex-1 h-11 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold tap-active flex items-center justify-center no-underline">取消</a>
+                <button class="flex-1 h-11 rounded-full bg-brand-500 text-white text-[14px] font-semibold tap-active shadow-[0_4px_12px_rgba(34,197,94,0.25)]" id="btn-save">保存</button>
+            </div>
+
+            <!-- 编辑模式下的删除按钮 -->
+            <div id="delete-section" class="hidden">
+                <button class="w-full h-11 rounded-full bg-rose-50 text-rose-600 text-[14px] font-semibold tap-active" id="btn-delete">删除此分类</button>
             </div>
             <div class="h-4"></div>
         </div>
     </main>
-
-    <div id="admin-bottom-nav"></div>
 </div>
 
 <script type="module">
     import { mountAdminTopbar } from '/src/components/admin-topbar.js';
     import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
 
+    // 判断是新增还是编辑
+    var params = new URLSearchParams(location.search);
+    var editId = params.get('id');
+    var isEdit = !!editId;
+
     mountAdminTopbar('#admin-topbar', {
-        title: '编辑分类',
+        title: isEdit ? '编辑分类' : '新增分类',
         back: true,
         onAvatar: () => location.href = '/admin/manage.html',
     });
-    mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
+    mountAdminBottomNav('#admin-bottom-nav', { active: 'business' });
+</script>
 
+<script>
+(function () {
+    var CATS = window._AL_CATS;
+    if (!CATS) {
+        showToast('分类数据未加载', 'error');
+        return;
+    }
+
+    var params = new URLSearchParams(location.search);
+    var editId = params.get('id');
+    var isEdit = !!editId;
+    var selectedGradient = 'gradient-red';
+    var isVisible = true;
+
+    // ── 编辑模式：回填数据 ──────────────────────────────
+    if (isEdit) {
+        var cat = CATS.getById(editId);
+        if (cat) {
+            document.getElementById('f-name').value = cat.name || '';
+            document.getElementById('f-brand').value = cat.brand || '';
+            document.getElementById('f-type').value = cat.type || '';
+            document.getElementById('f-icon').value = cat.icon || '';
+            document.getElementById('f-sort').value = cat.sort || 50;
+            document.getElementById('f-tagmatch').value = cat.tagMatch || '';
+            selectedGradient = cat.gradient || 'gradient-red';
+            isVisible = cat.visible !== false;
+            // 显示删除按钮
+            document.getElementById('delete-section').classList.remove('hidden');
+        } else {
+            showToast('分类不存在', 'error');
+            setTimeout(function () { location.href = 'category-list.html'; }, 1500);
+        }
+    }
+
+    // ── 初始化 UI 状态 ──────────────────────────────────
     // 颜色选择
-    document.querySelectorAll('.color-swatch').forEach(el => {
-        el.addEventListener('click', () => {
-            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-            el.classList.add('active');
+    var colorPicker = document.getElementById('color-picker');
+    function updateColorUI() {
+        colorPicker.querySelectorAll('.color-swatch').forEach(function (s) {
+            s.classList.toggle('active', s.getAttribute('data-gradient') === selectedGradient);
         });
+    }
+    updateColorUI();
+
+    colorPicker.addEventListener('click', function (e) {
+        var swatch = e.target.closest('.color-swatch');
+        if (!swatch) return;
+        selectedGradient = swatch.getAttribute('data-gradient');
+        updateColorUI();
     });
+
+    // 可见性 toggle
+    var toggleEl = document.getElementById('f-visible');
+    function updateToggleUI() {
+        toggleEl.classList.toggle('on', isVisible);
+    }
+    updateToggleUI();
+    toggleEl.addEventListener('click', function () {
+        isVisible = !isVisible;
+        updateToggleUI();
+    });
+
+    // ── 保存 ─────────────────────────────────────────────
+    document.getElementById('btn-save').addEventListener('click', function () {
+        var name = document.getElementById('f-name').value.trim();
+        if (!name) {
+            showToast('请输入分类名称', 'error');
+            document.getElementById('f-name').focus();
+            return;
+        }
+
+        var data = {
+            name: name,
+            brand: document.getElementById('f-brand').value.trim(),
+            type: document.getElementById('f-type').value,
+            icon: document.getElementById('f-icon').value.trim() || name[0],
+            gradient: selectedGradient,
+            sort: parseInt(document.getElementById('f-sort').value, 10) || 50,
+            tagMatch: document.getElementById('f-tagmatch').value.trim(),
+            visible: isVisible
+        };
+
+        if (isEdit) {
+            CATS.update(editId, data);
+            showToast('分类已更新');
+        } else {
+            data.id = 'cat_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+            CATS.add(data);
+            showToast('分类已新增');
+        }
+
+        setTimeout(function () {
+            location.href = 'category-list.html';
+        }, 800);
+    });
+
+    // ── 删除 ─────────────────────────────────────────────
+    document.getElementById('btn-delete').addEventListener('click', function () {
+        if (!editId) return;
+        if (!confirm('确定删除此分类？关联的产品数据不受影响。')) return;
+        CATS.remove(editId);
+        showToast('分类已删除');
+        setTimeout(function () {
+            location.href = 'category-list.html';
+        }, 800);
+    });
+
+    // ── Toast ────────────────────────────────────────────
+    function showToast(msg, type) {
+        var el = document.createElement('div');
+        el.className = 'toast ' + (type || 'success');
+        el.textContent = msg;
+        document.body.appendChild(el);
+        setTimeout(function () { el.remove(); }, 2000);
+    }
+})();
 </script>
 
 </body>

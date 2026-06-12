@@ -6,6 +6,8 @@
     <title>型号管理 - 铝老板管理后台</title>
     <script src="/lib/tailwind/tailwind.js"></script>
     <link href="/lib/fonts/fonts-admin-main.css" rel="stylesheet">
+    <script src="/data/contacts.js"></script>
+    <script src="/data/categories.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -28,9 +30,19 @@
         .admin-sticky-header { position: sticky; top: 0; z-index: 40; background: #ffffff; }
         .admin-content { padding-bottom: 80px; }
         .content-inner { max-width: 1200px; margin: 0 auto; }
+        .tab-scroll { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .tab-item { scroll-snap-align: start; flex-shrink: 0; }
+        .search-input { width: 100%; height: 38px; padding: 0 12px 0 36px; background: #f1f5f9; border-radius: 9999px; font-size: 13px; color: #0f172a; outline: none; border: 0; }
+        .search-input:focus { background: #ffffff; box-shadow: 0 0 0 2px #22c55e; }
+        /* 底部弹窗动画 */
+        .sheet-overlay { animation: fadeIn .2s ease; }
+        .sheet-panel  { animation: slideUp .25s ease; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
         @media (min-width: 1024px) {
             .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
             .content-inner { padding: 0 24px; }
+            .tab-scroll { justify-content: flex-start; }
         }
     </style>
 </head>
@@ -39,13 +51,12 @@
 <div class="admin-app">
     <header class="admin-sticky-header">
         <div id="admin-topbar"></div>
-        <div class="bg-white border-b border-metal-100 px-4 py-2.5">
-            <div class="flex items-center gap-3">
-                <div class="flex-1 flex items-center gap-2 bg-metal-50 rounded-full px-4 py-2">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                    <input type="text" placeholder="搜索型号 / 品牌" class="flex-1 min-w-0 bg-transparent text-[13px] text-metal-800 placeholder-metal-400 outline-none">
-                </div>
-                <button class="px-3 py-1.5 text-[12px] text-metal-600 bg-metal-50 rounded-full tap-active">筛选</button>
+        <div class="bg-white border-b border-metal-100">
+            <div class="tab-scroll flex overflow-x-auto scrollbar-hide px-4 lg:px-0" id="tab-bar">
+                <button data-tab="all" class="tab-item px-4 py-2.5 text-[13px] font-semibold text-brand-600 relative whitespace-nowrap">
+                    全部<div class="tab-indicator absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full"></div>
+                </button>
+                <!-- 分类 Tab 由 JS 动态注入 -->
             </div>
         </div>
     </header>
@@ -56,109 +67,27 @@
             <!-- 统计卡片 -->
             <div class="mt-4 grid grid-cols-3 gap-3">
                 <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="text-[20px] font-black text-metal-900 font-mono">1,286</div>
+                    <div class="text-[20px] font-black text-metal-900 font-mono" id="stat-total">0</div>
                     <div class="text-[11px] text-metal-500 mt-0.5">型号总数</div>
                 </div>
                 <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="text-[20px] font-black text-brand-600 font-mono">42</div>
-                    <div class="text-[11px] text-metal-500 mt-0.5">本周新增</div>
+                    <div class="text-[20px] font-black text-brand-600 font-mono" id="stat-current">0</div>
+                    <div class="text-[11px] text-metal-500 mt-0.5">当前分类型号</div>
                 </div>
                 <div class="bg-white rounded-[14px] p-3 text-center shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="text-[20px] font-black text-amber-600 font-mono">4</div>
-                    <div class="text-[11px] text-metal-500 mt-0.5">付费字段</div>
+                    <div class="text-[20px] font-black text-amber-600 font-mono" id="stat-cats">0</div>
+                    <div class="text-[11px] text-metal-500 mt-0.5">分类总数</div>
                 </div>
             </div>
 
-            <!-- 列表 -->
-            <div class="mt-3 space-y-2">
-                <!-- 列表项1 -->
-                <a href="catalog-detail.html" class="block bg-white rounded-[14px] p-3 flex gap-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="w-16 h-16 rounded-[10px] bg-metal-50 flex-shrink-0 overflow-hidden">
-                        <img src="/images/products/c08-zhengtai-cjx2-1210.jpg" class="w-full h-full object-cover" alt="">
-                    </div>
-                    <div class="flex-1 min-w-0 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[14px] font-semibold text-metal-900 truncate">交流接触器 CJX2-1210</h3>
-                                <span class="px-1.5 py-0.5 bg-brand-50 text-brand-700 text-[10px] rounded">正泰</span>
-                            </div>
-                            <p class="text-[11px] text-metal-500 mt-1">钨钢类 · 直流接触器</p>
-                        </div>
-                        <div class="flex items-center gap-3 text-[11px] text-metal-500">
-                            <span class="text-amber-600 font-semibold font-mono">¥160.00</span>
-                            <span>·</span>
-                            <span>2小时前更新</span>
-                        </div>
-                    </div>
-                    <svg class="self-center" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                </a>
-
-                <!-- 列表项2 -->
-                <a href="catalog-detail.html" class="block bg-white rounded-[14px] p-3 flex gap-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="w-16 h-16 rounded-[10px] bg-metal-50 flex-shrink-0 overflow-hidden">
-                        <img src="/images/products/c11-zhengtai-zjw20-400a.jpg" class="w-full h-full object-cover" alt="">
-                    </div>
-                    <div class="flex-1 min-w-0 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[14px] font-semibold text-metal-900 truncate">ZJW20-400A</h3>
-                                <span class="px-1.5 py-0.5 bg-blue-50 text-blue-700 text-[10px] rounded">人民</span>
-                            </div>
-                            <p class="text-[11px] text-metal-500 mt-1">银触点价格 · 断路器</p>
-                        </div>
-                        <div class="flex items-center gap-3 text-[11px] text-metal-500">
-                            <span class="text-amber-600 font-semibold font-mono">¥215.88</span>
-                            <span>·</span>
-                            <span>5小时前更新</span>
-                        </div>
-                    </div>
-                    <svg class="self-center" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                </a>
-
-                <!-- 列表项3 -->
-                <a href="catalog-detail.html" class="block bg-white rounded-[14px] p-3 flex gap-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="w-16 h-16 rounded-[10px] bg-metal-50 flex-shrink-0 overflow-hidden">
-                        <img src="/images/products/c10-zhengtai-contactor-w.jpg" class="w-full h-full object-cover" alt="">
-                    </div>
-                    <div class="flex-1 min-w-0 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[14px] font-semibold text-metal-900 truncate">交流接触器 CJX1-0910</h3>
-                                <span class="px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] rounded">德力西</span>
-                            </div>
-                            <p class="text-[11px] text-metal-500 mt-1">银触点价格 · 接触器</p>
-                        </div>
-                        <div class="flex items-center gap-3 text-[11px] text-metal-500">
-                            <span class="text-amber-600 font-semibold font-mono">已配置付费字段</span>
-                            <span>·</span>
-                            <span>昨天</span>
-                        </div>
-                    </div>
-                    <svg class="self-center" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                </a>
-
-                <!-- 列表项4 -->
-                <a href="catalog-detail.html" class="block bg-white rounded-[14px] p-3 flex gap-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="w-16 h-16 rounded-[10px] bg-metal-50 flex-shrink-0 overflow-hidden">
-                        <img src="/images/products/c09-zhengtai-41std-5pcs.jpg" class="w-full h-full object-cover" alt="">
-                    </div>
-                    <div class="flex-1 min-w-0 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[14px] font-semibold text-metal-900 truncate">41标接触器 5个</h3>
-                                <span class="px-1.5 py-0.5 bg-purple-50 text-purple-700 text-[10px] rounded">施耐德</span>
-                            </div>
-                            <p class="text-[11px] text-metal-500 mt-1">钨钢类 · 接触器</p>
-                        </div>
-                        <div class="flex items-center gap-3 text-[11px] text-metal-500">
-                            <span class="text-amber-600 font-semibold font-mono">¥190.46</span>
-                            <span>·</span>
-                            <span>3天前</span>
-                        </div>
-                    </div>
-                    <svg class="self-center" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                </a>
+            <!-- 搜索 -->
+            <div class="mt-3 relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-metal-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input class="search-input" id="search-input" placeholder="搜索型号 / 品牌 / 规格">
             </div>
+
+            <!-- 产品列表 -->
+            <div class="mt-3 space-y-2" id="product-list"></div>
 
             <!-- 新增按钮 -->
             <a href="catalog-edit.html" class="fixed bottom-[88px] right-4 lg:bottom-24 lg:right-8 w-14 h-14 rounded-full bg-brand-500 text-white shadow-[0_8px_24px_rgba(34,197,94,0.4)] flex items-center justify-center tap-active no-underline z-30">
@@ -170,6 +99,27 @@
     <div id="admin-bottom-nav"></div>
 </div>
 
+<!-- 操作菜单（底部弹出） -->
+<div id="action-sheet" class="fixed inset-0 z-[60] hidden">
+    <div class="sheet-overlay absolute inset-0 bg-black/40" id="action-overlay"></div>
+    <div class="sheet-panel absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-2 pb-6">
+        <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
+        <div class="px-4 py-3 border-b border-metal-100 mb-1">
+            <p class="text-[12px] text-metal-400">操作</p>
+            <p class="text-[15px] font-semibold text-metal-900" id="action-product-name">产品</p>
+        </div>
+        <a id="btn-detail" href="catalog-detail.html" class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl flex items-center gap-3 no-underline">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            查看详情
+        </a>
+        <button id="btn-delete" class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 active:bg-rose-50 rounded-xl flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            删除产品
+        </button>
+        <button id="btn-action-cancel" class="w-full text-left px-4 py-3.5 text-[14px] text-metal-500 active:bg-metal-50 rounded-xl mt-2 text-center">取消</button>
+    </div>
+</div>
+
 <script type="module">
     import { mountAdminTopbar } from '/src/components/admin-topbar.js';
     import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
@@ -179,7 +129,183 @@
         back: true,
         onAvatar: () => location.href = '/admin/manage.html',
     });
-    mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
+    mountAdminBottomNav('#admin-bottom-nav', { active: 'business' });
+</script>
+
+<script>
+(function () {
+    var PRODUCTS = window._AL_PRODUCTS || [];
+    var CATS = window._AL_CATS;
+    var allCategories = (CATS && CATS.getAll()) || [];
+
+    var currentTab = 'all';
+    var currentProductId = null;
+    var typeLabel = { contactor: '接触器', breaker: '断路器', relay: '继电器', button: '按钮开关', switch: '隔离开关' };
+
+    // ── 注入分类 Tab ──────────────────────────────────────
+    var tabBar = document.getElementById('tab-bar');
+    var uniqueBrands = [];
+    var brandSet = {};
+    allCategories.forEach(function (c) {
+        if (c.brand && !brandSet[c.brand]) {
+            brandSet[c.brand] = true;
+            uniqueBrands.push(c.brand);
+        }
+    });
+    uniqueBrands.forEach(function (brand) {
+        var btn = document.createElement('button');
+        btn.className = 'tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap';
+        btn.setAttribute('data-tab', 'brand_' + brand);
+        btn.textContent = brand;
+        tabBar.appendChild(btn);
+    });
+    // 追加分产品类型 Tab
+    ['contactor','breaker','relay','switch','button'].forEach(function (t) {
+        var btn = document.createElement('button');
+        btn.className = 'tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap';
+        btn.setAttribute('data-tab', 'type_' + t);
+        btn.textContent = typeLabel[t];
+        tabBar.appendChild(btn);
+    });
+
+    // ── 统计 ──────────────────────────────────────────────
+    function refreshStats(filteredCount) {
+        document.getElementById('stat-total').textContent = PRODUCTS.length;
+        document.getElementById('stat-current').textContent = filteredCount;
+        document.getElementById('stat-cats').textContent = allCategories.length;
+    }
+
+    // ── 渲染产品列表 ──────────────────────────────────────
+    function renderList() {
+        var container = document.getElementById('product-list');
+        var query = (document.getElementById('search-input').value || '').trim().toLowerCase();
+        var items = PRODUCTS.slice();
+
+        // Tab 过滤
+        if (currentTab !== 'all') {
+            if (currentTab.indexOf('brand_') === 0) {
+                var brand = currentTab.substring(6);
+                items = items.filter(function (p) { return p.brand === brand; });
+            } else if (currentTab.indexOf('type_') === 0) {
+                var type = currentTab.substring(5);
+                items = items.filter(function (p) { return p.cat === type; });
+            }
+        }
+        // 搜索过滤
+        if (query) {
+            items = items.filter(function (p) {
+                return (p.model || '').toLowerCase().indexOf(query) !== -1 ||
+                       (p.brand || '').toLowerCase().indexOf(query) !== -1 ||
+                       (p.spec  || '').toLowerCase().indexOf(query) !== -1;
+            });
+        }
+
+        refreshStats(items.length);
+
+        if (!items.length) {
+            container.innerHTML = '<div class="text-center py-12 text-metal-400 text-sm">暂无产品数据</div>';
+            return;
+        }
+
+        container.innerHTML = items.map(function (it) {
+            var imgSrc = it.img || (window._AL_CAT_IMG || {})[it.cat] || '';
+            var catLbl = typeLabel[it.cat] || '产品';
+            var price  = it.price || it.silverCopperPrice || '';
+            var priceHtml = price ? '<span class="text-amber-600 font-semibold font-mono">¥' + price + '</span>' : '<span class="text-metal-400">未定价</span>';
+
+            return '<div class="product-card bg-white rounded-[14px] p-3 flex gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] cursor-pointer" data-id="' + it.id + '">' +
+                '<div class="w-16 h-16 rounded-[10px] bg-metal-50 flex-shrink-0 overflow-hidden">' +
+                    (imgSrc ? '<img src="' + imgSrc + '" class="w-full h-full object-cover" alt="">' : '<div class="w-full h-full flex items-center justify-center text-[10px] text-metal-400">' + catLbl + '</div>') +
+                '</div>' +
+                '<div class="flex-1 min-w-0 flex flex-col justify-between">' +
+                    '<div>' +
+                        '<div class="flex items-center gap-2">' +
+                            '<h3 class="text-[14px] font-semibold text-metal-900 truncate">' + it.model + '</h3>' +
+                            '<span class="px-1.5 py-0.5 bg-brand-50 text-brand-700 text-[10px] rounded flex-shrink-0">' + it.brand + '</span>' +
+                        '</div>' +
+                        '<p class="text-[11px] text-metal-500 mt-1">' + catLbl + (it.tag ? ' · ' + it.tag : '') + '</p>' +
+                    '</div>' +
+                    '<div class="flex items-center gap-3 text-[11px] text-metal-500">' +
+                        priceHtml +
+                    '</div>' +
+                '</div>' +
+                '<button class="more-btn text-metal-400 tap-active px-1 self-center flex-shrink-0" data-id="' + it.id + '">' +
+                    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>' +
+                '</button>' +
+            '</div>';
+        }).join('');
+
+        // 卡片点击 → 详情
+        container.querySelectorAll('.product-card').forEach(function (card) {
+            card.addEventListener('click', function (e) {
+                if (e.target.closest('.more-btn')) return;
+                location.href = 'catalog-detail.html?id=' + card.dataset.id;
+            });
+        });
+        // 更多按钮
+        container.querySelectorAll('.more-btn').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                openActionSheet(btn.dataset.id);
+            });
+        });
+    }
+
+    // ── Tab 切换 ──────────────────────────────────────────
+    tabBar.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-tab]');
+        if (!btn) return;
+        currentTab = btn.dataset.tab;
+        tabBar.querySelectorAll('[data-tab]').forEach(function (b) {
+            b.classList.remove('font-semibold','text-brand-600');
+            b.classList.add('text-metal-500');
+            var ind = b.querySelector('.tab-indicator');
+            if (ind) ind.remove();
+        });
+        btn.classList.add('font-semibold','text-brand-600');
+        btn.classList.remove('text-metal-500');
+        var indicator = document.createElement('div');
+        indicator.className = 'tab-indicator absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full';
+        btn.appendChild(indicator);
+        renderList();
+    });
+
+    // ── 搜索 ──────────────────────────────────────────────
+    document.getElementById('search-input').addEventListener('input', renderList);
+
+    // ── 操作菜单 ──────────────────────────────────────────
+    var actionSheet = document.getElementById('action-sheet');
+    var actionName  = document.getElementById('action-product-name');
+
+    function openActionSheet(id) {
+        currentProductId = id;
+        var p = PRODUCTS.find(function (x) { return x.id === id; });
+        if (!p) return;
+        actionName.textContent = p.model || p.brand;
+        document.getElementById('btn-detail').href = 'catalog-detail.html?id=' + id;
+        actionSheet.classList.remove('hidden');
+    }
+    function closeAction() { actionSheet.classList.add('hidden'); }
+
+    document.getElementById('action-overlay').addEventListener('click', closeAction);
+    document.getElementById('btn-action-cancel').addEventListener('click', closeAction);
+
+    document.getElementById('btn-delete').addEventListener('click', function () {
+        if (!currentProductId) return;
+        if (!confirm('确定删除该产品？')) return;
+        // 从 localStorage 中移除
+        PRODUCTS = PRODUCTS.filter(function (p) { return p.id !== currentProductId; });
+        window._AL_PRODUCTS = PRODUCTS;
+        try {
+            localStorage.setItem('al_products', JSON.stringify(PRODUCTS));
+        } catch (e) { /* ignore */ }
+        closeAction();
+        renderList();
+    });
+
+    // ── 初始化 ────────────────────────────────────────────
+    renderList();
+})();
 </script>
 
 </body>
