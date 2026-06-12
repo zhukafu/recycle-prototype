@@ -1312,7 +1312,7 @@
     }
 
     function refreshToolbarState() {
-        $('#editorToolbar [data-cmd]').forEach(function(btn) {
+        document.querySelectorAll('#editorToolbar [data-cmd]').forEach(function(btn) {
             var cmd = btn.dataset.cmd;
             if (cmd && document.queryCommandState(cmd)) {
                 btn.classList.add('active');
