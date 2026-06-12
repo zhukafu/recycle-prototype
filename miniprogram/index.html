@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>铝老板金属网</title>
 <script src="/lib/tailwind/tailwind.js"></script>
+<script src="/data/quotes.js"></script>
 <link href="/lib/fonts/fonts-mp-main.css" rel="stylesheet"/>
 <script>
 tailwind.config = {
@@ -620,10 +621,12 @@ to { opacity: 1; transform: translateY(0); }
 
       // 应用展示金属：显示/隐藏对应的卡片
       if (config.displayMetals && Array.isArray(config.displayMetals)) {
+        var metalIdMap = { au: 'q-au', ag: 'q-ag', pt: 'q-pt', pd: 'q-pd', cu: 'q-cu', al: 'q-al' };
         const allMetals = grid.querySelectorAll('[data-metal]');
         allMetals.forEach(card => {
           const metalKey = card.dataset.metal;
-          const shouldShow = config.displayMetals.some(m => m.toLowerCase() === metalKey.toLowerCase());
+          const fullId = metalIdMap[metalKey] || metalKey;
+          const shouldShow = config.displayMetals.length === 0 || config.displayMetals.some(m => m.toLowerCase() === fullId.toLowerCase() || m.toLowerCase() === metalKey.toLowerCase());
           card.style.display = shouldShow ? '' : 'none';
           // 清除可能的 banner 样式
           if (!shouldShow) return;
@@ -668,134 +671,123 @@ to { opacity: 1; transform: translateY(0); }
 </script>
 
 <script>
-  // 行情刷新（手动 + 可配置自动）
+  // 行情刷新（手动 + 可配置自动）— 从 localStorage 加载真实数据
   (function () {
-    // 从 localStorage 读取行情配置
-    let refreshInterval = 10; // 默认 10 秒
-    try {
-      const saved = localStorage.getItem('_AL_QUOTES_CONFIG');
-      if (saved) {
-        const config = JSON.parse(saved);
-        if (config.refreshInterval !== undefined && config.refreshInterval > 0) {
-          refreshInterval = config.refreshInterval;
-        } else if (config.refreshInterval === 0) {
-          refreshInterval = 0; // 手动刷新
-        }
-      }
-    } catch (e) {}
+    var _api = window._AL_QUOTES;
 
-    const btn = document.querySelector('[data-refresh]');
-    const svg = btn?.querySelector('svg');
+    // 从配置读取刷新间隔（秒）
+    var refreshInterval = 900;
+    if (_api && _api.getRefreshInterval) {
+      refreshInterval = _api.getRefreshInterval();
+    }
+
+    var btn = document.querySelector('[data-refresh]');
+    var svg = btn?.querySelector('svg');
     if (svg) svg.style.transition = 'transform 0.6s ease';
 
-    // 所有金属卡片数据
-    const cards = document.querySelectorAll('[data-metal]');
-    const state = {};
-    cards.forEach(card => {
-      const key = card.dataset.metal;
-      const priceEl = card.querySelector('[data-price]');
-      const changeEl = card.querySelector('[data-change]');
-      const pctEl = card.querySelector('[data-pct]');
-      const pctTextEl = card.querySelector('[data-pct-text]');
-      const priceStr = priceEl?.textContent.trim() || '0';
-      state[key] = {
-        card, priceEl, changeEl, pctEl, pctTextEl,
-        price: parseFloat(priceStr),
-        decimals: (priceStr.split('.')[1] || '').length
+    // 金属卡片与 quotes.js 中 ID 的映射
+    var metalMap = {
+      au:  'q-au',
+      ag:  'q-ag',
+      pt:  'q-pt',
+      pd:  'q-pd',
+      cu:  'q-cu',
+      al:  'q-al'
+    };
+
+    // 收集页面上的卡片 DOM 引用
+    var cards = document.querySelectorAll('[data-metal]');
+    var cardRefs = {};
+    cards.forEach(function (card) {
+      var key = card.dataset.metal;
+      cardRefs[key] = {
+        card: card,
+        priceEl: card.querySelector('[data-price]'),
+        changeEl: card.querySelector('[data-change]'),
+        pctEl: card.querySelector('[data-pct]'),
+        pctTextEl: card.querySelector('[data-pct-text]')
       };
     });
 
-    // 计算涨跌 + 百分比
-    function calcChange(oldP, newP) {
-      const diff = newP - oldP;
-      const pct = oldP > 0 ? (diff / oldP) * 100 : 0;
-      const sign = diff >= 0 ? '+' : '';
-      return { diff, pct, sign, up: diff >= 0 };
-    }
+    // 从 localStorage 加载真实数据并更新卡片
+    function refreshFromStorage() {
+      if (!_api) return;
+      var allQuotes = _api.getAllQuotes();
+      if (!allQuotes || !allQuotes.length) return;
 
-    // 格式化价格（保留原始小数位）
-    function formatPrice(num, decimals) {
-      return num.toFixed(decimals);
-    }
+      Object.keys(metalMap).forEach(function (metalKey) {
+        var ref = cardRefs[metalKey];
+        if (!ref) return;
+        var quoteId = metalMap[metalKey];
+        var q = _api.getDetail(quoteId);
+        if (!q) return;
 
-    // 格式化涨跌额
-    function formatDiff(diff) {
-      const abs = Math.abs(diff);
-      // 根据绝对值决定小数位
-      if (abs >= 100) return diff.toFixed(0);
-      if (abs >= 10) return diff.toFixed(2);
-      if (abs >= 1) return diff.toFixed(2);
-      return diff.toFixed(3);
-    }
+        var priceStr = String(q.price).replace(/,/g, '');
+        var priceNum = parseFloat(priceStr);
 
-    // 更新单个卡片显示
-    function updateCard(s) {
-      const { priceEl, changeEl, pctEl, pctTextEl, decimals } = s;
-      const newPrice = s.price;
-      const chg = calcChange(s._oldPrice, newPrice);
-      // 切换涨跌颜色
-      pctEl.classList.toggle('text-emerald-600', chg.up);
-      pctEl.classList.toggle('text-rose-600', !chg.up);
-      // 切换箭头
-      const arrowSvg = pctEl.querySelector('svg path');
-      if (arrowSvg) {
-        arrowSvg.setAttribute('d', chg.up ? 'M7 14l5-5 5 5z' : 'M7 10l5 5 5-5z');
-      }
-      // 更新文本
-      if (priceEl) priceEl.textContent = formatPrice(newPrice, decimals);
-      if (pctTextEl) pctTextEl.textContent = `${chg.sign}${chg.pct.toFixed(2)}%`;
-      if (changeEl) changeEl.textContent = (chg.up ? '+' : '') + formatDiff(chg.diff);
-    }
+        // 更新价格
+        if (ref.priceEl) ref.priceEl.textContent = q.price;
 
-    // 刷新一次：随机扰动每个金属价格
-    function tick() {
-      Object.keys(state).forEach(key => {
-        const s = state[key];
-        s._oldPrice = s.price;
-        // 随机波动 ±0.3%
-        const delta = (Math.random() - 0.5) * 0.006 * s.price;
-        s.price = s.price + delta;
-        updateCard(s);
+        // 更新涨跌额
+        if (ref.changeEl) ref.changeEl.textContent = q.change;
+
+        // 更新百分比
+        if (ref.pctTextEl) ref.pctTextEl.textContent = q.pct;
+
+        // 更新涨跌颜色和箭头
+        if (ref.pctEl) {
+          ref.pctEl.classList.toggle('text-emerald-600', !!q.up);
+          ref.pctEl.classList.toggle('text-rose-600', !q.up);
+          var arrowSvg = ref.pctEl.querySelector('svg path');
+          if (arrowSvg) {
+            arrowSvg.setAttribute('d', q.up ? 'M7 14l5-5 5 5z' : 'M7 10l5 5 5-5z');
+          }
+        }
       });
+
       // 更新时间戳
-      const timeEl = document.querySelector('[data-quotes-time]');
+      var timeEl = document.querySelector('[data-quotes-time]');
       if (timeEl) {
-        const now = new Date();
-        const pad = n => n.toString().padStart(2, '0');
-        timeEl.textContent = `实时行情 · ${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        var data = _api.getData();
+        var ts = (data.meta && data.meta.updatedAt) || '';
+        if (ts) {
+          timeEl.textContent = '实时行情 · ' + ts.replace(/:\d{2}$/, '');
+        } else {
+          var now = new Date();
+          var pad = function (n) { return n.toString().padStart(2, '0'); };
+          timeEl.textContent = '实时行情 · ' + now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+        }
       }
     }
 
-    // 初始化：保存初始价格为 oldPrice
-    Object.values(state).forEach(s => { s._oldPrice = s.price; });
+    // 首次加载真实数据
+    refreshFromStorage();
 
     // 手动刷新按钮
-    btn?.addEventListener('click', () => {
-      if (svg) svg.style.transform = `rotate(${Date.now() % 360}deg)`;
-      setTimeout(() => { if (svg) svg.style.transform = ''; }, 800);
-      tick();
-      countdown = refreshInterval;
+    btn?.addEventListener('click', function () {
+      if (svg) svg.style.transform = 'rotate(' + (Date.now() % 360) + 'deg)';
+      setTimeout(function () { if (svg) svg.style.transform = ''; }, 800);
+      refreshFromStorage();
     });
 
-    // 自动刷新：根据配置的频率
-    let countdown = refreshInterval;
-    let timer = null;
-    if (refreshInterval > 0) {
-      timer = setInterval(() => {
-        countdown -= 1;
-        if (countdown <= 0) {
-          tick();
-          countdown = refreshInterval;
-        }
-      }, 1000);
+    // 自动刷新：根据后台配置的频率
+    var timer = null;
+    function startAutoRefresh() {
+      if (timer) clearInterval(timer);
+      if (refreshInterval <= 0) return; // 手动刷新模式
+      timer = setInterval(function () {
+        refreshFromStorage();
+      }, refreshInterval * 1000);
     }
+    startAutoRefresh();
 
-    // 页面隐藏时停止
-    document.addEventListener('visibilitychange', () => {
+    // 页面隐藏时停止，可见时恢复
+    document.addEventListener('visibilitychange', function () {
       if (document.hidden) {
-        if (timer) clearInterval(timer);
+        if (timer) { clearInterval(timer); timer = null; }
       } else {
-        tick();
+        refreshFromStorage();
+        startAutoRefresh();
       }
     });
   })();

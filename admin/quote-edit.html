@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>更新报价 - 铝老板管理后台</title>
+    <title>编辑报价 - 铝老板管理后台</title>
     <script src="/lib/tailwind/tailwind.js"></script>
     <link href="/lib/fonts/fonts-admin-main.css" rel="stylesheet">
+    <script src="/data/quotes.js"></script>
     <script>
         tailwind.config = {
             theme: { extend: {
@@ -49,21 +50,33 @@
                 <div class="space-y-3">
                     <div>
                         <label class="field-label">报价名称 *</label>
-                        <input class="input" value="白银回收价">
+                        <input class="input" id="fieldName" placeholder="如：黄金、紫铜、废铝">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="field-label">类别</label>
-                            <select class="input">
-                                <option>银触点</option><option>铜</option><option>铝</option><option>接触器</option>
-                            </select>
+                            <label class="field-label">金属代码</label>
+                            <input class="input" id="fieldCode" placeholder="如：Au、Cu">
                         </div>
                         <div>
-                            <label class="field-label">单位</label>
-                            <select class="input">
-                                <option>元/克</option><option>元/公斤</option><option>元/件</option>
+                            <label class="field-label">分类</label>
+                            <select class="input" id="fieldCategory">
+                                <option value="precious">贵金属</option>
+                                <option value="nonferrous">有色金属</option>
+                                <option value="rare">稀有金属</option>
+                                <option value="ferrous">黑色金属</option>
+                                <option value="scrap">废料</option>
                             </select>
                         </div>
+                    </div>
+                    <div>
+                        <label class="field-label">单位</label>
+                        <select class="input" id="fieldUnit">
+                            <option value="元/克">元/克</option>
+                            <option value="元/吨">元/吨</option>
+                            <option value="元/kg">元/kg</option>
+                            <option value="万元/吨">万元/吨</option>
+                            <option value="元/件">元/件</option>
+                        </select>
                     </div>
                 </div>
             </section>
@@ -74,27 +87,22 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="field-label">当前价</label>
-                        <input class="input font-mono" value="7.36">
+                        <input class="input font-mono" id="fieldPrice" placeholder="如：558.30">
                     </div>
                     <div>
                         <label class="field-label">涨跌额</label>
-                        <input class="input font-mono" value="+0.13">
+                        <input class="input font-mono" id="fieldChange" placeholder="如：+1.78">
                     </div>
                     <div>
-                        <label class="field-label">开盘价</label>
-                        <input class="input font-mono" value="7.23">
+                        <label class="field-label">涨跌幅</label>
+                        <input class="input font-mono" id="fieldPct" placeholder="如：+0.32%">
                     </div>
                     <div>
-                        <label class="field-label">最高价</label>
-                        <input class="input font-mono" value="7.42">
-                    </div>
-                    <div>
-                        <label class="field-label">最低价</label>
-                        <input class="input font-mono" value="7.20">
-                    </div>
-                    <div>
-                        <label class="field-label">昨收价</label>
-                        <input class="input font-mono" value="7.23">
+                        <label class="field-label">涨跌方向</label>
+                        <select class="input" id="fieldUp">
+                            <option value="true">上涨</option>
+                            <option value="false">下跌</option>
+                        </select>
                     </div>
                 </div>
             </section>
@@ -102,13 +110,17 @@
             <!-- 备注 -->
             <section class="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
                 <h3 class="text-[14px] font-bold text-metal-900 mb-3">备注</h3>
-                <textarea class="input" rows="3" placeholder="如行情来源、特殊说明"></textarea>
+                <textarea class="input" id="fieldNote" rows="3" placeholder="如行情来源、特殊说明"></textarea>
             </section>
 
             <!-- 操作 -->
             <div class="flex gap-3 pt-2">
-                <button class="flex-1 h-11 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold tap-active">取消</button>
-                <button class="flex-1 h-11 rounded-full bg-brand-500 text-white text-[14px] font-semibold tap-active shadow-[0_4px_12px_rgba(34,197,94,0.25)]">保存</button>
+                <button class="flex-1 h-11 rounded-full bg-metal-100 text-metal-700 text-[14px] font-semibold tap-active" id="btnCancel">取消</button>
+                <button class="flex-1 h-11 rounded-full bg-brand-500 text-white text-[14px] font-semibold tap-active shadow-[0_4px_12px_rgba(34,197,94,0.25)]" id="btnSave">保存</button>
+            </div>
+            <!-- 删除按钮（仅编辑模式显示） -->
+            <div class="pt-1" id="deleteSection" style="display:none">
+                <button class="w-full h-11 rounded-full bg-rose-50 text-rose-600 text-[14px] font-semibold tap-active" id="btnDelete">删除此报价</button>
             </div>
             <div class="h-4"></div>
         </div>
@@ -122,11 +134,127 @@
     import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
 
     mountAdminTopbar('#admin-topbar', {
-        title: '更新报价',
+        title: '编辑报价',
         back: true,
         onAvatar: () => location.href = '/admin/manage.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
+</script>
+
+<script>
+(function () {
+    var _api = window._AL_QUOTES;
+
+    // 解析 URL 参数
+    var params = new URLSearchParams(location.search);
+    var quoteId = params.get('id');
+    var isEdit = !!quoteId;
+    var quote = null;
+
+    // 颜色池（新增时随机取一个）
+    var COLORS = ['amber', 'orange', 'cyan', 'slate', 'fuchsia', 'indigo', 'green', 'rose', 'gray'];
+
+    // DOM 元素
+    var elName = document.getElementById('fieldName');
+    var elCode = document.getElementById('fieldCode');
+    var elCategory = document.getElementById('fieldCategory');
+    var elUnit = document.getElementById('fieldUnit');
+    var elPrice = document.getElementById('fieldPrice');
+    var elChange = document.getElementById('fieldChange');
+    var elPct = document.getElementById('fieldPct');
+    var elUp = document.getElementById('fieldUp');
+    var elNote = document.getElementById('fieldNote');
+    var elDeleteSection = document.getElementById('deleteSection');
+
+    // 加载数据填充表单
+    function loadForm() {
+        if (!isEdit || !_api) return;
+        quote = _api.getDetail(quoteId);
+        if (!quote) {
+            alert('未找到该报价数据');
+            return;
+        }
+        elName.value = quote.name || '';
+        elCode.value = quote.code || '';
+        elCategory.value = quote.category || 'precious';
+        elUnit.value = quote.unit || '元/克';
+        elPrice.value = quote.price || '';
+        elChange.value = quote.change || '';
+        elPct.value = quote.pct || '';
+        elUp.value = quote.up ? 'true' : 'false';
+        elNote.value = quote.note || '';
+        // 编辑模式显示删除按钮
+        if (elDeleteSection) elDeleteSection.style.display = '';
+    }
+
+    // 保存
+    function handleSave() {
+        if (!_api) { alert('数据模块未加载'); return; }
+        var name = elName.value.trim();
+        if (!name) { alert('请填写报价名称'); elName.focus(); return; }
+
+        // 确认弹框
+        var msg = isEdit ? '确定保存对「' + name + '」的修改？' : '确定新增报价「' + name + '」？';
+        if (!confirm(msg)) return;
+
+        var updates = {
+            name: name,
+            code: elCode.value.trim(),
+            category: elCategory.value,
+            unit: elUnit.value,
+            price: elPrice.value.trim(),
+            change: elChange.value.trim(),
+            pct: elPct.value.trim(),
+            up: elUp.value === 'true',
+            note: elNote.value.trim()
+        };
+
+        var ok;
+        if (isEdit) {
+            ok = _api.updateQuote(quoteId, updates);
+        } else {
+            updates.id = 'q-' + Date.now();
+            updates.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+            ok = _api.addQuote(updates);
+        }
+
+        if (ok) {
+            alert(isEdit ? '报价已更新' : '报价已添加');
+            location.href = 'quote-list.html';
+        } else {
+            alert('保存失败，请重试');
+        }
+    }
+
+    // 删除
+    function handleDelete() {
+        if (!isEdit || !_api) return;
+        if (!confirm('确定删除此报价？删除后不可恢复。')) return;
+        var ok = _api.deleteQuote(quoteId);
+        if (ok) {
+            alert('已删除');
+            location.href = 'quote-list.html';
+        } else {
+            alert('删除失败');
+        }
+    }
+
+    // 取消
+    function handleCancel() {
+        history.back();
+    }
+
+    // 绑定事件
+    var btnSave = document.getElementById('btnSave');
+    var btnCancel = document.getElementById('btnCancel');
+    var btnDelete = document.getElementById('btnDelete');
+    if (btnSave) btnSave.addEventListener('click', handleSave);
+    if (btnCancel) btnCancel.addEventListener('click', handleCancel);
+    if (btnDelete) btnDelete.addEventListener('click', handleDelete);
+
+    // 初始化
+    loadForm();
+})();
 </script>
 
 </body>

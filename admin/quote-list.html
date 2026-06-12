@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>报价管理 - 铝老板管理后台</title>
+    <title>金属行情 - 铝老板管理后台</title>
     <script src="/lib/tailwind/tailwind.js"></script>
     <link href="/lib/fonts/fonts-admin-main.css" rel="stylesheet">
+    <script src="/data/quotes.js"></script>
     <script>
         tailwind.config = {
             theme: { extend: {
@@ -41,15 +42,15 @@
     <header class="admin-sticky-header">
         <div id="admin-topbar"></div>
         <div class="bg-white border-b border-metal-100">
-            <div class="tab-scroll flex overflow-x-auto scrollbar-hide px-4 lg:px-0">
-                <button class="tab-item px-4 py-2.5 text-[13px] font-semibold text-brand-600 relative whitespace-nowrap">
+            <div class="tab-scroll flex overflow-x-auto scrollbar-hide px-4 lg:px-0" id="categoryTabs">
+                <button class="tab-item px-4 py-2.5 text-[13px] font-semibold text-brand-600 relative whitespace-nowrap" data-cat="all">
                     全部<div class="absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full"></div>
                 </button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">贵金属</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">有色金属</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">稀有金属</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">黑色金属</button>
-                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">废料</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap" data-cat="precious">贵金属</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap" data-cat="nonferrous">有色金属</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap" data-cat="rare">稀有金属</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap" data-cat="ferrous">黑色金属</button>
+                <button class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap" data-cat="scrap">废料</button>
             </div>
         </div>
     </header>
@@ -61,85 +62,20 @@
             <div class="mt-4 bg-gradient-to-br from-amber-400 to-amber-500 rounded-[16px] p-4 text-white shadow-[0_4px_16px_rgba(245,158,11,0.25)]">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-[11px] opacity-85">今日白银均价</p>
-                        <p class="text-[26px] font-black font-mono leading-tight mt-1">¥7.36<span class="text-[14px]">/g</span></p>
+                        <p class="text-[11px] opacity-85">报价品种</p>
+                        <p class="text-[26px] font-black font-mono leading-tight mt-1"><span id="summaryTotal">--</span><span class="text-[14px]">种</span></p>
                     </div>
                     <div class="text-right">
                         <div class="flex items-center gap-1 text-[11px]">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-                            <span>+1.8%</span>
+                            <span>上涨 <span id="summaryUp" class="font-bold">--</span> · 下跌 <span id="summaryDown" class="font-bold">--</span></span>
                         </div>
-                        <p class="text-[10px] opacity-80 mt-0.5">较昨日</p>
+                        <p class="text-[10px] opacity-80 mt-0.5">更新: <span id="summaryTime">--</span></p>
                     </div>
                 </div>
             </div>
 
             <!-- 报价列表 -->
-            <div class="mt-3 space-y-2">
-                <a href="quote-edit.html" class="block bg-white rounded-[14px] p-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[14px] font-semibold text-metal-900 truncate">白银回收价</h3>
-                                <span class="px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] rounded">银触点</span>
-                            </div>
-                            <p class="text-[11px] text-metal-500 mt-1">10分钟前更新 · 张老板</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[16px] font-bold text-amber-600 font-mono">¥7.36/g</p>
-                            <p class="text-[10px] text-brand-600 font-medium mt-0.5">↑ 0.13</p>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="quote-edit.html" class="block bg-white rounded-[14px] p-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[14px] font-semibold text-metal-900 truncate">紫铜回收价</h3>
-                                <span class="px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] rounded">铜</span>
-                            </div>
-                            <p class="text-[11px] text-metal-500 mt-1">30分钟前更新 · 张老板</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[16px] font-bold text-amber-600 font-mono">¥73.5/kg</p>
-                            <p class="text-[10px] text-rose-600 font-medium mt-0.5">↓ 0.5</p>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="quote-edit.html" class="block bg-white rounded-[14px] p-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[14px] font-semibold text-metal-900 truncate">铝合金回收价</h3>
-                                <span class="px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] rounded">铝</span>
-                            </div>
-                            <p class="text-[11px] text-metal-500 mt-1">1小时前更新 · 李老板</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[16px] font-bold text-amber-600 font-mono">¥19.8/kg</p>
-                            <p class="text-[10px] text-metal-400 font-medium mt-0.5">— 持平</p>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="quote-edit.html" class="block bg-white rounded-[14px] p-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-[14px] font-semibold text-metal-900 truncate">CJX2-8011 整件回收</h3>
-                                <span class="px-1.5 py-0.5 bg-brand-50 text-brand-700 text-[10px] rounded">接触器</span>
-                            </div>
-                            <p class="text-[11px] text-metal-500 mt-1">2小时前更新 · 张老板</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[16px] font-bold text-amber-600 font-mono">¥160.00</p>
-                            <p class="text-[10px] text-metal-400 font-medium mt-0.5">— 持平</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
+            <div class="mt-3 space-y-2" id="quoteListContainer"></div>
 
             <a href="quote-edit.html" class="fixed bottom-[88px] right-4 lg:bottom-24 lg:right-8 w-14 h-14 rounded-full bg-brand-500 text-white shadow-[0_8px_24px_rgba(34,197,94,0.4)] flex items-center justify-center tap-active no-underline z-30">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -155,11 +91,121 @@
     import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
 
     mountAdminTopbar('#admin-topbar', {
-        title: '报价管理',
+        title: '金属行情',
         back: true,
         onAvatar: () => location.href = '/admin/manage.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
+</script>
+
+<script>
+(function () {
+    var _api = window._AL_QUOTES;
+    var currentCat = 'all';
+
+    var CAT_LABELS = {
+        precious: '贵金属',
+        nonferrous: '有色金属',
+        rare: '稀有金属',
+        ferrous: '黑色金属',
+        scrap: '废料'
+    };
+
+    function getAllItems() {
+        if (!_api) return [];
+        return _api.getAllQuotes();
+    }
+
+    function getItemsByCategory(cat) {
+        if (!_api) return [];
+        if (cat === 'all') return _api.getAllQuotes();
+        return _api.getQuotes(cat);
+    }
+
+    function refreshSummary() {
+        if (!_api) return;
+        var summary = _api.getSummary();
+        var totalEl = document.getElementById('summaryTotal');
+        var upEl = document.getElementById('summaryUp');
+        var downEl = document.getElementById('summaryDown');
+        var timeEl = document.getElementById('summaryTime');
+        if (totalEl) totalEl.textContent = summary.total;
+        if (upEl) upEl.textContent = summary.upCount;
+        if (downEl) downEl.textContent = summary.total - summary.upCount;
+        if (timeEl) timeEl.textContent = summary.updatedAt;
+    }
+
+    function renderList(cat) {
+        var container = document.getElementById('quoteListContainer');
+        if (!container) return;
+        var items = getItemsByCategory(cat);
+        if (items.length === 0) {
+            container.innerHTML = '<div class="text-center py-12 text-metal-400 text-sm">暂无报价数据</div>';
+            return;
+        }
+        container.innerHTML = items.map(function (it) {
+            var catLabel = CAT_LABELS[it.category] || '';
+            var catBadgeClass = it.category === 'scrap'
+                ? 'bg-brand-50 text-brand-700'
+                : 'bg-amber-50 text-amber-700';
+            var trendHtml;
+            if (it.up) {
+                trendHtml = '<p class="text-[10px] text-brand-600 font-medium mt-0.5">↑ ' + it.change + '</p>';
+            } else if (it.change && it.change !== '0' && it.change !== '0.00' && it.change !== '+0' && it.change !== '+0.00') {
+                trendHtml = '<p class="text-[10px] text-rose-600 font-medium mt-0.5">↓ ' + it.change + '</p>';
+            } else {
+                trendHtml = '<p class="text-[10px] text-metal-400 font-medium mt-0.5">— 持平</p>';
+            }
+            var note = it.note || '';
+            return '<a href="quote-edit.html?id=' + encodeURIComponent(it.id) + '" class="block bg-white rounded-[14px] p-3 tap-active no-underline shadow-[0_2px_8px_rgba(0,0,0,0.03)]">' +
+                '<div class="flex items-center justify-between">' +
+                    '<div class="flex-1 min-w-0">' +
+                        '<div class="flex items-center gap-2">' +
+                            '<h3 class="text-[14px] font-semibold text-metal-900 truncate">' + it.name + '</h3>' +
+                            '<span class="px-1.5 py-0.5 ' + catBadgeClass + ' text-[10px] rounded">' + catLabel + '</span>' +
+                        '</div>' +
+                        '<p class="text-[11px] text-metal-500 mt-1">' + it.code + ' · ' + note + '</p>' +
+                    '</div>' +
+                    '<div class="text-right">' +
+                        '<p class="text-[16px] font-bold text-amber-600 font-mono">¥' + it.price + '</p>' +
+                        trendHtml +
+                    '</div>' +
+                '</div>' +
+            '</a>';
+        }).join('');
+    }
+
+    // Tab 切换
+    var tabContainer = document.getElementById('categoryTabs');
+    if (tabContainer) {
+        var tabs = tabContainer.querySelectorAll('[data-cat]');
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                currentCat = tab.dataset.cat;
+                // 更新 Tab 样式
+                tabs.forEach(function (t) {
+                    var isActive = t.dataset.cat === currentCat;
+                    t.className = 'tab-item px-4 py-2.5 text-[13px] relative whitespace-nowrap '
+                        + (isActive ? 'font-semibold text-brand-600' : 'text-metal-500');
+                    // 更新底部指示条
+                    var indicator = t.querySelector('.absolute');
+                    if (isActive && !indicator) {
+                        var div = document.createElement('div');
+                        div.className = 'absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full';
+                        t.appendChild(div);
+                    } else if (!isActive && indicator) {
+                        indicator.remove();
+                    }
+                });
+                renderList(currentCat);
+            });
+        });
+    }
+
+    // 初始化
+    refreshSummary();
+    renderList('all');
+})();
 </script>
 
 </body>

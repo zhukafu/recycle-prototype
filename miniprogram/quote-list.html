@@ -6,6 +6,7 @@
 <title>金属行情 - 铝老板金属网</title>
 <script src="/lib/tailwind/tailwind.js"></script>
 <link href="/lib/fonts/fonts-mp-main.css" rel="stylesheet"/>
+<script src="/data/quotes.js"></script>
 <script>
 tailwind.config = {
 theme: {
@@ -106,11 +107,11 @@ to { opacity: 1; transform: translateY(0); }
       <div class="flex items-end justify-between">
         <div>
           <p class="text-[11px] text-white/75">更新时间</p>
-          <p class="text-sm font-bold font-mono" id="updateTime">2026-06-09 14:32:00</p>
+          <p class="text-sm font-bold font-mono" id="updateTime">--</p>
         </div>
         <div class="text-right">
           <p class="text-[11px] text-white/75">上涨品种</p>
-          <p class="text-lg font-black"><span class="text-white">8</span><span class="text-xs text-white/70 ml-1">/ 12</span></p>
+          <p class="text-lg font-black"><span class="text-white" id="upCount">--</span><span class="text-xs text-white/70 ml-1">/ <span id="totalCount">--</span></span></p>
         </div>
       </div>
     </div>
@@ -141,47 +142,27 @@ to { opacity: 1; transform: translateY(0); }
 </script>
 
 <script>
-  // 行情数据（演示用）
-  const QUOTE_DATA = {
-    precious: [
-      { name: '黄金', code: 'Au', unit: '元/克', price: '558.30', change: '+1.78', pct: '+0.32%', up: true, color: 'amber', note: '国际金价震荡' },
-      { name: '白银', code: 'Ag', unit: '元/克', price: '7.36', change: '+0.13', pct: '+1.80%', up: true, color: 'slate', note: '工业需求强劲' },
-      { name: '铂金', code: 'Pt', unit: '元/克', price: '226.80', change: '-1.02', pct: '-0.45%', up: false, color: 'cyan', note: '汽车催化需求疲软' },
-      { name: '钯金', code: 'Pd', unit: '元/克', price: '248.50', change: '+2.12', pct: '+0.86%', up: true, color: 'fuchsia', note: '供应紧张' },
-      { name: '铑金', code: 'Rh', unit: '元/克', price: '986.00', change: '-15.50', pct: '-1.55%', up: false, color: 'rose', note: '高位回调' },
-      { name: '钌', code: 'Ru', unit: '元/克', price: '88.20', change: '+0.65', pct: '+0.74%', up: true, color: 'indigo', note: '电子工业需求' }
-    ],
-    nonferrous: [
-      { name: '紫铜', code: 'Cu', unit: '元/吨', price: '73,200', change: '+450', pct: '+0.62%', up: true, color: 'orange', note: '宏观利好' },
-      { name: '黄铜', code: 'CuZn', unit: '元/吨', price: '52,800', change: '+220', pct: '+0.42%', up: true, color: 'amber', note: '跟随铜价' },
-      { name: '铝', code: 'Al', unit: '元/吨', price: '20,650', change: '-85', pct: '-0.41%', up: false, color: 'slate', note: '库存累积' },
-      { name: '锌', code: 'Zn', unit: '元/吨', price: '23,180', change: '+95', pct: '+0.41%', up: true, color: 'cyan', note: '冶炼端限产' },
-      { name: '铅', code: 'Pb', unit: '元/吨', price: '16,950', change: '-30', pct: '-0.18%', up: false, color: 'gray', note: '需求平淡' },
-      { name: '锡', code: 'Sn', unit: '元/吨', price: '265,800', change: '+1,200', pct: '+0.45%', up: true, color: 'fuchsia', note: '电子焊料需求' }
-    ],
-    rare: [
-      { name: '钨', code: 'W', unit: '元/吨', price: '132,500', change: '+800', pct: '+0.61%', up: true, color: 'amber', note: '硬质合金需求' },
-      { name: '钼', code: 'Mo', unit: '元/吨', price: '358,000', change: '-1,500', pct: '-0.42%', up: false, color: 'orange', note: '钢厂招标价走低' },
-      { name: '锂', code: 'Li', unit: '万元/吨', price: '89.50', change: '-0.85', pct: '-0.94%', up: false, color: 'green', note: '新能源需求放缓' },
-      { name: '钴', code: 'Co', unit: '元/吨', price: '186,000', change: '+1,200', pct: '+0.65%', up: true, color: 'cyan', note: '动力电池回暖' },
-      { name: '铟', code: 'In', unit: '元/kg', price: '2,580', change: '+45', pct: '+1.78%', up: true, color: 'indigo', note: 'ITO靶材需求' },
-      { name: '锗', code: 'Ge', unit: '元/kg', price: '13,200', change: '-120', pct: '-0.90%', up: false, color: 'rose', note: '出口管制影响' }
-    ],
-    ferrous: [
-      { name: '螺纹钢', code: 'RB', unit: '元/吨', price: '3,580', change: '+12', pct: '+0.34%', up: true, color: 'slate', note: '需求季节性回暖' },
-      { name: '热卷', code: 'HC', unit: '元/吨', price: '3,720', change: '-8', pct: '-0.21%', up: false, color: 'gray', note: '库存压力' },
-      { name: '铁矿石', code: 'I', unit: '元/吨', price: '825', change: '+5', pct: '+0.61%', up: true, color: 'amber', note: '澳洲发货减少' },
-      { name: '废钢', code: 'FS', unit: '元/吨', price: '2,580', change: '+18', pct: '+0.70%', up: true, color: 'orange', note: '电炉钢厂复产' }
-    ],
-    scrap: [
-      { name: '废铜', code: 'Cu-S', unit: '元/吨', price: '68,500', change: '+300', pct: '+0.44%', up: true, color: 'orange', note: '光亮铜线参考价' },
-      { name: '废铝', code: 'Al-S', unit: '元/吨', price: '16,200', change: '-50', pct: '-0.31%', up: false, color: 'slate', note: '生铝易拉罐参考' },
-      { name: '废不锈钢', code: 'SS-S', unit: '元/吨', price: '11,800', change: '+80', pct: '+0.68%', up: true, color: 'cyan', note: '304边角料参考' },
-      { name: '含银废料', code: 'Ag-S', unit: '元/kg', price: '6.85', change: '+0.11', pct: '+1.63%', up: true, color: 'slate', note: '接触器触点参考' }
-    ]
-  };
+  // 行情数据：从 quotes.js 加载（window._AL_QUOTES）
+  var _quotesAPI = window._AL_QUOTES;
 
-  const CAT_LABEL = {
+  function getQuoteData() {
+    if (!_quotesAPI) return {};
+    var data = _quotesAPI.getData();
+    return (data && data.quotes) || {};
+  }
+
+  function refreshSummary() {
+    if (!_quotesAPI) return;
+    var summary = _quotesAPI.getSummary();
+    var upEl = document.getElementById('upCount');
+    var totalEl = document.getElementById('totalCount');
+    var timeEl = document.getElementById('updateTime');
+    if (upEl) upEl.textContent = summary.upCount;
+    if (totalEl) totalEl.textContent = summary.total;
+    if (timeEl) timeEl.textContent = summary.updatedAt;
+  }
+
+  var CAT_LABEL = {
     precious: '贵金属',
     nonferrous: '有色金属',
     rare: '稀有金属',
@@ -190,8 +171,9 @@ to { opacity: 1; transform: translateY(0); }
   };
 
   function renderList(cat) {
-    const list = document.getElementById('quoteList');
-    const items = QUOTE_DATA[cat] || [];
+    var list = document.getElementById('quoteList');
+    var QUOTE_DATA = getQuoteData();
+    var items = QUOTE_DATA[cat] || [];
     if (items.length === 0) {
       list.innerHTML = '<div class="text-center py-12 text-gray-400 text-sm">暂无数据</div>';
       return;
@@ -257,110 +239,65 @@ to { opacity: 1; transform: translateY(0); }
     triggers.forEach(t => t.addEventListener('click', () => activate(t.dataset.catTrigger)));
   })();
 
-  // 初始化：渲染贵金属
+  // 初始化：渲染贵金属 + 汇总
+  refreshSummary();
   renderList('precious');
 
-  // 刷新按钮 + 10 秒自动刷新
+  // 刷新按钮 + 基于后台配置的自动刷新
   (function () {
-    const btn = document.querySelector('[data-refresh]');
-    const list = document.getElementById('quoteList');
-    const svg = btn?.querySelector('svg');
+    var btn = document.querySelector('[data-refresh]');
+    var list = document.getElementById('quoteList');
+    var svg = btn ? btn.querySelector('svg') : null;
     if (svg) svg.style.transition = 'transform 0.6s ease';
+    var timer = null;
 
-    // 解析价格：返回数值 + 原始字符串（保留格式）
-    function parsePrice(str) {
-      const num = parseFloat(str.replace(/,/g, ''));
-      const decimals = (str.split('.')[1] || '').length;
-      const hasComma = str.includes(',');
-      return { num, decimals, hasComma };
-    }
-    // 格式化价格：按原始格式回写
-    function formatPrice(num, fmt) {
-      const fixed = num.toFixed(fmt.decimals);
-      if (fmt.hasComma) {
-        const [int, dec] = fixed.split('.');
-        return int.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (dec !== undefined ? '.' + dec : '');
-      }
-      return fixed;
-    }
-    // 计算涨跌 + 百分比
-    function calcChange(oldP, newP) {
-      const diff = newP - oldP;
-      const pct = (diff / oldP) * 100;
-      const sign = diff >= 0 ? '+' : '';
-      return {
-        diff: diff.toFixed(2),
-        pct: `${sign}${pct.toFixed(2)}%`,
-        up: diff >= 0
-      };
-    }
-
-    // 刷新一次：随机扰动每个品种价格
-    function tick() {
-      Object.keys(QUOTE_DATA).forEach(cat => {
-        QUOTE_DATA[cat].forEach(it => {
-          const fmt = parsePrice(it.price);
-          // 随机波动 ±0.3%
-          const delta = (Math.random() - 0.5) * 0.006 * fmt.num;
-          const newNum = fmt.num + delta;
-          it.price = formatPrice(newNum, fmt);
-          // 更新涨跌
-          const oldPrice = fmt.num;
-          const chg = calcChange(oldPrice, newNum);
-          it.change = chg.diff;
-          it.pct = chg.pct;
-          it.up = chg.up;
-        });
-      });
-      // 当前激活的分类重新渲染
-      const activeTrigger = document.querySelector('[data-cat-trigger].text-green-brand') ||
-                            document.querySelector('.border-b-2.border-green-brand');
-      const currentCat = activeTrigger?.dataset.catTrigger || 'precious';
+    // 从 localStorage 重新加载真实数据并刷新页面
+    function refreshFromStorage() {
+      var activeTrigger = document.querySelector('[data-cat-trigger].text-green-brand') ||
+                          document.querySelector('.border-b-2.border-green-brand');
+      var currentCat = (activeTrigger && activeTrigger.dataset.catTrigger) || 'precious';
       renderList(currentCat);
-      // 更新时间戳
-      updateTimeEl();
+      refreshSummary();
     }
 
-    function updateTimeEl() {
-      const el = document.getElementById('updateTime');
-      if (!el) return;
-      const now = new Date();
-      const pad = n => n.toString().padStart(2, '0');
-      el.textContent = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-    }
-
-    // 手动刷新
-    btn?.addEventListener('click', () => {
-      if (list) list.classList.add('shimmer-effect');
-      if (svg) svg.style.transform = `rotate(${Date.now() % 360}deg)`;
-      setTimeout(() => {
-        if (list) list.classList.remove('shimmer-effect');
-        if (svg) svg.style.transform = '';
-        tick();
-      }, 800);
-      // 重置倒计时
-      countdown = 10;
-    });
-
-    // 自动刷新：10 秒一次
-    let countdown = 10;
-    const timer = setInterval(() => {
-      countdown -= 1;
-      if (countdown <= 0) {
-        tick();
-        countdown = 10;
+    // 启动/重启自动刷新定时器
+    function startAutoRefresh() {
+      if (timer) clearInterval(timer);
+      var intervalSec = 900; // 默认 15 分钟
+      if (_quotesAPI && _quotesAPI.getRefreshInterval) {
+        intervalSec = _quotesAPI.getRefreshInterval();
       }
-    }, 1000);
+      if (intervalSec <= 0) return; // 0 表示手动刷新，不启动定时器
+      timer = setInterval(function () {
+        refreshFromStorage();
+      }, intervalSec * 1000);
+    }
 
-    // 页面隐藏时停止定时器
-    document.addEventListener('visibilitychange', () => {
+    // 手动刷新按钮
+    if (btn) {
+      btn.addEventListener('click', function () {
+        if (list) list.classList.add('shimmer-effect');
+        if (svg) svg.style.transform = 'rotate(' + (Date.now() % 360) + 'deg)';
+        setTimeout(function () {
+          if (list) list.classList.remove('shimmer-effect');
+          if (svg) svg.style.transform = '';
+          refreshFromStorage();
+        }, 600);
+      });
+    }
+
+    // 页面可见性变化：隐藏时停止，恢复时重启并立即刷新
+    document.addEventListener('visibilitychange', function () {
       if (document.hidden) {
-        clearInterval(timer);
+        if (timer) { clearInterval(timer); timer = null; }
       } else {
-        // 恢复后立即刷新一次
-        tick();
+        refreshFromStorage();
+        startAutoRefresh();
       }
     });
+
+    // 启动
+    startAutoRefresh();
   })();
 </script>
 
