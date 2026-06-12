@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>回收管理 - 铝老板管理后台</title>
+    <script src="/lib/tailwind/tailwind.js"></script>
+    <link href="/lib/fonts/fonts-admin-main.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: {
+                    brand: { 50:'#f0fdf4',100:'#dcfce7',500:'#22c55e',600:'#16a34a',700:'#15803d' },
+                    metal: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a' }
+                },
+                fontFamily: { sans: ['Noto Sans SC','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] }
+            } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans SC', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .tap-active:active { transform: scale(0.97); }
+        .admin-app { min-height: 100vh; background: #f5f5f5; }
+        .admin-sticky-header { position: sticky; top: 0; z-index: 40; background: #ffffff; }
+        .admin-content { padding-bottom: 80px; }
+        .content-inner { max-width: 1200px; margin: 0 auto; }
+        .tab-scroll { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .tab-item { scroll-snap-align: start; flex-shrink: 0; }
+        .search-input { width: 100%; height: 38px; padding: 0 12px 0 36px; background: #f1f5f9; border-radius: 9999px; font-size: 13px; color: #0f172a; outline: none; border: 0; }
+        .search-input:focus { background: #ffffff; box-shadow: 0 0 0 2px #22c55e; }
+        @media (min-width: 1024px) {
+            .admin-content { min-height: calc(100vh - 44px); padding-bottom: 72px; }
+            .content-inner { padding: 0 24px; }
+            .tab-scroll { justify-content: flex-start; }
+        }
+        .sheet-overlay { animation: fadeIn .2s ease; }
+        .sheet-panel  { animation: slideUp .25s ease; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="admin-app">
+    <header class="admin-sticky-header">
+        <div id="admin-topbar"></div>
+        <div class="bg-white border-b border-metal-100">
+            <div class="tab-scroll flex overflow-x-auto scrollbar-hide px-4 lg:px-0" id="tab-bar">
+                <button data-tab="all" class="tab-item px-4 py-2.5 text-[13px] font-semibold text-brand-600 relative whitespace-nowrap">
+                    全部<div class="tab-indicator absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full"></div>
+                </button>
+                <button data-tab="pending" class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">待审核</button>
+                <button data-tab="approved" class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">已通过</button>
+                <button data-tab="rejected" class="tab-item px-4 py-2.5 text-[13px] text-metal-500 relative whitespace-nowrap">已拒绝</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-content">
+        <div class="content-inner px-4 lg:px-0">
+
+            <!-- 汇总条 -->
+            <div class="mt-4 bg-gradient-to-br from-teal-500 to-teal-600 rounded-[16px] p-4 text-white shadow-[0_4px_16px_rgba(20,184,166,0.25)]">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] opacity-85">提交记录</p>
+                        <p class="text-[26px] font-black font-mono leading-tight mt-1"><span id="totalCount">0</span><span class="text-[14px]">条</span></p>
+                    </div>
+                    <div class="text-right">
+                        <div class="flex items-center gap-2 text-[11px]">
+                            <span>待审 <span id="pendingCount" class="font-bold">0</span></span>
+                            <span>·</span>
+                            <span>已过 <span id="approvedCount" class="font-bold">0</span></span>
+                            <span>·</span>
+                            <span>已拒 <span id="rejectedCount" class="font-bold">0</span></span>
+                        </div>
+                        <p class="text-[10px] opacity-80 mt-0.5">数据来自小程序表单提交</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 搜索 -->
+            <div class="mt-3 relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-metal-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input class="search-input" id="search-input" placeholder="搜索姓名 / 手机号">
+            </div>
+
+            <!-- 列表 -->
+            <div class="mt-3 space-y-2" id="recycle-list"></div>
+        </div>
+    </main>
+
+    <div id="admin-bottom-nav"></div>
+</div>
+
+<!-- 操作菜单（底部弹出） -->
+<div id="action-sheet" class="fixed inset-0 z-[60] hidden">
+    <div class="sheet-overlay absolute inset-0 bg-black/40" id="action-overlay"></div>
+    <div class="sheet-panel absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-2 pb-6">
+        <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
+        <div class="px-4 py-3 border-b border-metal-100 mb-1">
+            <p class="text-[12px] text-metal-400">操作</p>
+            <p class="text-[15px] font-semibold text-metal-900" id="action-record-name">记录</p>
+        </div>
+        <button id="btn-detail" class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            查看详情
+        </button>
+        <button id="btn-approve" class="w-full text-left px-4 py-3.5 text-[14px] text-brand-600 active:bg-brand-50 rounded-xl flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            审核通过
+        </button>
+        <button id="btn-reject" class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 active:bg-rose-50 rounded-xl flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            审核拒绝
+        </button>
+        <button id="btn-delete" class="w-full text-left px-4 py-3.5 text-[14px] text-rose-600 active:bg-rose-50 rounded-xl flex items-center gap-3 mt-1">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            删除记录
+        </button>
+        <button id="btn-action-cancel" class="w-full text-left px-4 py-3.5 text-[14px] text-metal-500 active:bg-metal-50 rounded-xl mt-2 text-center">取消</button>
+    </div>
+</div>
+
+<!-- 详情弹窗（底部弹出） -->
+<div id="detail-sheet" class="fixed inset-0 z-[70] hidden">
+    <div class="sheet-overlay absolute inset-0 bg-black/40" id="detail-overlay"></div>
+    <div class="sheet-panel absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-4 pb-8 max-h-[85vh] overflow-y-auto">
+        <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-1 mb-4"></div>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-[16px] font-bold text-metal-900">提交详情</h3>
+            <span id="detail-status-badge" class="px-2 py-0.5 text-[11px] rounded-full font-semibold"></span>
+        </div>
+        <div id="detail-body" class="space-y-4"></div>
+        <button id="btn-detail-close" class="w-full mt-6 h-11 rounded-xl bg-metal-100 text-metal-600 text-[14px] font-medium tap-active">关闭</button>
+    </div>
+</div>
+
+<script type="module">
+    import { mountAdminTopbar } from '/src/components/admin-topbar.js';
+    import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
+
+    mountAdminTopbar('#admin-topbar', {
+        title: '回收管理',
+        back: true,
+        onAvatar: () => location.href = '/admin/manage.html',
+    });
+    mountAdminBottomNav('#admin-bottom-nav', { active: 'business' });
+</script>
+
+<script>
+(function () {
+    const STORAGE_KEY = 'recycle_submissions';
+    let currentTab  = 'all';
+    let currentId   = null;
+
+    // ── 工具函数 ──────────────────────────────────────────
+    function getList() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+        catch { return []; }
+    }
+    function saveList(list) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+    function fmtTime(iso) {
+        if (!iso) return '-';
+        const d = new Date(iso);
+        const pad = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+    function statusLabel(s) {
+        return { pending: '待审核', approved: '已通过', rejected: '已拒绝' }[s] || s;
+    }
+    function statusBadgeClass(s) {
+        return {
+            pending:  'bg-amber-50 text-amber-600',
+            approved: 'bg-brand-50 text-brand-600',
+            rejected: 'bg-rose-50 text-rose-500',
+        }[s] || 'bg-metal-100 text-metal-500';
+    }
+
+    // ── 汇总 ─────────────────────────────────────────────
+    function refreshSummary() {
+        const list = getList();
+        const total = list.length;
+        const pending  = list.filter(r => r.status === 'pending').length;
+        const approved = list.filter(r => r.status === 'approved').length;
+        const rejected = list.filter(r => r.status === 'rejected').length;
+        document.getElementById('totalCount').textContent    = total;
+        document.getElementById('pendingCount').textContent  = pending;
+        document.getElementById('approvedCount').textContent = approved;
+        document.getElementById('rejectedCount').textContent = rejected;
+    }
+
+    // ── 渲染列表 ─────────────────────────────────────────
+    function renderList() {
+        const container = document.getElementById('recycle-list');
+        const query     = (document.getElementById('search-input').value || '').trim().toLowerCase();
+        let   list      = getList();
+
+        // Tab 过滤
+        if (currentTab !== 'all') {
+            list = list.filter(r => r.status === currentTab);
+        }
+        // 搜索过滤
+        if (query) {
+            list = list.filter(r =>
+                (r.name  || '').toLowerCase().includes(query) ||
+                (r.phone || '').toLowerCase().includes(query)
+            );
+        }
+
+        if (!list.length) {
+            container.innerHTML = '<div class="text-center py-16 text-metal-400 text-sm">暂无提交记录</div>';
+            return;
+        }
+
+        container.innerHTML = list.map(record => {
+            const badgeCls   = statusBadgeClass(record.status);
+            const label      = statusLabel(record.status);
+            const typeTag    = record.contactType
+                ? `<span class="px-1.5 py-0.5 bg-teal-50 text-teal-600 text-[10px] rounded font-medium">${record.contactType}</span>`
+                : '';
+            const imgCount   = (record.images || []).length;
+            const imgTag     = imgCount > 0
+                ? `<span class="px-1.5 py-0.5 bg-blue-50 text-blue-500 text-[10px] rounded font-medium">${imgCount}张图</span>`
+                : '';
+            const weightParts = [];
+            if (record.totalWeight)       weightParts.push(`总重 ${record.totalWeight}kg`);
+            if (record.silverCopperWeight) weightParts.push(`银点铜 ${record.silverCopperWeight}kg`);
+            if (record.copperPlateWeight)  weightParts.push(`铜板线图 ${record.copperPlateWeight}kg`);
+            if (record.copperCoilWeight)   weightParts.push(`铜板线圈 ${record.copperCoilWeight}kg`);
+            if (record.spotWeight)         weightParts.push(`点块烤点 ${record.spotWeight}kg`);
+            if (record.fifthWeight)        weightParts.push(`第五项 ${record.fifthWeight}kg`);
+            const weightStr  = weightParts.length ? weightParts.join(' · ') : '无重量数据';
+
+            // 缩略图（最多显示3张）
+            const imgs = (record.images || []).slice(0, 3);
+            const thumbHtml = imgs.length > 0
+                ? '<div class="flex gap-1.5 mt-2">' +
+                    imgs.map(src => `<img src="${src}" class="w-10 h-10 rounded-lg object-cover border border-metal-100 flex-shrink-0" alt="提交图片"/>`).join('') +
+                    (imgCount > 3 ? `<div class="w-10 h-10 rounded-lg bg-metal-100 flex items-center justify-center text-[10px] text-metal-500 flex-shrink-0">+${imgCount-3}</div>` : '') +
+                  '</div>'
+                : '';
+
+            return `
+                <div class="recycle-card bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] cursor-pointer"
+                     data-id="${record.id}"
+                     data-name="${(record.name||'').replace(/"/g,'&quot;')}"
+                     data-phone="${(record.phone||'').replace(/"/g,'&quot;')}"
+                     data-status="${record.status}">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center text-white text-[15px] font-bold flex-shrink-0">
+                            ${(record.name || '?')[0]}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap mb-1">
+                                <span class="text-[14px] font-semibold text-metal-900">${record.name || '未填写姓名'}</span>
+                                ${typeTag}
+                                <span class="px-1.5 py-0.5 ${badgeCls} text-[10px] rounded font-medium">${label}</span>
+                                ${imgTag}
+                            </div>
+                            <p class="text-[11px] text-metal-500">${record.phone || '未填写电话'}</p>
+                            <p class="text-[10px] text-metal-400 mt-0.5 truncate">${weightStr}</p>
+                            <p class="text-[10px] text-metal-300 mt-0.5">${fmtTime(record.submittedAt)}</p>
+                            ${thumbHtml}
+                        </div>
+                        <button class="more-btn text-metal-400 tap-active px-2" data-id="${record.id}">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                        </button>
+                    </div>
+                </div>`;
+        }).join('');
+
+        // 绑定卡片点击 → 打开详情
+        container.querySelectorAll('.recycle-card').forEach(card => {
+            card.addEventListener('click', e => {
+                if (e.target.closest('.more-btn')) return;
+                openDetail(card.dataset.id);
+            });
+        });
+        // 绑定更多按钮
+        container.querySelectorAll('.more-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                openActionSheet(btn.dataset.id);
+            });
+        });
+    }
+
+    // ── Tab 切换 ─────────────────────────────────────────
+    const tabBar = document.getElementById('tab-bar');
+    tabBar.querySelectorAll('.tab-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentTab = btn.dataset.tab;
+            tabBar.querySelectorAll('.tab-item').forEach(b => {
+                b.classList.remove('font-semibold','text-brand-600');
+                b.classList.add('text-metal-500');
+                const ind = b.querySelector('.tab-indicator');
+                if (ind) ind.remove();
+            });
+            btn.classList.add('font-semibold','text-brand-600');
+            btn.classList.remove('text-metal-500');
+            const indicator = document.createElement('div');
+            indicator.className = 'tab-indicator absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full';
+            btn.appendChild(indicator);
+            renderList();
+        });
+    });
+
+    // ── 搜索 ─────────────────────────────────────────────
+    document.getElementById('search-input').addEventListener('input', renderList);
+
+    // ── 操作菜单 ─────────────────────────────────────────
+    const actionSheet = document.getElementById('action-sheet');
+    const actionName  = document.getElementById('action-record-name');
+
+    function openActionSheet(id) {
+        currentId = id;
+        const list = getList();
+        const rec  = list.find(r => r.id === id);
+        if (!rec) return;
+        actionName.textContent = (rec.name || '未知') + ' · ' + statusLabel(rec.status);
+        // 隐藏已不适用的操作
+        document.getElementById('btn-approve').style.display = rec.status === 'approved' ? 'none' : '';
+        document.getElementById('btn-reject').style.display  = rec.status === 'rejected'  ? 'none' : '';
+        actionSheet.classList.remove('hidden');
+    }
+    function closeAction() { actionSheet.classList.add('hidden'); }
+
+    document.getElementById('action-overlay').addEventListener('click', closeAction);
+    document.getElementById('btn-action-cancel').addEventListener('click', closeAction);
+
+    // 审核通过
+    document.getElementById('btn-approve').addEventListener('click', () => {
+        if (!currentId) return;
+        const list = getList();
+        const rec  = list.find(r => r.id === currentId);
+        if (rec) { rec.status = 'approved'; saveList(list); }
+        closeAction();
+        refreshSummary();
+        renderList();
+    });
+
+    // 审核拒绝
+    document.getElementById('btn-reject').addEventListener('click', () => {
+        if (!currentId) return;
+        const list = getList();
+        const rec  = list.find(r => r.id === currentId);
+        if (rec) { rec.status = 'rejected'; saveList(list); }
+        closeAction();
+        refreshSummary();
+        renderList();
+    });
+
+    // 删除
+    document.getElementById('btn-delete').addEventListener('click', () => {
+        if (!currentId) return;
+        if (!confirm('确定删除该记录？删除后不可恢复')) return;
+        let list = getList().filter(r => r.id !== currentId);
+        saveList(list);
+        closeAction();
+        refreshSummary();
+        renderList();
+    });
+
+    // 查看详情（操作菜单入口）
+    document.getElementById('btn-detail').addEventListener('click', () => {
+        if (!currentId) return;
+        closeAction();
+        openDetail(currentId);
+    });
+
+    // ── 详情弹窗 ─────────────────────────────────────────
+    const detailSheet  = document.getElementById('detail-sheet');
+    const detailBody   = document.getElementById('detail-body');
+    const detailBadge  = document.getElementById('detail-status-badge');
+
+    function openDetail(id) {
+        const list = getList();
+        const rec  = list.find(r => r.id === id);
+        if (!rec) return;
+
+        detailBadge.className = `px-2 py-0.5 text-[11px] rounded-full font-semibold ${statusBadgeClass(rec.status)}`;
+        detailBadge.textContent = statusLabel(rec.status);
+
+        const field = (label, value) => `
+            <div class="flex items-start justify-between gap-2">
+                <span class="text-[12px] text-metal-400 flex-shrink-0 w-20">${label}</span>
+                <span class="text-[13px] text-metal-800 text-right flex-1">${value || '<span class=&quot;text-metal-300&quot;>-</span>'}</span>
+            </div>`;
+
+        let html = `
+            <div class="bg-metal-50 rounded-xl p-3 space-y-2.5">
+                <p class="text-[11px] text-metal-400 font-semibold uppercase tracking-wider mb-2">基本信息</p>
+                ${field('姓名', rec.name)}
+                ${field('电话', rec.phone)}
+                ${field('类型', rec.contactType)}
+                ${field('提交时间', fmtTime(rec.submittedAt))}
+            </div>`;
+
+        const weightFields = [
+            ['接触器总重', rec.totalWeight],
+            ['银点铜总重', rec.silverCopperWeight],
+            ['铜板线图总重', rec.copperPlateWeight],
+            ['铜板线圈总重', rec.copperCoilWeight],
+            ['点块烤点重', rec.spotWeight],
+            ['第五项重量', rec.fifthWeight],
+        ];
+        const hasWeight = weightFields.some(([,v]) => v);
+        if (hasWeight) {
+            html += `
+            <div class="bg-metal-50 rounded-xl p-3 space-y-2.5">
+                <p class="text-[11px] text-metal-400 font-semibold uppercase tracking-wider mb-2">重量数据</p>
+                ${weightFields.map(([l,v]) => field(l, v ? v + ' kg' : '')).join('')}
+            </div>`;
+        }
+
+        const imgs = rec.images || [];
+        if (imgs.length > 0) {
+            html += `
+            <div class="bg-metal-50 rounded-xl p-3">
+                <p class="text-[11px] text-metal-400 font-semibold uppercase tracking-wider mb-3">上传图片（${imgs.length}张）</p>
+                <div class="grid grid-cols-3 gap-2">
+                    ${imgs.map(src => `
+                        <img src="${src}" class="w-full aspect-square object-cover rounded-xl border border-metal-200 cursor-pointer"
+                             onclick="window._previewImage(this.src)" alt="提交图片"/>
+                    `).join('')}
+                </div>
+            </div>`;
+        }
+
+        detailBody.innerHTML = html;
+        detailSheet.classList.remove('hidden');
+    }
+
+    function closeDetail() { detailSheet.classList.add('hidden'); }
+    document.getElementById('detail-overlay').addEventListener('click', closeDetail);
+    document.getElementById('btn-detail-close').addEventListener('click', closeDetail);
+
+    // ── 图片大图预览 ────────────────────────────────────
+    window._previewImage = function(src) {
+        const existing = document.getElementById('__img_preview__');
+        if (existing) existing.remove();
+        const overlay = document.createElement('div');
+        overlay.id = '__img_preview__';
+        overlay.className = 'fixed inset-0 z-[100] bg-black/85 flex items-center justify-center p-4 cursor-pointer';
+        overlay.innerHTML = `<img src="${src}" class="max-w-full max-h-full rounded-2xl shadow-2xl object-contain"/>`;
+        overlay.addEventListener('click', () => overlay.remove());
+        document.body.appendChild(overlay);
+    };
+
+    // ── 初始化 ────────────────────────────────────────────
+    refreshSummary();
+    renderList();
+})();
+</script>
+
+</body>
+</html>

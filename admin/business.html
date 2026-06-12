@@ -76,11 +76,17 @@
             </section>
 
             <section class="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
-                <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">回收价与行情</h3>
+                <h3 class="px-4 pt-4 pb-2 text-[14px] font-bold text-metal-900">回收与行情</h3>
                 <a href="quote-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
                     <div class="w-10 h-10 rounded-[10px] bg-amber-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                     <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">金属行情</p><p class="text-[11px] text-metal-500 mt-0.5">金属行情、废料行情、产品回收价</p></div>
                     <span class="text-[11px] text-metal-400 mr-1">42</span>
+                    <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+                <a href="recycle-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
+                    <div class="w-10 h-10 rounded-[10px] bg-teal-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.293 13.596 7.196 9.5 3.1 10.598"/><path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.56 6.166"/><path d="m21.9 10.598-1.1 1.911 1.1 1.891"/><path d="M17.166 13.62 14 10l-3 3"/><path d="M16.243 5.815 14.456 5.5 13.5 7.133"/></svg></div>
+                    <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">回收管理</p><p class="text-[11px] text-metal-500 mt-0.5">接触器银触点数据提交记录管理</p></div>
+                    <span class="text-[11px] text-metal-400 mr-1" id="recycle-count"></span>
                     <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
             </section>
@@ -122,6 +128,14 @@
         onAvatar: () => location.href = '/admin/manage.html',
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'business' });
+
+    // 动态显示回收记录数
+    try {
+        const raw = localStorage.getItem('recycle_submissions') || '[]';
+        const list = JSON.parse(raw);
+        const el = document.getElementById('recycle-count');
+        if (el && list.length > 0) el.textContent = list.length;
+    } catch (e) { /* ignore */ }
 </script>
 
 </body>

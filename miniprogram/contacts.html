@@ -271,7 +271,49 @@
         }, 1000);
       }
 
-      submitBtn.addEventListener('click', openModal);
+      // ── 收集表单数据并保存到 localStorage ──
+      function collectAndSaveSubmission() {
+        const nameInput  = document.querySelector('input[placeholder="请输入姓名"]');
+        const phoneInput = document.querySelector('input[placeholder="请输入电话"]');
+        const weightInputs = document.querySelectorAll('.grid.grid-cols-3 input[type="number"]');
+        const typeRadio  = document.querySelector('input[name="contactType"]:checked');
+        const fifthInput = document.querySelector('.col-span-3 input[type="number"]');
+
+        // 获取上传图片
+        const images = (window._AL_UPLOADED && typeof window._AL_UPLOADED === 'function')
+          ? window._AL_UPLOADED().map(img => img.dataUrl)
+          : [];
+
+        const record = {
+          id: 'rc_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+          name:  nameInput  ? nameInput.value.trim()  : '',
+          phone: phoneInput ? phoneInput.value.trim() : '',
+          images: images,
+          totalWeight:       weightInputs[0] ? weightInputs[0].value : '',
+          silverCopperWeight: weightInputs[1] ? weightInputs[1].value : '',
+          copperPlateWeight:  weightInputs[2] ? weightInputs[2].value : '',
+          copperCoilWeight:   weightInputs[3] ? weightInputs[3].value : '',
+          spotWeight:        weightInputs[4] ? weightInputs[4].value : '',
+          fifthWeight:       fifthInput ? fifthInput.value : '',
+          contactType: typeRadio ? typeRadio.value : '',
+          status: 'pending',
+          submittedAt: new Date().toISOString(),
+        };
+
+        try {
+          const raw  = localStorage.getItem('recycle_submissions') || '[]';
+          const list = JSON.parse(raw);
+          list.unshift(record);
+          localStorage.setItem('recycle_submissions', JSON.stringify(list));
+        } catch (e) {
+          console.warn('[recycle] localStorage 写入失败：', e);
+        }
+      }
+
+      submitBtn.addEventListener('click', () => {
+        collectAndSaveSubmission();
+        openModal();
+      });
       goBackBtn.addEventListener('click', goBackToHome);
 
       // 点击遮罩也立即返回（友好体验）
