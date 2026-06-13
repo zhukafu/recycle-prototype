@@ -941,6 +941,10 @@
 
     // ========== 编辑器工具栏命令绑定 ==========
     function initToolbar() {
+        $('#editorToolbar').addEventListener('mousedown', function(e) {
+            if (e.target.closest('button')) e.preventDefault();
+        });
+
         $('#editorToolbar').addEventListener('click', function(e) {
             var btn = e.target.closest('[data-cmd]');
             if (!btn) return;
@@ -949,15 +953,13 @@
             var val = btn.dataset.value || null;
 
             if (cmd === 'createLink') {
-                var linkUrl = prompt('请输入链接地址：', 'https://');
-                if (linkUrl) {
-                    document.execCommand(cmd, false, linkUrl);
-                }
+                savedSelection = saveEditorSelection();
+                openLinkDialog(savedSelection);
             } else {
                 document.execCommand(cmd, false, val);
+                editorBody.focus();
+                refreshToolbarState();
             }
-            editorBody.focus();
-            refreshToolbarState();
         });
 
         // 插入分割线
@@ -1281,6 +1283,61 @@
                 console.warn('[restoreEditorSelection]', e.message);
                 return false;
             }
+        }
+
+        function openLinkDialog(selection) {
+            var selectedText = '';
+            if (selection && restoreEditorSelection(selection)) {
+                selectedText = window.getSelection().toString();
+            }
+
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:220;display:flex;align-items:center;justify-content:center;padding:20px;';
+            overlay.innerHTML = '<div style="width:100%;max-width:360px;background:#fff;border-radius:14px;padding:18px;box-shadow:0 12px 36px rgba(15,23,42,.2);">' +
+                '<h3 style="margin:0 0 12px;font-size:15px;font-weight:700;color:#0f172a;">插入链接</h3>' +
+                '<input type="text" id="linkInput" placeholder="https://example.com" style="width:100%;height:40px;padding:0 12px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;box-sizing:border-box;">' +
+                '<div style="display:flex;gap:10px;margin-top:14px;">' +
+                    '<button type="button" id="cancelLinkBtn" style="flex:1;height:38px;border:0;border-radius:999px;background:#f1f5f9;color:#475569;font-size:13px;font-weight:600;">取消</button>' +
+                    '<button type="button" id="confirmLinkBtn" style="flex:1;height:38px;border:0;border-radius:999px;background:#22c55e;color:#fff;font-size:13px;font-weight:700;">确定</button>' +
+                '</div>' +
+            '</div>';
+            document.body.appendChild(overlay);
+
+            var input = overlay.querySelector('#linkInput');
+            input.focus();
+
+            function close() {
+                if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+                editorBody.focus();
+            }
+
+            function confirm() {
+                var url = input.value.trim();
+                if (!url) { close(); return; }
+                if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+                editorBody.focus();
+                var restored = selection && restoreEditorSelection(selection);
+                if (restored && selectedText) {
+                    document.execCommand('createLink', false, url);
+                } else {
+                    var text = selectedText || url;
+                    var linkHtml = '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(text) + '</a>';
+                    if (restored) document.execCommand('insertHTML', false, linkHtml);
+                    else editorBody.insertAdjacentHTML('beforeend', linkHtml);
+                }
+                close();
+                refreshToolbarState();
+                showToast('✅ 链接已插入');
+            }
+
+            overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+            overlay.querySelector('#confirmLinkBtn').addEventListener('click', confirm);
+            overlay.querySelector('#cancelLinkBtn').addEventListener('click', close);
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') confirm();
+                if (e.key === 'Escape') close();
+            });
         }
 
         function formatFileSize(bytes) {

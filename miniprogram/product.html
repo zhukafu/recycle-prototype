@@ -46,6 +46,24 @@ to { opacity: 1; transform: translateY(0); }
 100% { background-position: 200% 0; }
 }
 .shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); background-size: 200% 100%; animation: shimmer 1.5s linear infinite; }
+
+/* 富文本样式 */
+#descEl h2 { font-size: 17px; font-weight: 700; margin: 12px 0 8px; color: #111827; line-height: 1.5; }
+#descEl h3 { font-size: 15px; font-weight: 700; margin: 10px 0 6px; color: #1f2937; line-height: 1.5; }
+#descEl p { margin: 0 0 10px; }
+#descEl strong { font-weight: 700; color: #111827; }
+#descEl em { font-style: italic; }
+#descEl blockquote {
+margin: 10px 0; padding: 10px 14px; border-left: 3.5px solid #22c55e;
+background: #f0fdf4; border-radius: 0 8px 8px 0; color: #374151;
+}
+#descEl ul, #descEl ol { margin: 8px 0; padding-left: 22px; }
+#descEl li { margin-bottom: 4px; }
+#descEl ul li { list-style-type: disc; }
+#descEl ol li { list-style-type: decimal; }
+#descEl a { color: #10B981; text-decoration: underline; }
+#descEl img { max-width: 100%; border-radius: 8px; margin: 8px 0; display: block; }
+#descEl hr { border: none; border-top: 1px solid #e5e7eb; margin: 12px 0; }
 </style>
 </head>
 <body class="bg-gray-bg min-h-screen pb-32">
@@ -90,7 +108,7 @@ to { opacity: 1; transform: translateY(0); }
   <!-- 产品大图（Hero） -->
   <section class="bg-white px-4 pt-5 pb-6 fade-in">
     <div class="w-full aspect-square bg-gray-bg rounded-2xl flex items-center justify-center relative overflow-hidden" id="imgHero">
-      <img id="imgEl" alt="产品图" class="w-full h-full object-contain p-4 fade-in" />
+      <img id="imgEl" alt="产品图" class="w-full h-full object-cover fade-in" />
       <!-- 分类色块兜底 -->
       <div id="imgFallback" class="absolute inset-0 flex items-center justify-center text-3xl font-black opacity-15"></div>
     </div>
@@ -219,7 +237,7 @@ to { opacity: 1; transform: translateY(0); }
       <span class="w-1 h-3.5 bg-orange-brand rounded-full"></span>
       产品说明
     </h3>
-    <p class="text-[13px] text-gray-600 leading-relaxed" id="descEl">--</p>
+    <div class="text-[13px] text-gray-600 leading-relaxed prose prose-sm max-w-none" id="descEl">--</div>
   </section>
 
   <!-- 同类推荐 -->
@@ -426,7 +444,7 @@ to { opacity: 1; transform: translateY(0); }
       return `
         <a href="product.html?id=${r.id}" class="flex items-center gap-3 p-2.5 bg-gray-bg rounded-xl active:scale-[0.99] transition no-underline">
           <div class="w-12 h-12 ${c.bg} rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-            <img src="${img}" alt="${r.model}" loading="lazy" class="w-full h-full object-contain" onerror="this.style.display='none'">
+            <img src="${img}" alt="${r.model}" loading="lazy" class="w-full h-full object-cover" onerror="this.style.display='none'">
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-[13px] font-bold text-gray-900 truncate">${r.model}</p>

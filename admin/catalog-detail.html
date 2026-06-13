@@ -30,6 +30,24 @@
             .admin-content { min-height: calc(100vh - 44px); padding-bottom: 140px; }
             .content-inner { padding: 0 24px; }
         }
+        
+        /* 富文本样式 */
+        #descEl h2 { font-size: 16px; font-weight: 700; margin: 12px 0 8px; color: #0f172a; }
+        #descEl h3 { font-size: 14px; font-weight: 700; margin: 10px 0 6px; color: #1e293b; }
+        #descEl p { margin: 0 0 8px; }
+        #descEl strong { font-weight: 700; color: #0f172a; }
+        #descEl em { font-style: italic; }
+        #descEl blockquote {
+            margin: 8px 0; padding: 8px 12px; border-left: 3px solid #22c55e;
+            background: #f0fdf4; border-radius: 0 6px 6px 0; color: #334155;
+        }
+        #descEl ul, #descEl ol { margin: 6px 0; padding-left: 20px; }
+        #descEl li { margin-bottom: 4px; }
+        #descEl ul li { list-style-type: disc; }
+        #descEl ol li { list-style-type: decimal; }
+        #descEl a { color: #16a34a; text-decoration: underline; }
+        #descEl img { max-width: 100%; border-radius: 6px; margin: 6px 0; display: block; }
+        #descEl hr { border: none; border-top: 1px solid #e2e8f0; margin: 10px 0; }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -67,7 +85,7 @@
             <!-- 产品图片 -->
             <div class="bg-white">
                 <div class="relative h-[260px] flex items-center justify-center bg-metal-50">
-                    <img id="productImg" src="" class="object-contain w-full h-full p-6" alt="">
+                    <img id="productImg" src="" class="object-cover w-full h-full" alt="">
                     <div id="imgFallback" class="absolute inset-0 flex items-center justify-center text-3xl font-black opacity-10 text-metal-500"></div>
                 </div>
             </div>
@@ -126,7 +144,7 @@
                     <div class="w-1 h-4 bg-brand-500 rounded-full"></div>
                     <h3 class="text-[14px] font-semibold text-metal-900">产品说明</h3>
                 </div>
-                <p class="text-[12px] text-metal-600 leading-relaxed" id="descEl">暂无详细说明。</p>
+                <div class="text-[12px] text-metal-600 leading-relaxed prose prose-sm max-w-none" id="descEl">暂无详细说明。</div>
             </div>
 
             <!-- 元数据 -->

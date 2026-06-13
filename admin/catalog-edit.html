@@ -529,7 +529,7 @@
         { url: '/images/products/cat-relay.png', name: 'cat-relay' },
         { url: '/images/products/cat-button.png', name: 'cat-button' }
     ];
-    var activeImgTab = 'upload', uploadedImageData = null, gallerySelectedImage = null, imageDialogMode = 'inline';
+    var activeImgTab = 'upload', uploadedImageData = null, gallerySelectedImage = null, imageDialogMode = 'inline', savedEditorSelection = null;
     function switchImgTab(tab) {
         activeImgTab = tab;
         document.querySelectorAll('.img-tab-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.tab === tab); });
@@ -550,7 +550,7 @@
         document.getElementById('imgCaptionInput').value = '';
     }
     document.getElementById('btnSelectCover').addEventListener('click', function() {
-        resetImageDialog(); imageDialogMode = 'cover';
+        resetImageDialog(); imageDialogMode = 'cover'; savedEditorSelection = null;
         document.querySelector('.img-dialog-header span').textContent = '📷 选择产品图';
         document.getElementById('btnConfirmImg').textContent = '✓ 确认选择';
         document.getElementById('imgDialogOverlay').classList.add('show');
@@ -618,7 +618,15 @@
         if (activeImgTab === 'upload') { if (!uploadedImageData) { showToast('请先上传图片'); return; } imgSrc = uploadedImageData; }
         else if (activeImgTab === 'url') { imgSrc = document.getElementById('imgUrlInput').value.trim(); if (!imgSrc) { showToast('请输入图片地址'); return; } }
         else if (activeImgTab === 'gallery') { if (!gallerySelectedImage) { showToast('请选择图片'); return; } imgSrc = gallerySelectedImage; }
-        fieldImg.value = imgSrc; updateCoverPreview(imgSrc); closeImageDialog(); showToast('✅ 产品图已设置');
+        
+        if (imageDialogMode === 'cover') {
+            fieldImg.value = imgSrc; updateCoverPreview(imgSrc); showToast('✅ 产品图已设置');
+        } else if (imageDialogMode === 'inline') {
+            insertEditorHtml('<img src="' + escapeHtml(imgSrc) + '" alt="" style="max-width:100%;border-radius:8px;margin:8px 0;display:block;">');
+            savedEditorSelection = null;
+            showToast('✅ 图片已插入');
+        }
+        closeImageDialog();
     });
 
     // ===== 分类选择器 =====
@@ -685,15 +693,126 @@
     updateCatLabel();
 
     // 富文本编辑器工具栏
+    function escapeHtml(s) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(s || ''));
+        return div.innerHTML;
+    }
+
+    function saveEditorSelection() {
+        var sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return null;
+        var range = sel.getRangeAt(0);
+        if (!editorBody.contains(range.commonAncestorContainer)) {
+            var newRange = document.createRange();
+            newRange.selectNodeContents(editorBody);
+            newRange.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(newRange);
+            range = newRange;
+        }
+        return {
+            startContainer: range.startContainer,
+            startOffset: range.startOffset,
+            endContainer: range.endContainer,
+            endOffset: range.endOffset
+        };
+    }
+
+    function restoreEditorSelection(saved) {
+        if (!saved) return false;
+        try {
+            var nodeExists = function(n) {
+                while (n && n !== document.body) n = n.parentNode;
+                return n === document.body;
+            };
+            if (!nodeExists(saved.startContainer) || !nodeExists(saved.endContainer)) return false;
+            var sel = window.getSelection();
+            var range = document.createRange();
+            range.setStart(saved.startContainer, saved.startOffset);
+            range.setEnd(saved.endContainer, saved.endOffset);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function insertEditorHtml(html) {
+        editorBody.focus();
+        if (restoreEditorSelection(savedEditorSelection)) {
+            document.execCommand('insertHTML', false, html);
+        } else {
+            editorBody.insertAdjacentHTML('beforeend', html);
+        }
+    }
+
+    function openLinkDialog(selection) {
+        var selectedText = '';
+        if (selection && restoreEditorSelection(selection)) selectedText = window.getSelection().toString();
+
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:220;display:flex;align-items:center;justify-content:center;padding:20px;';
+        overlay.innerHTML = '<div style="width:100%;max-width:360px;background:#fff;border-radius:14px;padding:18px;box-shadow:0 12px 36px rgba(15,23,42,.2);">' +
+            '<h3 style="margin:0 0 12px;font-size:15px;font-weight:700;color:#0f172a;">插入链接</h3>' +
+            '<input type="text" id="linkInput" placeholder="https://example.com" style="width:100%;height:40px;padding:0 12px;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;box-sizing:border-box;">' +
+            '<div style="display:flex;gap:10px;margin-top:14px;">' +
+                '<button type="button" id="cancelLinkBtn" style="flex:1;height:38px;border:0;border-radius:999px;background:#f1f5f9;color:#475569;font-size:13px;font-weight:600;">取消</button>' +
+                '<button type="button" id="confirmLinkBtn" style="flex:1;height:38px;border:0;border-radius:999px;background:#22c55e;color:#fff;font-size:13px;font-weight:700;">确定</button>' +
+            '</div>' +
+        '</div>';
+        document.body.appendChild(overlay);
+
+        var input = overlay.querySelector('#linkInput');
+        input.focus();
+
+        function close() {
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            editorBody.focus();
+        }
+
+        function confirm() {
+            var url = input.value.trim();
+            if (!url) { close(); return; }
+            if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+            editorBody.focus();
+            if (selection && restoreEditorSelection(selection) && selectedText) {
+                document.execCommand('createLink', false, url);
+            } else {
+                savedEditorSelection = selection;
+                insertEditorHtml('<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(selectedText || url) + '</a>');
+            }
+            close();
+            showToast('✅ 链接已插入');
+        }
+
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+        overlay.querySelector('#confirmLinkBtn').addEventListener('click', confirm);
+        overlay.querySelector('#cancelLinkBtn').addEventListener('click', close);
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') confirm();
+            if (e.key === 'Escape') close();
+        });
+    }
+
+    document.getElementById('editorToolbar').addEventListener('mousedown', function(e) {
+        if (e.target.closest('button')) e.preventDefault();
+    });
+
     document.getElementById('editorToolbar').addEventListener('click', function(e) {
         var btn = e.target.closest('[data-cmd]'); if (!btn) return;
         var cmd = btn.dataset.cmd, val = btn.dataset.value || null;
-        if (cmd === 'createLink') { var url = prompt('请输入链接地址：', 'https://'); if (url) document.execCommand(cmd, false, url); }
-        else { document.execCommand(cmd, false, val); }
+        if (cmd === 'createLink') {
+            savedEditorSelection = saveEditorSelection();
+            openLinkDialog(savedEditorSelection);
+            return;
+        }
+        document.execCommand(cmd, false, val);
         editorBody.focus();
     });
     document.getElementById('btnInsertImg').addEventListener('click', function() {
-        resetImageDialog(); imageDialogMode = 'inline';
+        resetImageDialog(); imageDialogMode = 'inline'; savedEditorSelection = saveEditorSelection();
         document.querySelector('.img-dialog-header span').textContent = '📷 插入图片';
         document.getElementById('btnConfirmImg').textContent = '✓ 确认插入';
         document.getElementById('imgDialogOverlay').classList.add('show');
@@ -706,33 +825,41 @@
 
     function renderUWRows() {
         if (!unitWeights.length) {
-            uwContainer.innerHTML = '<p class="text-[12px] text-metal-400 text-center py-4">暂无单位重量数据，点击上方"添加行"</p>';
-            return;
+            unitWeights.push({ name: '', weight: '', purity: '', value: '0' });
         }
         uwContainer.innerHTML = unitWeights.map(function (row, idx) {
+            var name = (row.name || '').replace(/"/g, '&quot;');
+            var weight = (row.weight || '').replace(/"/g, '&quot;');
+            var purity = (row.purity || '').replace(/"/g, '&quot;');
             return '<div class="grid grid-cols-[1fr_1fr_1fr_32px] gap-2 items-end" data-idx="' + idx + '">' +
-                '<div><label class="field-label">名称</label><input class="input uw-name" value="' + (row.name || '') + '"></div>' +
-                '<div><label class="field-label">重量</label><input class="input font-mono uw-weight" value="' + (row.weight || '') + '"></div>' +
-                '<div><label class="field-label">纯度</label><input class="input font-mono uw-purity" value="' + (row.purity || '') + '"></div>' +
+                '<div><label class="field-label">名称</label><input class="input uw-name" value="' + name + '"></div>' +
+                '<div><label class="field-label">重量</label><input class="input font-mono uw-weight" value="' + weight + '"></div>' +
+                '<div><label class="field-label">纯度</label><input class="input font-mono uw-purity" value="' + purity + '"></div>' +
                 '<button type="button" class="h-10 w-8 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center tap-active uw-del" data-idx="' + idx + '">' +
                     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
                 '</button>' +
             '</div>';
         }).join('');
-
-        // 绑定删除
-        uwContainer.querySelectorAll('.uw-del').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                unitWeights.splice(parseInt(btn.dataset.idx), 1);
-                renderUWRows();
-            });
-        });
     }
     renderUWRows();
 
     document.getElementById('btnAddRow').addEventListener('click', function () {
         unitWeights.push({ name: '', weight: '', purity: '', value: '0' });
         renderUWRows();
+    });
+
+    // 删除单位重量行
+    uwContainer.addEventListener('click', function (e) {
+        var delBtn = e.target.closest('.uw-del');
+        if (delBtn) {
+            var idx = parseInt(delBtn.dataset.idx);
+            if (unitWeights.length <= 1) {
+                showToast('至少保留一行');
+                return;
+            }
+            unitWeights.splice(idx, 1);
+            renderUWRows();
+        }
     });
 
     // 详情页链接
@@ -744,9 +871,14 @@
         var rows = uwContainer.querySelectorAll('[data-idx]');
         var newUW = [];
         rows.forEach(function (row) {
-            var name = row.querySelector('.uw-name').value.trim();
-            var weight = row.querySelector('.uw-weight').value.trim();
-            var purity = row.querySelector('.uw-purity').value.trim();
+            var nameInput = row.querySelector('.uw-name');
+            var weightInput = row.querySelector('.uw-weight');
+            var purityInput = row.querySelector('.uw-purity');
+            if (!nameInput || !weightInput || !purityInput) return;
+            
+            var name = nameInput.value.trim();
+            var weight = weightInput.value.trim();
+            var purity = purityInput.value.trim();
             if (name || weight) {
                 // 简单估值
                 var wNum = parseFloat(weight) || 0;

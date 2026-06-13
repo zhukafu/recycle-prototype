@@ -270,10 +270,31 @@
       desc: '施耐德 XB2-BA31 绿色启动按钮，Φ22 圆形平头，弹簧复位。' }
   ];
 
-  // 合并去重（避免重复 id；后出现的覆盖前面的）
+  // 优先从 localStorage 读取用户修改的数据
+  let localStorageData = [];
+  try {
+    const stored = localStorage.getItem('al_products');
+    if (stored) {
+      localStorageData = JSON.parse(stored);
+    }
+  } catch (e) {
+    console.warn('Failed to load from localStorage:', e);
+  }
+
+  // 合并去重（避免重复 id；localStorage 数据优先，后出现的覆盖前面的）
   const byId = new Map();
-  existing.forEach(p => byId.set(p.id, p));
-  PRODUCTS.forEach(p => byId.set(p.id, p));
+  
+  // 先添加 localStorage 数据（用户修改的优先）
+  localStorageData.forEach(p => byId.set(p.id, p));
+  
+  // 再添加现有数据和初始数据
+  existing.forEach(p => {
+    if (!byId.has(p.id)) byId.set(p.id, p);
+  });
+  PRODUCTS.forEach(p => {
+    if (!byId.has(p.id)) byId.set(p.id, p);
+  });
+  
   window._AL_PRODUCTS = Array.from(byId.values());
 
   // 工具方法：按 id 取单品
