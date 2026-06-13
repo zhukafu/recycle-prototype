@@ -37,6 +37,22 @@
         /* 底部弹窗动画 */
         .sheet-overlay { animation: fadeIn .2s ease; }
         .sheet-panel  { animation: slideUp .25s ease; }
+        /* ====== 常见型号开关（绿色胶囊样式，与品牌风格统一）====== */
+        .common-switch { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; user-select: none; -webkit-user-select: none; }
+        .common-switch-label { font-size: 11px; font-weight: 600; white-space: nowrap; transition: color 0.2s; color: #64748b; }
+        .common-switch.active .common-switch-label { color: #16a34a; }
+        .common-switch .toggle-track {
+            position: relative; width: 32px; height: 18px; border-radius: 9px;
+            background: #d1d5db; transition: background 0.25s ease; flex-shrink: 0;
+            border: none; cursor: pointer; padding: 0;
+        }
+        .common-switch .toggle-knob {
+            position: absolute; top: 2px; left: 2px; width: 14px; height: 14px;
+            border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .common-switch.active .toggle-track { background: #22c55e; }
+        .common-switch.active .toggle-knob { transform: translateX(14px); }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
         @media (min-width: 1024px) {
@@ -215,8 +231,9 @@
             var catLbl = typeLabel[it.cat] || '产品';
             var price  = it.price || it.silverCopperPrice || '';
             var priceHtml = price ? '<span class="text-amber-600 font-semibold font-mono">¥' + price + '</span>' : '<span class="text-metal-400">未定价</span>';
+            var isCommon = it.common === true;
 
-            return '<div class="product-card bg-white rounded-[14px] p-3 flex gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] cursor-pointer" data-id="' + it.id + '">' +
+            return '<div class="product-card bg-white rounded-[14px] p-3 flex gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)]" data-id="' + it.id + '">' +
                 '<div class="w-16 h-16 rounded-[10px] bg-metal-50 flex-shrink-0 overflow-hidden">' +
                     (imgSrc ? '<img src="' + imgSrc + '" class="w-full h-full object-cover" alt="">' : '<div class="w-full h-full flex items-center justify-center text-[10px] text-metal-400">' + catLbl + '</div>') +
                 '</div>' +
@@ -230,6 +247,10 @@
                     '</div>' +
                     '<div class="flex items-center gap-3 text-[11px] text-metal-500">' +
                         priceHtml +
+                        '<label class="common-switch ml-auto' + (isCommon ? ' active' : '') + '" data-id="' + it.id + '">' +
+                            '<span class="common-switch-label">常见</span>' +
+                            '<button type="button" class="toggle-track common-toggle" data-id="' + it.id + '" aria-label="常见型号开关"><span class="toggle-knob"></span></button>' +
+                        '</label>' +
                     '</div>' +
                 '</div>' +
                 '<button class="more-btn text-metal-400 tap-active px-1 self-center flex-shrink-0" data-id="' + it.id + '">' +
@@ -242,6 +263,7 @@
         container.querySelectorAll('.product-card').forEach(function (card) {
             card.addEventListener('click', function (e) {
                 if (e.target.closest('.more-btn')) return;
+                if (e.target.closest('.common-switch')) return;
                 location.href = 'catalog-detail.html?id=' + card.dataset.id;
             });
         });
@@ -328,6 +350,31 @@
             localStorage.setItem('al_products', JSON.stringify(PRODUCTS));
         } catch (e) { /* ignore */ }
         closeAction();
+        renderList();
+    });
+
+    // ── 常见型号开关 ────────────────────────────────────
+    document.getElementById('product-list').addEventListener('click', function (e) {
+        var toggle = e.target.closest('.common-toggle');
+        var sw = e.target.closest('.common-switch');
+        if (!toggle && !sw) return;
+        e.stopPropagation();
+        e.preventDefault();
+        var id = (toggle && toggle.dataset.id) || (sw && sw.dataset.id);
+        if (!id) return;
+        // 如果是点击 label 本身，触发表单关联的按钮 click
+        if (!toggle && sw) {
+            var btn = sw.querySelector('.common-toggle');
+            if (btn) { btn.click(); return; }
+        }
+        var p = PRODUCTS.find(function (x) { return x.id === id; });
+        if (!p) return;
+        p.common = !p.common;
+        // 持久化到 localStorage
+        window._AL_PRODUCTS = PRODUCTS;
+        try {
+            localStorage.setItem('al_products', JSON.stringify(PRODUCTS));
+        } catch (err) { /* ignore */ }
         renderList();
     });
 

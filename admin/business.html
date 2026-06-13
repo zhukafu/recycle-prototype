@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>业务管理 - 铝老板管理后台</title>
+    <script src="/data/contacts.js"></script>
+    <script src="/data/categories.js"></script>
+    <script src="/data/quotes.js"></script>
+    <script src="/data/articles.js"></script>
+    <script src="/data/users.js"></script>
     <script src="/lib/tailwind/tailwind.js"></script>
     <link href="/lib/fonts/fonts-admin-main.css" rel="stylesheet">
     <script>
@@ -46,15 +51,15 @@
                 <div class="grid grid-cols-3 gap-3 mt-3">
                     <div>
                         <p class="text-[10px] opacity-80">型号总数</p>
-                        <p class="text-[16px] font-bold font-mono mt-0.5">128</p>
+                        <p class="text-[16px] font-bold font-mono mt-0.5" id="summary-model-count">0</p>
                     </div>
                     <div>
-                        <p class="text-[10px] opacity-80">付费字段</p>
-                        <p class="text-[16px] font-bold font-mono mt-0.5">4 类</p>
+                        <p class="text-[10px] opacity-80">付费用户数</p>
+                        <p class="text-[16px] font-bold font-mono mt-0.5" id="summary-paid-count">0</p>
                     </div>
                     <div>
                         <p class="text-[10px] opacity-80">行情报价</p>
-                        <p class="text-[16px] font-bold font-mono mt-0.5">42</p>
+                        <p class="text-[16px] font-bold font-mono mt-0.5" id="summary-quote-count">0</p>
                     </div>
                 </div>
             </div>
@@ -64,13 +69,13 @@
                 <a href="catalog-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
                     <div class="w-10 h-10 rounded-[10px] bg-brand-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
                     <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">型号管理</p><p class="text-[11px] text-metal-500 mt-0.5">接触器型号库、产品详情、图片、上下架</p></div>
-                    <span class="text-[11px] text-metal-400 mr-1">128</span>
+                    <span class="text-[11px] text-metal-400 mr-1" id="catalog-count">0</span>
                     <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
                 <a href="category-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
                     <div class="w-10 h-10 rounded-[10px] bg-blue-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
                     <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">分类管理</p><p class="text-[11px] text-metal-500 mt-0.5">品牌、品类、标签、首页分类筛选</p></div>
-                    <span class="text-[11px] text-metal-400 mr-1">8</span>
+                    <span class="text-[11px] text-metal-400 mr-1" id="category-count">0</span>
                     <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
             </section>
@@ -80,7 +85,7 @@
                 <a href="quote-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
                     <div class="w-10 h-10 rounded-[10px] bg-amber-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                     <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">金属行情</p><p class="text-[11px] text-metal-500 mt-0.5">金属行情、废料行情、产品回收价</p></div>
-                    <span class="text-[11px] text-metal-400 mr-1">42</span>
+                    <span class="text-[11px] text-metal-400 mr-1" id="quote-count">0</span>
                     <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
                 <a href="recycle-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
@@ -96,7 +101,7 @@
                 <a href="article-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
                     <div class="w-10 h-10 rounded-[10px] bg-red-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
                     <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">资讯管理</p><p class="text-[11px] text-metal-500 mt-0.5">行业资讯、回收知识、公告与轮播配置</p></div>
-                    <span class="text-[11px] text-metal-400 mr-1">48</span>
+                    <span class="text-[11px] text-metal-400 mr-1" id="article-count">0</span>
                     <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
             </section>
@@ -106,7 +111,7 @@
                 <a href="user-list.html" class="w-full flex items-center gap-3 px-4 py-3.5 tap-active no-underline border-t border-metal-50">
                     <div class="w-10 h-10 rounded-[10px] bg-purple-50 flex items-center justify-center flex-shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
                     <div class="flex-1 min-w-0"><p class="text-[14px] text-metal-800 font-medium">账号管理</p><p class="text-[11px] text-metal-500 mt-0.5">管理员账号、普通用户、会员权限</p></div>
-                    <span class="text-[11px] text-metal-400 mr-1">12</span>
+                    <span class="text-[11px] text-metal-400 mr-1" id="user-count">12</span>
                     <svg class="text-metal-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
             </section>
@@ -118,7 +123,7 @@
     <div id="admin-bottom-nav"></div>
 </div>
 
-<script type="module">
+    <script type="module">
     import { mountAdminTopbar } from '/src/components/admin-topbar.js';
     import { mountAdminBottomNav } from '/src/components/admin-bottom-nav.js';
 
@@ -134,8 +139,45 @@
         const raw = localStorage.getItem('recycle_submissions') || '[]';
         const list = JSON.parse(raw);
         const el = document.getElementById('recycle-count');
-        if (el && list.length > 0) el.textContent = list.length;
-    } catch (e) { /* ignore */ }
+        if (el) el.textContent = Array.isArray(list) ? list.length : 0;
+    } catch (e) {
+        const el = document.getElementById('recycle-count');
+        if (el) el.textContent = 0;
+    }
+
+    // 动态填充各统计数据
+    // 型号/产品总数
+    if (window._AL_PRODUCTS) {
+        document.getElementById('summary-model-count').textContent = _AL_PRODUCTS.length;
+        document.getElementById('catalog-count').textContent = _AL_PRODUCTS.length;
+    }
+
+    // 分类总数（仅统计可见分类）
+    if (window._AL_CATS) {
+        document.getElementById('category-count').textContent = _AL_CATS.getVisible().length;
+    }
+
+    // 行情报价总数
+    if (window._AL_QUOTES) {
+        const allQuotes = _AL_QUOTES.getAllQuotes();
+        document.getElementById('summary-quote-count').textContent = allQuotes.length;
+        document.getElementById('quote-count').textContent = allQuotes.length;
+    }
+
+    // 资讯文章总数
+    if (window._AL_ARTICLES) {
+        document.getElementById('article-count').textContent = _AL_ARTICLES.getAllArticles().length;
+    }
+
+    // 用户总数
+    if (window._AL_USERS) {
+        document.getElementById('user-count').textContent = _AL_USERS.getAll().length;
+    }
+
+    // 付费用户数（顶部卡片中间）
+    if (window._AL_USERS) {
+        document.getElementById('summary-paid-count').textContent = _AL_USERS.getPaid().length;
+    }
 </script>
 
 </body>

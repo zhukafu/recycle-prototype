@@ -219,6 +219,46 @@
           ? Date.now() + pkg.days * 24 * 60 * 60 * 1000
           : Date.now() + pkg.days * 24 * 60 * 60 * 1000;
         window._AL_saveProfile();
+
+        // 同步到 al_users（后台用户数据库），确保后台管理可见
+        try {
+          var usersRaw = localStorage.getItem('al_users');
+          var users = usersRaw ? JSON.parse(usersRaw) : [];
+          if (!Array.isArray(users)) users = [];
+          var matched = users.find(function (u) {
+            return u.name === window._AL_USER.nickname ||
+                   (window._AL_USER._phone && u.phone === window._AL_USER._phone);
+          });
+          if (matched) {
+            matched.paid = true;
+            matched.vip = pkg.name;
+            // 计算到期日
+            var expireDate = new Date();
+            expireDate.setDate(expireDate.getDate() + pkg.days);
+            matched.expire = expireDate.toISOString().slice(0, 10);
+            localStorage.setItem('al_users', JSON.stringify(users));
+          } else {
+            // 未匹配到 al_users 中的用户，新增一条
+            var avatarChar = (window._AL_USER.nickname || '?').charAt(0);
+            var gradients = ['from-amber-400 to-amber-500', 'from-blue-400 to-blue-500', 'from-purple-400 to-purple-500', 'from-cyan-400 to-cyan-500', 'from-rose-400 to-rose-500'];
+            var expireDate2 = new Date();
+            expireDate2.setDate(expireDate2.getDate() + pkg.days);
+            var newUser = {
+              id: 'u' + Date.now(),
+              name: window._AL_USER.nickname || '未知用户',
+              phone: window._AL_USER._phone || '',
+              avatarChar: avatarChar,
+              avatarGradient: gradients[Math.floor(Math.random() * gradients.length)],
+              vip: pkg.name,
+              expire: expireDate2.toISOString().slice(0, 10),
+              regDate: new Date().toISOString().slice(0, 10),
+              paid: true,
+              disabled: false
+            };
+            users.push(newUser);
+            localStorage.setItem('al_users', JSON.stringify(users));
+          }
+        } catch (e) { /* ignore */ }
         // 跳回 vip-center，触发成功提示；透传 return，让 vip-center 在订阅成功后再回到原页
         const retTail = /^[a-zA-Z0-9_./-]+\.html(\?.*)?$/.test(pkgRet)
           ? '&return=' + encodeURIComponent(pkgRet)

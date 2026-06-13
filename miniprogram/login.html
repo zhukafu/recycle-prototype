@@ -286,10 +286,40 @@
         window._AL_USER.nickname   = nickname;
         window._AL_USER.avatar     = avatar;
         window._AL_USER.loginAt    = Date.now();
+        window._AL_USER._phone     = phone; // 存手机号用于后台 al_users 匹配
         // 会员状态保持不变（可能之前开通过）
         window._AL_saveProfile();
         // 循环防护：注册成功后标记本会话已登录，避免「vip-center 返回 → login」再被 autoRedirect 拉回去
         try { sessionStorage.setItem('_AL_loginAutoRedirected', '1'); } catch (e) {}
+
+        // 保存用户到后台用户数据库（al_users），以便管理后台可见
+        try {
+          var usersKey = 'al_users';
+          var raw = localStorage.getItem(usersKey);
+          var users = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(users)) users = [];
+          // 检查手机号是否已存在（已注册的不重复添加）
+          var exists = users.some(function (u) { return u.phone === phone; });
+          if (!exists) {
+            var avatarChar = nickname.charAt(0);
+            var gradients = ['from-amber-400 to-amber-500', 'from-blue-400 to-blue-500', 'from-purple-400 to-purple-500', 'from-cyan-400 to-cyan-500', 'from-rose-400 to-rose-500', 'from-green-400 to-green-500'];
+            var newUser = {
+              id: 'u' + Date.now(),
+              name: nickname,
+              phone: phone || '',
+              avatarChar: avatarChar,
+              avatarGradient: gradients[Math.floor(Math.random() * gradients.length)],
+              vip: '无',
+              expire: '-',
+              regDate: new Date().toISOString().slice(0, 10),
+              paid: false,
+              disabled: false
+            };
+            users.push(newUser);
+            localStorage.setItem(usersKey, JSON.stringify(users));
+          }
+        } catch (e) { /* ignore */ }
+
         _AL_toast && _AL_toast('注册成功！正在进入会员中心…', 1500);
 
         // 解析 URL：return = 最终返回页；target = 意图页（如订阅页）

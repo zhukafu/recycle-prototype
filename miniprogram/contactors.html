@@ -207,7 +207,7 @@
     <!-- 最新上架区（数据驱动渲染，敏感数据按登录态脱敏） -->
     <section class="px-4 py-3 animate-in stagger-4">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-bold text-al-dark">最新上架</h2>
+        <h2 class="text-lg font-bold text-al-dark">常见型号</h2>
         <button class="flex items-center gap-1 text-sm text-al-gray touch-active" onclick="window._AL_navigate&&_AL_navigate('category.html?cat=all')">
           <span>更多</span>
           <i class="fas fa-chevron-right text-xs"></i>
@@ -276,16 +276,15 @@
       return true;
     };
 
-    // 「最新上架」8 张卡片：数据驱动渲染 + 登录态脱敏
+    // 「常见型号」网格卡片：取 common === true 的产品
     // 独立 try/catch IIFE：主 render 抛错不影响主流程
     (function renderLatest() {
       try {
         const list = document.getElementById('latestList');
         if (!list) return;
         const all = window._AL_PRODUCTS || [];
-        // 取 c8 ~ c15 共 8 张「最新上架」卡片（按 id 顺序）
-        const ids = ['c8','c9','c10','c11','c12','c13','c14','c15'];
-        const items = ids.map(id => all.find(p => p.id === id)).filter(Boolean);
+        // 取 common 标记为 true 的产品
+        const items = all.filter(function(p) { return p.common === true; });
         if (!items.length) { list.innerHTML = ''; return; }
 
         const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

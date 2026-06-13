@@ -45,7 +45,40 @@
         window._AL_USER = Object.assign(window._AL_USER, obj);
       }
     }
-  } catch (e) { /* localStorage 不可用 */ }
+
+    // 从后台用户数据库（al_users）同步 VIP 信息，确保后台修改在前台生效
+    if (window._AL_USER && window._AL_USER.isLoggedIn && window._AL_USER.nickname) {
+      var alUsersRaw = localStorage.getItem('al_users');
+      if (alUsersRaw) {
+        var alUsers = JSON.parse(alUsersRaw);
+        if (Array.isArray(alUsers)) {
+          var matched = alUsers.find(function (u) {
+            return u.name === window._AL_USER.nickname ||
+                   (window._AL_USER._phone && u.phone === window._AL_USER._phone);
+          });
+          if (matched) {
+            // 根据 al_users 中的 paid + vip + expire 同步到 _AL_USER
+            window._AL_USER.isMember = matched.paid === true;
+            window._AL_USER.memberPackageName = matched.vip || '';
+            // 计算 memberPackage
+            var pkgMap = { '体验版': 'trial', '全品类初级': 'basic', '全品类高级 30 天': 'std30', '全品类高级一年': 'std1y', '初级年会员': 'basic1y' };
+            window._AL_USER.memberPackage = pkgMap[matched.vip] || '';
+            // 计算会员到期时间戳
+            if (matched.paid && matched.expire && matched.expire !== '-') {
+              var d = new Date(matched.expire);
+              if (!isNaN(d.getTime())) {
+                window._AL_USER.memberExpireAt = d.getTime() + 24 * 60 * 60 * 1000; // 到期日 23:59:59
+              }
+            } else if (!matched.paid) {
+              window._AL_USER.memberExpireAt = 0;
+            }
+            // 写回 _AL_USER_PROFILE 持久化
+            window._AL_saveProfile();
+          }
+        }
+      }
+    }
+  } catch (e) { /* localStorage 不可用或 al_users 同步失败 */ }
 
   // 权限检查
   //   level: 'public'（默认）| 'login'（需登录）| 'member'（需开通会员）| 'premium'（需高级会员，tag=STD）
@@ -172,6 +205,7 @@
         memberPackage:     window._AL_USER.memberPackage,
         memberPackageName: window._AL_USER.memberPackageName,
         memberExpireAt:    window._AL_USER.memberExpireAt,
+        _phone:            window._AL_USER._phone || '',
       };
       localStorage.setItem('_AL_USER_PROFILE', JSON.stringify(toSave));
     } catch (e) { /* localStorage 不可用 */ }

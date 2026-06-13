@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>用户管理 - 铝老板管理后台</title>
     <script src="/lib/tailwind/tailwind.js"></script>
+    <script src="/data/users.js"></script>
     <link href="/lib/fonts/fonts-admin-main.css" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -75,126 +76,7 @@
             </div>
 
             <!-- 用户列表 -->
-            <div class="mt-3 space-y-2" id="user-list">
-
-                <!-- 付费用户 -->
-                <div class="user-card" data-paid="1" data-name="张老板" data-phone="13812348888" data-disabled="0">
-                    <div class="block bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                        <div class="flex items-start gap-3">
-                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white text-[16px] font-bold flex-shrink-0">张</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap mb-1">
-                                    <span class="text-[14px] font-semibold text-metal-900">张老板</span>
-                                    <span class="px-1.5 py-0.5 bg-amber-50 text-amber-600 text-[10px] rounded font-medium">全品类高级一年</span>
-                                </div>
-                                <p class="text-[11px] text-metal-500">138****8888</p>
-                                <p class="text-[10px] text-metal-400 mt-0.5">会员到期：2026-12-31</p>
-                            </div>
-                            <button class="more-btn text-metal-400 tap-active px-2" data-name="张老板" data-phone="13812348888" data-vip="全品类高级一年" data-expire="2026-12-31" data-paid="1" data-disabled="0">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="user-card" data-paid="1" data-name="李工" data-phone="13912345678" data-disabled="0">
-                    <div class="block bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                        <div class="flex items-start gap-3">
-                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center text-white text-[16px] font-bold flex-shrink-0">李</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap mb-1">
-                                    <span class="text-[14px] font-semibold text-metal-900">李工</span>
-                                    <span class="px-1.5 py-0.5 bg-amber-50 text-amber-600 text-[10px] rounded font-medium">全品类高级 30 天</span>
-                                </div>
-                                <p class="text-[11px] text-metal-500">139****5678</p>
-                                <p class="text-[10px] text-metal-400 mt-0.5">会员到期：2026-09-15</p>
-                            </div>
-                            <button class="more-btn text-metal-400 tap-active px-2" data-name="李工" data-phone="13912345678" data-vip="全品类高级 30 天" data-expire="2026-09-15" data-paid="1" data-disabled="0">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="user-card" data-paid="1" data-name="王姐" data-phone="18612349012" data-disabled="0">
-                    <div class="block bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                        <div class="flex items-start gap-3">
-                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center text-white text-[16px] font-bold flex-shrink-0">王</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap mb-1">
-                                    <span class="text-[14px] font-semibold text-metal-900">王姐</span>
-                                    <span class="px-1.5 py-0.5 bg-amber-50 text-amber-600 text-[10px] rounded font-medium">全品类初级</span>
-                                </div>
-                                <p class="text-[11px] text-metal-500">186****9012</p>
-                                <p class="text-[10px] text-metal-400 mt-0.5">会员到期：2026-07-10</p>
-                            </div>
-                            <button class="more-btn text-metal-400 tap-active px-2" data-name="王姐" data-phone="18612349012" data-vip="全品类初级" data-expire="2026-07-10" data-paid="1" data-disabled="0">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 非付费用户 -->
-                <div class="user-card" data-paid="0" data-name="陈师傅" data-phone="13712343456" data-disabled="0">
-                    <div class="block bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                        <div class="flex items-start gap-3">
-                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-500 flex items-center justify-center text-white text-[16px] font-bold flex-shrink-0">陈</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap mb-1">
-                                    <span class="text-[14px] font-semibold text-metal-900">陈师傅</span>
-                                    <span class="px-1.5 py-0.5 bg-metal-100 text-metal-500 text-[10px] rounded font-medium">普通用户</span>
-                                </div>
-                                <p class="text-[11px] text-metal-500">137****3456</p>
-                                <p class="text-[10px] text-metal-400 mt-0.5">注册：2026-04-18</p>
-                            </div>
-                            <button class="more-btn text-metal-400 tap-active px-2" data-name="陈师傅" data-phone="13712343456" data-vip="无" data-expire="-" data-paid="0" data-disabled="0">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="user-card" data-paid="0" data-name="赵先生" data-phone="15812347777" data-disabled="0">
-                    <div class="block bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                        <div class="flex items-start gap-3">
-                            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-rose-400 to-rose-500 flex items-center justify-center text-white text-[16px] font-bold flex-shrink-0">赵</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap mb-1">
-                                    <span class="text-[14px] font-semibold text-metal-900">赵先生</span>
-                                    <span class="px-1.5 py-0.5 bg-metal-100 text-metal-500 text-[10px] rounded font-medium">普通用户</span>
-                                </div>
-                                <p class="text-[11px] text-metal-500">158****7777</p>
-                                <p class="text-[10px] text-metal-400 mt-0.5">注册：2026-05-02</p>
-                            </div>
-                            <button class="more-btn text-metal-400 tap-active px-2" data-name="赵先生" data-phone="15812347777" data-vip="无" data-expire="-" data-paid="0" data-disabled="0">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 已禁用用户示例 -->
-                <div class="user-card" data-paid="0" data-name="旧账号" data-phone="13512340000" data-disabled="1">
-                    <div class="block bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] opacity-50">
-                        <div class="flex items-start gap-3">
-                            <div class="w-11 h-11 rounded-full bg-metal-300 flex items-center justify-center text-white text-[16px] font-bold flex-shrink-0">旧</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap mb-1">
-                                    <span class="text-[14px] font-semibold text-metal-700">旧账号</span>
-                                    <span class="px-1.5 py-0.5 bg-metal-100 text-metal-500 text-[10px] rounded font-medium">已禁用</span>
-                                </div>
-                                <p class="text-[11px] text-metal-500">135****0000</p>
-                                <p class="text-[10px] text-metal-400 mt-0.5">已于 2026-05-20 禁用</p>
-                            </div>
-                            <button class="more-btn text-metal-400 tap-active px-2" data-name="旧账号" data-phone="13512340000" data-vip="无" data-expire="-" data-paid="0" data-disabled="1">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+            <div class="mt-3 space-y-2" id="user-list"></div>
         </div>
     </main>
 
@@ -283,24 +165,107 @@
     });
     mountAdminBottomNav('#admin-bottom-nav', { active: 'home' });
 
+    // ── 渲染用户卡片 ─────────────────────────────────────
+    function buildUserCard(user) {
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        card.dataset.paid = user.paid ? '1' : '0';
+        card.dataset.name = user.name;
+        card.dataset.phone = user.phone;
+        card.dataset.disabled = user.disabled ? '1' : '0';
+
+        const expireText = user.paid ? '会员到期：' + user.expire : '注册：' + user.regDate;
+        const badgeColor = user.disabled
+            ? 'bg-metal-100 text-metal-500'
+            : user.paid ? 'bg-amber-50 text-amber-600' : 'bg-metal-100 text-metal-500';
+        const badgeText = user.disabled ? '已禁用' : user.paid ? user.vip : '普通用户';
+        const opacityClass = user.disabled ? ' opacity-50' : '';
+
+        card.innerHTML = `
+          <div class="block bg-white rounded-[14px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)]${opacityClass}">
+            <div class="flex items-start gap-3">
+              <div class="w-11 h-11 rounded-full bg-gradient-to-br ${user.avatarGradient} flex items-center justify-center text-white text-[16px] font-bold flex-shrink-0">${user.avatarChar}</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="text-[14px] font-semibold text-metal-900">${user.name}</span>
+                  <span class="px-1.5 py-0.5 ${badgeColor} text-[10px] rounded font-medium">${badgeText}</span>
+                </div>
+                <p class="text-[11px] text-metal-500">${maskPhone(user.phone)}</p>
+                <p class="text-[10px] text-metal-400 mt-0.5">${expireText}</p>
+              </div>
+              <button class="more-btn text-metal-400 tap-active px-2"
+                data-id="${user.id}"
+                data-name="${user.name}"
+                data-phone="${user.phone}"
+                data-vip="${user.vip}"
+                data-expire="${user.expire}"
+                data-paid="${user.paid ? '1' : '0'}"
+                data-disabled="${user.disabled ? '1' : '0'}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+            </div>
+          </div>`;
+        return card;
+    }
+
+    function maskPhone(phone) {
+        if (!phone || phone.length < 7) return phone || '';
+        return phone.slice(0, 3) + '****' + phone.slice(-4);
+    }
+
+    function renderUserList(users) {
+        const container = document.getElementById('user-list');
+        container.innerHTML = '';
+        users.forEach(function (u) {
+            container.appendChild(buildUserCard(u));
+        });
+        bindMoreButtons();
+    }
+
+    // ── More 按钮事件绑定 ────────────────────────────────
+    function bindMoreButtons() {
+        document.querySelectorAll('.more-btn').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                currentUserBtn = btn;
+                currentUserId = btn.dataset.id;
+                const isDisabled = btn.dataset.disabled === '1';
+                actionUserName.textContent = btn.dataset.name;
+                const disableBtn  = document.getElementById('btn-disable');
+                const disableIcon = document.getElementById('disable-icon');
+                const disableLbl  = document.getElementById('disable-label');
+                if (isDisabled) {
+                    disableLbl.textContent = '解除禁用';
+                    disableBtn.classList.remove('text-rose-600', 'active:bg-rose-50');
+                    disableBtn.classList.add('text-brand-600', 'active:bg-brand-50');
+                    disableIcon.innerHTML = '<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>';
+                } else {
+                    disableLbl.textContent = '禁用该用户';
+                    disableBtn.classList.add('text-rose-600', 'active:bg-rose-50');
+                    disableBtn.classList.remove('text-brand-600', 'active:bg-brand-50');
+                    disableIcon.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>';
+                }
+                actionSheet.classList.remove('hidden');
+            });
+        });
+    }
+
     // ── Tab 切换 ──────────────────────────────────────────
     const tabBar  = document.getElementById('tab-bar');
-    const allCards = () => document.querySelectorAll('.user-card');
     let currentTab = 'all';
 
-    tabBar.querySelectorAll('.tab-item').forEach(btn => {
-        btn.addEventListener('click', () => {
+    tabBar.querySelectorAll('.tab-item').forEach(function (btn) {
+        btn.addEventListener('click', function () {
             currentTab = btn.dataset.tab;
-            // 高亮
-            tabBar.querySelectorAll('.tab-item').forEach(b => {
-                b.classList.remove('font-semibold','text-brand-600','tab-active-btn');
+            tabBar.querySelectorAll('.tab-item').forEach(function (b) {
+                b.classList.remove('font-semibold', 'text-brand-600', 'tab-active-btn');
                 b.classList.add('text-metal-500');
-                const ind = b.querySelector('.tab-indicator');
+                var ind = b.querySelector('.tab-indicator');
                 if (ind) ind.remove();
             });
-            btn.classList.add('font-semibold','text-brand-600','tab-active-btn');
+            btn.classList.add('font-semibold', 'text-brand-600', 'tab-active-btn');
             btn.classList.remove('text-metal-500');
-            const indicator = document.createElement('div');
+            var indicator = document.createElement('div');
             indicator.className = 'tab-indicator absolute bottom-0 left-4 right-4 h-[2.5px] bg-brand-500 rounded-full';
             btn.appendChild(indicator);
             filterList();
@@ -313,13 +278,12 @@
 
     function filterList() {
         const q = searchInput.value.trim().toLowerCase();
-        allCards().forEach(card => {
+        document.querySelectorAll('.user-card').forEach(function (card) {
             const name     = (card.dataset.name  || '').toLowerCase();
             const phone    = (card.dataset.phone || '').toLowerCase();
             const paid     = card.dataset.paid;
             const disabled = card.dataset.disabled === '1';
             let show = true;
-            // tab 过滤：非"已禁用"tab 时，隐藏已禁用用户；"已禁用"tab 只显示已禁用
             if (currentTab === 'disabled') {
                 if (!disabled) show = false;
             } else {
@@ -327,7 +291,6 @@
                 if (currentTab === 'paid' && paid !== '1') show = false;
                 if (currentTab === 'free' && paid !== '0') show = false;
             }
-            // 搜索过滤（昵称 or 手机号）
             if (show && q) {
                 show = name.includes(q) || phone.includes(q);
             }
@@ -339,74 +302,56 @@
     const actionSheet    = document.getElementById('action-sheet');
     const actionUserName = document.getElementById('action-user-name');
     let   currentUserBtn = null;
+    let   currentUserId  = null;
 
-    document.querySelectorAll('.more-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-            e.stopPropagation();
-            currentUserBtn = btn;
-            const isDisabled = btn.dataset.disabled === '1';
-            actionUserName.textContent = btn.dataset.name;
-            // 动态切换禁用/解除禁用按钮文案和颜色
-            const disableBtn  = document.getElementById('btn-disable');
-            const disableIcon = document.getElementById('disable-icon');
-            const disableLbl  = document.getElementById('disable-label');
-            if (isDisabled) {
-                disableLbl.textContent = '解除禁用';
-                disableBtn.classList.remove('text-rose-600','active:bg-rose-50');
-                disableBtn.classList.add('text-brand-600','active:bg-brand-50');
-                disableIcon.innerHTML = '<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>';
-            } else {
-                disableLbl.textContent = '禁用该用户';
-                disableBtn.classList.add('text-rose-600','active:bg-rose-50');
-                disableBtn.classList.remove('text-brand-600','active:bg-brand-50');
-                disableIcon.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>';
-            }
-            actionSheet.classList.remove('hidden');
-        });
-    });
-
-    const closeAction = () => actionSheet.classList.add('hidden');
+    const closeAction = function () { actionSheet.classList.add('hidden'); };
     document.getElementById('action-overlay').addEventListener('click', closeAction);
     document.getElementById('btn-action-cancel').addEventListener('click', closeAction);
 
-    // 禁用 / 解除禁用
-    document.getElementById('btn-disable').addEventListener('click', () => {
-        if (!currentUserBtn) return;
+    // 禁用 / 解除禁用（同步 _AL_USERS）
+    document.getElementById('btn-disable').addEventListener('click', function () {
+        if (!currentUserBtn || !currentUserId) return;
         const card = currentUserBtn.closest('.user-card');
         if (!card) return;
         const isDisabled = currentUserBtn.dataset.disabled === '1';
         const name = currentUserBtn.dataset.name;
-        if (isDisabled) {
-            // 解除禁用
-            if (confirm(`确定要解除禁用用户「${name}」吗？`)) {
-                currentUserBtn.dataset.disabled = '0';
-                card.dataset.disabled = '0';
-                card.querySelector('.block').classList.remove('opacity-50');
-                // 移除已禁用 badge，恢复普通 badge
-                const badge = card.querySelectorAll('span')[1];
-                const paid  = currentUserBtn.dataset.paid;
-                if (paid === '1') {
-                    badge.className = 'px-1.5 py-0.5 bg-amber-50 text-amber-600 text-[10px] rounded font-medium';
-                    badge.textContent = 'VIP' + currentUserBtn.dataset.vip;
-                } else {
-                    badge.className = 'px-1.5 py-0.5 bg-metal-100 text-metal-500 text-[10px] rounded font-medium';
-                    badge.textContent = '普通用户';
-                }
-                alert(`用户「${name}」已解除禁用`);
-                filterList();
+
+        if (confirm((isDisabled ? '确定要解除禁用用户「' : '确定要禁用用户「') + name + '」吗？')) {
+            // 同步到数据层
+            _AL_USERS.toggleDisabled(currentUserId);
+
+            // 如果被禁用的是当前登录用户，登出其小程序会话
+            if (isDisabled === false) { // 执行的是禁用操作（当前未禁用 → 点击后禁用）
+                try {
+                    var profileRaw2 = localStorage.getItem('_AL_USER_PROFILE');
+                    if (profileRaw2) {
+                        var profile2 = JSON.parse(profileRaw2);
+                        if (profile2.isLoggedIn && (profile2.nickname === name || profile2._phone === currentUserBtn.dataset.phone)) {
+                            localStorage.removeItem('_AL_USER_PROFILE');
+                        }
+                    }
+                } catch (e) {}
             }
-        } else {
-            // 禁用
-            if (confirm(`确定要禁用用户「${name}」吗？`)) {
-                currentUserBtn.dataset.disabled = '1';
-                card.dataset.disabled = '1';
-                card.querySelector('.block').classList.add('opacity-50');
-                const badge = card.querySelectorAll('span')[1];
+
+            // 更新 DOM
+            const newDisabled = isDisabled ? '0' : '1';
+            currentUserBtn.dataset.disabled = newDisabled;
+            card.dataset.disabled = newDisabled;
+            const block = card.querySelector('.block');
+            const badge = card.querySelectorAll('span')[1];
+            if (isDisabled) {
+                block.classList.remove('opacity-50');
+                const paid = currentUserBtn.dataset.paid;
+                badge.className = paid === '1'
+                    ? 'px-1.5 py-0.5 bg-amber-50 text-amber-600 text-[10px] rounded font-medium'
+                    : 'px-1.5 py-0.5 bg-metal-100 text-metal-500 text-[10px] rounded font-medium';
+                badge.textContent = paid === '1' ? currentUserBtn.dataset.vip : '普通用户';
+            } else {
+                block.classList.add('opacity-50');
                 badge.className = 'px-1.5 py-0.5 bg-metal-100 text-metal-500 text-[10px] rounded font-medium';
                 badge.textContent = '已禁用';
-                alert(`用户「${name}」已被禁用`);
-                filterList();
             }
+            filterList();
         }
         closeAction();
     });
@@ -419,50 +364,74 @@
     const editExpire  = document.getElementById('edit-expire');
     const editReg     = document.getElementById('edit-reg');
 
-    document.getElementById('btn-edit').addEventListener('click', () => {
+    document.getElementById('btn-edit').addEventListener('click', function () {
         if (!currentUserBtn) return;
-        const d    = currentUserBtn.dataset;
-        const card = currentUserBtn.closest('.user-card');
+        const d = currentUserBtn.dataset;
         editName.value   = d.name;
         editPhone.value  = d.phone;
-        // 为所有 user-card 补充 data-disabled（如果缺失）
-        if (card && !card.dataset.disabled) card.dataset.disabled = '0';
         const vipMap = { '年卡':'年卡', '季卡':'季卡', '月卡':'月卡', '永久':'永久', '体验版':'体验版', '全品类初级':'全品类初级', '全品类高级 30 天':'全品类高级 30 天', '全品类高级一年':'全品类高级一年', '初级年会员':'初级年会员', '无':'无' };
         editVip.value    = vipMap[d.vip] || '无';
         editExpire.value = d.expire && d.expire !== '-' ? d.expire : '';
-        editReg.value    = '2026-01-15'; // 示例固定
+        editReg.value    = '2026-01-15';
         closeAction();
         editSheet.classList.remove('hidden');
     });
 
-    const closeEdit = () => editSheet.classList.add('hidden');
+    const closeEdit = function () { editSheet.classList.add('hidden'); };
     document.getElementById('edit-overlay').addEventListener('click', closeEdit);
     document.getElementById('btn-edit-cancel').addEventListener('click', closeEdit);
 
-    document.getElementById('btn-edit-save').addEventListener('click', () => {
-        if (!currentUserBtn) return;
+    // 编辑保存（同步 _AL_USERS）
+    document.getElementById('btn-edit-save').addEventListener('click', function () {
+        if (!currentUserBtn || !currentUserId) return;
         const d = currentUserBtn.dataset;
         d.vip    = editVip.value === '无' ? '无' : editVip.value;
         d.expire = editExpire.value || '-';
         d.paid   = editVip.value === '无' ? '0' : '1';
 
-        // 更新卡片显示
+        // 同步到数据层
+        _AL_USERS.update(currentUserId, {
+            vip: d.vip,
+            expire: d.expire,
+            paid: editVip.value !== '无'
+        });
+
+        // 如果编辑的用户与当前小程序登录用户匹配，同步更新 _AL_USER_PROFILE
+        var userProfile = null;
+        try {
+            var profileRaw = localStorage.getItem('_AL_USER_PROFILE');
+            if (profileRaw) userProfile = JSON.parse(profileRaw);
+        } catch (e) {}
+        if (userProfile && userProfile.isLoggedIn) {
+            var matched = userProfile.nickname === d.name || userProfile._phone === d.phone;
+            if (matched) {
+                var pkgMap = { '体验版': 'trial', '全品类初级': 'basic', '全品类高级 30 天': 'std30', '全品类高级一年': 'std1y', '初级年会员': 'basic1y' };
+                userProfile.isMember = editVip.value !== '无';
+                userProfile.memberPackage = pkgMap[d.vip] || '';
+                userProfile.memberPackageName = d.vip || '';
+                if (editVip.value !== '无' && d.expire && d.expire !== '-') {
+                    var expireDate = new Date(d.expire);
+                    userProfile.memberExpireAt = expireDate.getTime() + 24 * 60 * 60 * 1000;
+                } else {
+                    userProfile.memberExpireAt = 0;
+                }
+                localStorage.setItem('_AL_USER_PROFILE', JSON.stringify(userProfile));
+            }
+        }
+
+        // 更新 DOM
         const card = currentUserBtn.closest('.user-card');
         card.dataset.paid = d.paid;
-        const vipLabel = card.querySelectorAll('span')[1]; // VIP badge span
+        const vipLabel = card.querySelectorAll('span')[1];
         if (d.paid === '1') {
             vipLabel.className = 'px-1.5 py-0.5 bg-amber-50 text-amber-600 text-[10px] rounded font-medium';
-            vipLabel.textContent = 'VIP' + d.vip;
+            vipLabel.textContent = d.vip;
         } else {
             vipLabel.className = 'px-1.5 py-0.5 bg-metal-100 text-metal-500 text-[10px] rounded font-medium';
             vipLabel.textContent = '普通用户';
         }
         const expireP = card.querySelector('p:last-of-type');
-        if (d.paid === '1') {
-            expireP.textContent = '会员到期：' + d.expire;
-        } else {
-            expireP.textContent = '注册：' + editReg.value;
-        }
+        expireP.textContent = d.paid === '1' ? '会员到期：' + d.expire : '注册：' + editReg.value;
 
         alert('保存成功');
         closeEdit();
@@ -475,16 +444,13 @@
         const menu = document.createElement('div');
         menu.id = '__top_menu__';
         menu.className = 'fixed inset-0 z-[60] flex items-end justify-center';
-        menu.innerHTML = `
-          <div class="absolute inset-0 bg-black/40" data-close></div>
-          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 sheet-panel">
-            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>
-            ${items.map(t => `<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">${t}</button>`).join('')}
-            <button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-500 active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>
-          </div>`;
+        menu.innerHTML = ' \n          <div class="absolute inset-0 bg-black/40" data-close></div>\n          <div class="relative w-full bg-white rounded-t-2xl p-2 pb-6 sheet-panel">\n            <div class="w-10 h-1 bg-metal-200 rounded-full mx-auto my-2"></div>\n            ' + items.map(function (t) { return '<button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-800 active:bg-metal-50 rounded-xl">' + t + '</button>'; }).join('') + '\n            <button class="w-full text-left px-4 py-3.5 text-[14px] text-metal-500 active:bg-metal-50 rounded-xl mt-2" data-close>取消</button>\n          </div>';
         document.body.appendChild(menu);
-        menu.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => menu.remove()));
+        menu.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', function () { menu.remove(); }); });
     }
+
+    // ── 初始化：从数据层渲染用户列表 ─────────────────────
+    renderUserList(_AL_USERS.getAll());
 </script>
 
 </body>
