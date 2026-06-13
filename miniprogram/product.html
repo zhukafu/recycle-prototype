@@ -301,6 +301,10 @@ background: #f0fdf4; border-radius: 0 8px 8px 0; color: #374151;
     document.title = it.model + ' - 铝老板金属网';
     document.getElementById('pageTitle').textContent = it.cat === 'contactor' ? '接触器详情' : it.cat === 'breaker' ? '断路器详情' : it.cat === 'relay' ? '继电器详情' : '按钮详情';
 
+    // 统计回收价浏览 & 单位重量浏览
+    if (window._AL_TRACK_PRICE_VIEW) window._AL_TRACK_PRICE_VIEW();
+    if (window._AL_TRACK_UNIT_WEIGHT_VIEW) window._AL_TRACK_UNIT_WEIGHT_VIEW();
+
     // 1. 图片（优先用本地的 it.img，否则用分类通用图）
     const imgUrl = it.img || CAT_IMG[it.cat] || '';
     const imgEl = document.getElementById('imgEl');

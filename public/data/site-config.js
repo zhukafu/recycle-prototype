@@ -124,6 +124,8 @@
   // target 链：login.html (注册/登录) → target=vip-center.html (订阅) → return=<原页> (返回)
   // 循环防护：进入 login 流程前打 sessionStorage 标记，避免「vip-center 返回 → login 自动跳回 vip-center」死循环
   window._AL_lockClick = function (e, productId) {
+    // 统计付费信息点击
+    if (window._AL_TRACK_PAID_CLICK) window._AL_TRACK_PAID_CLICK();
     e && e.preventDefault();
     e && e.stopPropagation();
     const ret = (location.pathname + location.search) || 'index.html';
@@ -222,6 +224,209 @@
   window._AL_getPackage = function (id) {
     return (window._AL_PACKAGES || []).find(p => p.id === id) || null;
   };
+
+  /* ========== 1.7 站点访问统计数据 ========== */
+  // 所有统计数据持久化到 localStorage，每次进入网站时初始化
+  window._AL_STATS = {
+    today:                  '',
+    todayPageViews:         0,
+    todayModelQueries:      0,
+    todayPriceViews:        0,
+    todayUnitWeightViews:   0,
+    todayPaidClicks:        0,
+    yesterdayPageViews:     0,
+    yesterdayModelQueries:  0,
+    yesterdayPriceViews:    0,
+    yesterdayUnitWeightViews: 0,
+    yesterdayPaidClicks:    0,
+    pageViewsHistory:       [],   // [{date, count}] 近7天
+    cumulativePageViews:    0,
+    cumulativeModelQueries: 0,
+    cumulativePriceViews:   0,
+    cumulativeUnitWeightViews: 0,
+  };
+
+  // 从 localStorage 恢复 & 跨日重置
+  function _AL_initStats() {
+    try {
+      var raw = localStorage.getItem('_AL_STATS_DATA');
+      if (raw) {
+        var saved = JSON.parse(raw);
+        if (saved && typeof saved === 'object') {
+          window._AL_STATS = Object.assign(window._AL_STATS, saved);
+        }
+      }
+    } catch (e) { /* localStorage 不可用，使用默认值 */ }
+
+    var now = new Date();
+    var todayStr = now.toDateString();
+
+    // 跨日检测
+    if (window._AL_STATS.today !== todayStr) {
+      if (window._AL_STATS.today && window._AL_STATS.today !== todayStr) {
+        // 将今日数据移到昨日
+        window._AL_STATS.yesterdayPageViews       = window._AL_STATS.todayPageViews;
+        window._AL_STATS.yesterdayModelQueries    = window._AL_STATS.todayModelQueries;
+        window._AL_STATS.yesterdayPriceViews      = window._AL_STATS.todayPriceViews;
+        window._AL_STATS.yesterdayUnitWeightViews = window._AL_STATS.todayUnitWeightViews;
+        window._AL_STATS.yesterdayPaidClicks      = window._AL_STATS.todayPaidClicks;
+        // 更新 pageViewsHistory：将昨天的数据写入历史
+        var hist = window._AL_STATS.pageViewsHistory || [];
+        var oldToday = window._AL_STATS.today;
+        var foundOld = false;
+        for (var hi = 0; hi < hist.length; hi++) {
+          if (hist[hi].date === oldToday) {
+            hist[hi].count = window._AL_STATS.yesterdayPageViews;
+            foundOld = true;
+            break;
+          }
+        }
+        if (!foundOld && window._AL_STATS.yesterdayPageViews > 0) {
+          hist.push({ date: oldToday, count: window._AL_STATS.yesterdayPageViews });
+        }
+        // 今日归零
+        window._AL_STATS.todayPageViews       = 0;
+        window._AL_STATS.todayModelQueries    = 0;
+        window._AL_STATS.todayPriceViews      = 0;
+        window._AL_STATS.todayUnitWeightViews = 0;
+        window._AL_STATS.todayPaidClicks      = 0;
+        // 添加今日占位到历史
+        var foundToday = false;
+        for (var hj = 0; hj < hist.length; hj++) {
+          if (hist[hj].date === todayStr) { foundToday = true; break; }
+        }
+        if (!foundToday) {
+          hist.push({ date: todayStr, count: 0 });
+        }
+        // 按日期排序
+        hist.sort(function (a, b) { return new Date(a.date) - new Date(b.date); });
+        // 保留最近 7 天
+        if (hist.length > 7) hist = hist.slice(hist.length - 7);
+        window._AL_STATS.pageViewsHistory = hist;
+      }
+      window._AL_STATS.today = todayStr;
+      _AL_saveStats();
+    }
+
+    // 数据一致性修复：如果今日访问量为 0 但有历史数据，对齐
+    var hist2 = window._AL_STATS.pageViewsHistory;
+    if (hist2 && hist2.length > 0) {
+      var lastDay = hist2[hist2.length - 1];
+      if (lastDay.date === todayStr && window._AL_STATS.todayPageViews > 0 && lastDay.count < window._AL_STATS.todayPageViews) {
+        lastDay.count = window._AL_STATS.todayPageViews;
+        _AL_saveStats();
+      } else if (lastDay.date === todayStr && window._AL_STATS.todayPageViews < lastDay.count) {
+        window._AL_STATS.todayPageViews = lastDay.count;
+        _AL_saveStats();
+      }
+    }
+
+    // 首次使用无历史数据时，生成演示数据（仅用于原型展示曲线和功能占比）
+    if (!window._AL_STATS.pageViewsHistory || window._AL_STATS.pageViewsHistory.length === 0) {
+      var demoHistory = [];
+      var demoNow = new Date();
+      for (var d = 6; d >= 0; d--) {
+        var day = new Date(demoNow);
+        day.setDate(day.getDate() - d);
+        demoHistory.push({
+          date: day.toDateString(),
+          count: Math.floor(Math.random() * 40) + 5  // 5~44 随机数
+        });
+      }
+      window._AL_STATS.pageViewsHistory = demoHistory;
+      window._AL_STATS.cumulativePageViews = demoHistory.reduce(function (s, item) { return s + item.count; }, 0);
+      // 今日访问量对齐历史最新一天
+      window._AL_STATS.todayPageViews = demoHistory[demoHistory.length - 1].count;
+      window._AL_STATS.today = todayStr;
+      // 昨日访问量对齐历史倒数第二天
+      if (demoHistory.length >= 2) {
+        window._AL_STATS.yesterdayPageViews = demoHistory[demoHistory.length - 2].count;
+      } else {
+        window._AL_STATS.yesterdayPageViews = 0;
+      }
+      // 其他昨日数据也给演示值，让增长率有显示
+      window._AL_STATS.yesterdayModelQueries    = Math.floor(Math.random() * 15) + 3;
+      window._AL_STATS.yesterdayPriceViews      = Math.floor(Math.random() * 12) + 2;
+      window._AL_STATS.yesterdayUnitWeightViews = Math.floor(Math.random() * 8) + 1;
+      window._AL_STATS.yesterdayPaidClicks      = Math.floor(Math.random() * 5) + 1;
+      // 三项功能模块的演示数据
+      window._AL_STATS.cumulativeModelQueries    = Math.floor(Math.random() * 80) + 20;   // 20~99
+      window._AL_STATS.cumulativePriceViews      = Math.floor(Math.random() * 60) + 10;   // 10~69
+      window._AL_STATS.cumulativeUnitWeightViews = Math.floor(Math.random() * 40) + 5;    // 5~44
+      _AL_saveStats();
+    }
+  }
+
+  // 持久化
+  function _AL_saveStats() {
+    try {
+      localStorage.setItem('_AL_STATS_DATA', JSON.stringify(window._AL_STATS));
+    } catch (e) { /* localStorage 不可用 */ }
+  }
+
+  // 获取完整统计数据
+  window._AL_GET_STATS = function () {
+    return window._AL_STATS;
+  };
+
+  // ===== 跟踪函数 =====
+
+  // 页面访问
+  window._AL_TRACK_PAGE_VIEW = function () {
+    window._AL_STATS.todayPageViews = (window._AL_STATS.todayPageViews || 0) + 1;
+    window._AL_STATS.cumulativePageViews = (window._AL_STATS.cumulativePageViews || 0) + 1;
+    // 更新历史趋势
+    var now = new Date();
+    var todayStr2 = now.toDateString();
+    var history = window._AL_STATS.pageViewsHistory || [];
+    var found = false;
+    for (var i = 0; i < history.length; i++) {
+      if (history[i].date === todayStr2) {
+        history[i].count = (history[i].count || 0) + 1;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      history.push({ date: todayStr2, count: 1 });
+    }
+    // 只保留最近 7 天
+    if (history.length > 7) {
+      history = history.slice(history.length - 7);
+    }
+    window._AL_STATS.pageViewsHistory = history;
+    _AL_saveStats();
+  };
+
+  // 型号查询
+  window._AL_TRACK_MODEL_QUERY = function () {
+    window._AL_STATS.todayModelQueries = (window._AL_STATS.todayModelQueries || 0) + 1;
+    window._AL_STATS.cumulativeModelQueries = (window._AL_STATS.cumulativeModelQueries || 0) + 1;
+    _AL_saveStats();
+  };
+
+  // 回收价浏览
+  window._AL_TRACK_PRICE_VIEW = function () {
+    window._AL_STATS.todayPriceViews = (window._AL_STATS.todayPriceViews || 0) + 1;
+    window._AL_STATS.cumulativePriceViews = (window._AL_STATS.cumulativePriceViews || 0) + 1;
+    _AL_saveStats();
+  };
+
+  // 单位重量浏览
+  window._AL_TRACK_UNIT_WEIGHT_VIEW = function () {
+    window._AL_STATS.todayUnitWeightViews = (window._AL_STATS.todayUnitWeightViews || 0) + 1;
+    window._AL_STATS.cumulativeUnitWeightViews = (window._AL_STATS.cumulativeUnitWeightViews || 0) + 1;
+    _AL_saveStats();
+  };
+
+  // 付费信息点击
+  window._AL_TRACK_PAID_CLICK = function () {
+    window._AL_STATS.todayPaidClicks = (window._AL_STATS.todayPaidClicks || 0) + 1;
+    _AL_saveStats();
+  };
+
+  // 立即初始化统计
+  _AL_initStats();
 
   /* ========== 2. tel: 链接 ========== */
   window._AL_telLink = function (phone) {
@@ -380,4 +585,16 @@
     modal.querySelector('[data-close]').addEventListener('click', close);
     modal.querySelector('[data-copy]').addEventListener('click', copy);
   }
+
+  /* ========== 7. 自动统计页面访问 ========== */
+  // 检测当前页面是否属于 mini-program 目录，若是则自动统计一次访问量
+  try {
+    var _path = location.pathname || '';
+    if (_path.indexOf('/miniprogram/') >= 0 || /^\/?(index\.html)?$/.test(_path)) {
+      setTimeout(function () {
+        if (window._AL_TRACK_PAGE_VIEW) window._AL_TRACK_PAGE_VIEW();
+      }, 200);
+    }
+  } catch (e) { /* 页面访问统计失败，不影响其他功能 */ }
+
 })();

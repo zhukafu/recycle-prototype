@@ -156,6 +156,11 @@ mark { background: linear-gradient(transparent 60%, #FDE68A 60%); color: inherit
   document.getElementById('queryText').textContent = state.q;
   document.getElementById('searchInput').value = state.q;
 
+  // 型号查询统计
+  if (state.q && window._AL_TRACK_MODEL_QUERY) {
+    window._AL_TRACK_MODEL_QUERY();
+  }
+
   // 搜索（关键词高亮）
   function highlight(text, q) {
     if (!q) return text;
@@ -259,6 +264,8 @@ mark { background: linear-gradient(transparent 60%, #FDE68A 60%); color: inherit
     document.getElementById('queryText').textContent = q;
     // 同步 URL（便于分享）
     history.replaceState(null, '', '?q=' + encodeURIComponent(q));
+    // 型号查询统计
+    if (window._AL_TRACK_MODEL_QUERY) window._AL_TRACK_MODEL_QUERY();
     render();
     return false;
   }

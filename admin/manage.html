@@ -199,10 +199,10 @@
                             </svg>
                             <span class="text-[11px] opacity-90">今日访问量</span>
                         </div>
-                        <p class="text-[24px] font-bold font-mono tracking-tight">1,234</p>
+                        <p class="text-[24px] font-bold font-mono tracking-tight" id="statPageViews">1,234</p>
                         <div class="flex items-center gap-1 mt-1">
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-                            <span class="text-[11px] font-medium opacity-90">12%</span>
+                            <span class="text-[11px] font-medium opacity-90" id="growthPageViews">12%</span>
                         </div>
                     </div>
                     <!-- 卡片2 -->
@@ -213,10 +213,10 @@
                             </svg>
                             <span class="text-[11px] opacity-90">型号查询量</span>
                         </div>
-                        <p class="text-[24px] font-bold font-mono tracking-tight">856</p>
+                        <p class="text-[24px] font-bold font-mono tracking-tight" id="statModelQueries">856</p>
                         <div class="flex items-center gap-1 mt-1">
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-                            <span class="text-[11px] font-medium opacity-90">8%</span>
+                            <span class="text-[11px] font-medium opacity-90" id="growthModelQueries">8%</span>
                         </div>
                     </div>
                     <!-- 卡片3 -->
@@ -227,10 +227,10 @@
                             </svg>
                             <span class="text-[11px] opacity-90">回收价浏览量</span>
                         </div>
-                        <p class="text-[24px] font-bold font-mono tracking-tight">2,103</p>
+                        <p class="text-[24px] font-bold font-mono tracking-tight" id="statPriceViews">2,103</p>
                         <div class="flex items-center gap-1 mt-1">
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-                            <span class="text-[11px] font-medium opacity-90">15%</span>
+                            <span class="text-[11px] font-medium opacity-90" id="growthPriceViews">15%</span>
                         </div>
                     </div>
                     <!-- 卡片4 -->
@@ -241,10 +241,10 @@
                             </svg>
                             <span class="text-[11px] opacity-90">付费信息点击</span>
                         </div>
-                        <p class="text-[24px] font-bold font-mono tracking-tight">45</p>
+                        <p class="text-[24px] font-bold font-mono tracking-tight" id="statPaidClicks">45</p>
                         <div class="flex items-center gap-1 mt-1">
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-                            <span class="text-[11px] font-medium opacity-90">5%</span>
+                            <span class="text-[11px] font-medium opacity-90" id="growthPaidClicks">5%</span>
                         </div>
                     </div>
                 </div>
@@ -323,34 +323,28 @@
                     <div class="bg-white rounded-[16px] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)] lg:flex-1">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-[15px] font-bold text-metal-900">近7日访问量趋势</h3>
-                            <span class="text-[11px] text-metal-400">12/09 - 今日</span>
+                            <span class="text-[11px] text-metal-400" id="trendDateRange">--</span>
                         </div>
                         <div class="relative w-full" style="padding-bottom: 43.75%">
-                            <svg viewBox="0 0 320 140" class="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
+                            <svg viewBox="0 0 320 140" class="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet" id="trendChart">
                                 <defs>
                                     <linearGradient id="areaGradMobile" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="0%" stop-color="#22c55e" stop-opacity="0.15"/>
                                         <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
                                     </linearGradient>
                                 </defs>
+                                <!-- 3条参考线 -->
                                 <line x1="0" y1="35" x2="320" y2="35" stroke="#f1f5f9" stroke-width="1"/>
                                 <line x1="0" y1="70" x2="320" y2="70" stroke="#f1f5f9" stroke-width="1"/>
                                 <line x1="0" y1="105" x2="320" y2="105" stroke="#f1f5f9" stroke-width="1"/>
-                                <path d="M0,98 L46,70 L92,84 L138,42 L184,56 L230,28 L276,35 L320,14 L320,140 L0,140 Z" fill="url(#areaGradMobile)"/>
-                                <path d="M0,98 L46,70 L92,84 L138,42 L184,56 L230,28 L276,35 L320,14" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <circle cx="0" cy="98" r="3" fill="white" stroke="#22c55e" stroke-width="2"/>
-                                <circle cx="46" cy="70" r="3" fill="white" stroke="#22c55e" stroke-width="2"/>
-                                <circle cx="92" cy="84" r="3" fill="white" stroke="#22c55e" stroke-width="2"/>
-                                <circle cx="138" cy="42" r="3" fill="white" stroke="#22c55e" stroke-width="2"/>
-                                <circle cx="184" cy="56" r="3" fill="white" stroke="#22c55e" stroke-width="2"/>
-                                <circle cx="230" cy="28" r="3" fill="white" stroke="#22c55e" stroke-width="2"/>
-                                <circle cx="276" cy="35" r="3" fill="white" stroke="#22c55e" stroke-width="2"/>
-                                <circle cx="320" cy="14" r="4" fill="#22c55e" stroke="white" stroke-width="2"/>
-                                <text x="0" y="136" text-anchor="middle" fill="#94a3b8" font-size="9">12-09</text>
-                                <text x="92" y="136" text-anchor="middle" fill="#94a3b8" font-size="9">12-11</text>
-                                <text x="184" y="136" text-anchor="middle" fill="#94a3b8" font-size="9">12-13</text>
-                                <text x="276" y="136" text-anchor="middle" fill="#94a3b8" font-size="9">12-15</text>
-                                <text x="320" y="136" text-anchor="middle" fill="#94a3b8" font-size="9">今日</text>
+                                <!-- 面积图路径 -->
+                                <path id="areaPath" d="" fill="url(#areaGradMobile)"/>
+                                <!-- 折线路径 -->
+                                <path id="linePath" d="" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <!-- 数据点 & 数值标签 & 日期标签 - 由 JS 动态生成 -->
+                                <g id="trendDots"></g>
+                                <g id="trendLabels"></g>
+                                <g id="dateLabels"></g>
                             </svg>
                         </div>
                     </div>
@@ -368,11 +362,8 @@
                                 <circle cx="70" cy="70" r="52" fill="none" stroke="#f59e0b" stroke-width="18" 
                                     stroke-dasharray="91.43 326.56" stroke-dashoffset="-114.4" 
                                     stroke-linecap="round" transform="rotate(-90 70 70)"/>
-                                <circle cx="70" cy="70" r="52" fill="none" stroke="#3b82f6" stroke-width="18" 
-                                    stroke-dasharray="65.31 326.56" stroke-dashoffset="-205.83" 
-                                    stroke-linecap="round" transform="rotate(-90 70 70)"/>
                                 <circle cx="70" cy="70" r="52" fill="none" stroke="#a855f7" stroke-width="18" 
-                                    stroke-dasharray="55.51 326.56" stroke-dashoffset="-271.14" 
+                                    stroke-dasharray="55.51 326.56" stroke-dashoffset="-205.83" 
                                     stroke-linecap="round" transform="rotate(-90 70 70)"/>
                                 <text x="70" y="66" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="bold">8,234</text>
                                 <text x="70" y="82" text-anchor="middle" fill="#94a3b8" font-size="9">总交互</text>
@@ -392,13 +383,6 @@
                                     <span class="text-[12px] text-metal-600">看回收价</span>
                                 </div>
                                 <span class="text-[12px] font-semibold text-metal-800">28%</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                                    <span class="text-[12px] text-metal-600">查看含量</span>
-                                </div>
-                                <span class="text-[12px] font-semibold text-metal-800">20%</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
@@ -458,6 +442,240 @@
                     }
                 }
             });
+        })();
+    </script>
+
+    <!-- 后台统计数据动态加载 -->
+    <script>
+        (function () {
+            try {
+                // 始终基于当前日期生成演示数据，确保日期和数值对齐
+                var todayStrLocal = new Date().toDateString();
+
+                // 生成演示数据（基于当前日期，7天）
+                function generateDemoStats() {
+                    var ds = {
+                        today: todayStrLocal,
+                        todayPageViews: 0,
+                        todayModelQueries: 0,
+                        todayPriceViews: 0,
+                        todayUnitWeightViews: 0,
+                        todayPaidClicks: 0,
+                        yesterdayPageViews: 0,
+                        yesterdayModelQueries: 0,
+                        yesterdayPriceViews: 0,
+                        yesterdayUnitWeightViews: 0,
+                        yesterdayPaidClicks: 0,
+                        pageViewsHistory: [],
+                        cumulativePageViews: 0,
+                        cumulativeModelQueries: 0,
+                        cumulativePriceViews: 0,
+                        cumulativeUnitWeightViews: 0
+                    };
+                    var now = new Date();
+                    var totalPageDemo = 0;
+                    for (var dd = 6; dd >= 0; dd--) {
+                        var day = new Date(now);
+                        day.setDate(day.getDate() - dd);
+                        var c = Math.floor(Math.random() * 40) + 5;
+                        totalPageDemo += c;
+                        ds.pageViewsHistory.push({ date: day.toDateString(), count: c });
+                    }
+                    ds.todayPageViews = ds.pageViewsHistory[6].count;
+                    ds.yesterdayPageViews = ds.pageViewsHistory[5].count;
+                    ds.yesterdayModelQueries    = Math.floor(Math.random() * 15) + 3;
+                    ds.yesterdayPriceViews      = Math.floor(Math.random() * 12) + 2;
+                    ds.yesterdayUnitWeightViews = Math.floor(Math.random() * 8) + 1;
+                    ds.yesterdayPaidClicks      = Math.floor(Math.random() * 5) + 1;
+                    ds.cumulativePageViews       = totalPageDemo;
+                    ds.cumulativeModelQueries    = Math.floor(Math.random() * 80) + 20;
+                    ds.cumulativePriceViews      = Math.floor(Math.random() * 60) + 10;
+                    ds.cumulativeUnitWeightViews = Math.floor(Math.random() * 40) + 5;
+                    return ds;
+                }
+
+                var stats = generateDemoStats();
+
+                // 格式化数字（加千分位逗号）
+                function fmt(n) {
+                    if (n == null || isNaN(n)) return '0';
+                    return Number(n).toLocaleString('zh-CN');
+                }
+
+                // 计算增长率
+                function growth(today, yesterday) {
+                    var t = Number(today) || 0;
+                    var y = Number(yesterday) || 0;
+                    if (y === 0) return '--';
+                    var pct = ((t - y) / y * 100);
+                    return (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+                }
+
+                // 日期格式化：toDateString() 转 MM-DD
+                function fmtDate(dateStr) {
+                    if (!dateStr) return '--';
+                    var parts = ('' + dateStr).split(' ');
+                    if (parts.length >= 3) {
+                        var monthMap = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+                        return (monthMap[parts[1]] || '??') + '-' + (parts[2] || '??');
+                    }
+                    return dateStr;
+                }
+
+                // 仅从 localStorage 读取今日统计数据（卡片数据），曲线历史始终使用基于当前日期生成的演示数据
+                try {
+                    var raw = localStorage.getItem('_AL_STATS_DATA');
+                    if (raw) {
+                        var realStats = JSON.parse(raw);
+                        if (realStats && typeof realStats === 'object' && realStats.today === todayStrLocal) {
+                            stats.todayPageViews        = Number(realStats.todayPageViews) || 0;
+                            stats.todayModelQueries     = Number(realStats.todayModelQueries) || 0;
+                            stats.todayPriceViews       = Number(realStats.todayPriceViews) || 0;
+                            stats.todayUnitWeightViews  = Number(realStats.todayUnitWeightViews) || 0;
+                            stats.todayPaidClicks       = Number(realStats.todayPaidClicks) || 0;
+                            stats.yesterdayPageViews        = Number(realStats.yesterdayPageViews) || 0;
+                            stats.yesterdayModelQueries     = Number(realStats.yesterdayModelQueries) || 0;
+                            stats.yesterdayPriceViews       = Number(realStats.yesterdayPriceViews) || 0;
+                            stats.yesterdayUnitWeightViews  = Number(realStats.yesterdayUnitWeightViews) || 0;
+                            stats.yesterdayPaidClicks       = Number(realStats.yesterdayPaidClicks) || 0;
+                            stats.cumulativePageViews       = Number(realStats.cumulativePageViews) || stats.cumulativePageViews;
+                            stats.cumulativeModelQueries    = Number(realStats.cumulativeModelQueries) || stats.cumulativeModelQueries;
+                            stats.cumulativePriceViews      = Number(realStats.cumulativePriceViews) || stats.cumulativePriceViews;
+                            stats.cumulativeUnitWeightViews = Number(realStats.cumulativeUnitWeightViews) || stats.cumulativeUnitWeightViews;
+                            // 注意：pageViewsHistory 保留演示数据，不替换
+                        }
+                    }
+                } catch (e) { /* localStorage 不可用，使用演示数据 */ }
+
+                // 更新4个统计卡片
+                var elPageViews = document.getElementById('statPageViews');
+                var elModelQueries = document.getElementById('statModelQueries');
+                var elPriceViews = document.getElementById('statPriceViews');
+                var elPaidClicks = document.getElementById('statPaidClicks');
+                if (elPageViews) elPageViews.textContent = fmt(stats.todayPageViews);
+                if (elModelQueries) elModelQueries.textContent = fmt(stats.todayModelQueries);
+                if (elPriceViews) elPriceViews.textContent = fmt(stats.todayPriceViews);
+                if (elPaidClicks) elPaidClicks.textContent = fmt(stats.todayPaidClicks);
+
+                // 更新增长率
+                var gPageViews = document.getElementById('growthPageViews');
+                var gModelQueries = document.getElementById('growthModelQueries');
+                var gPriceViews = document.getElementById('growthPriceViews');
+                var gPaidClicks = document.getElementById('growthPaidClicks');
+                if (gPageViews) gPageViews.textContent = growth(stats.todayPageViews, stats.yesterdayPageViews);
+                if (gModelQueries) gModelQueries.textContent = growth(stats.todayModelQueries, stats.yesterdayModelQueries);
+                if (gPriceViews) gPriceViews.textContent = growth(stats.todayPriceViews, stats.yesterdayPriceViews);
+                if (gPaidClicks) gPaidClicks.textContent = growth(stats.todayPaidClicks, stats.yesterdayPaidClicks);
+
+                // ===== 近7日访问量趋势（动态绘制） =====
+                var history = stats.pageViewsHistory || [];
+                var svgWidth = 320;
+                var chartH = 140;
+                // 数据点水平间隔
+                var padding = 28; // 左右各留 28px 防止数值标签被截
+                var topPad = 24;  // 顶部留 24px 给数值标签
+                var btmPad = 20;  // 底部留 20px 给日期标签
+                var usableW = svgWidth - padding * 2;
+                var usableH = chartH - topPad - btmPad;
+                var maxCount = 0;
+                for (var hi = 0; hi < history.length; hi++) {
+                    if (history[hi].count > maxCount) maxCount = history[hi].count;
+                }
+                if (maxCount === 0) maxCount = 1; // 防止除以 0
+
+                // 生成点坐标
+                var points = [];
+                var total = history.length;
+                for (var pi = 0; pi < total; pi++) {
+                    var px = total > 1 ? padding + (pi / (total - 1)) * usableW : svgWidth / 2;
+                    var py = topPad + usableH - ((history[pi].count / maxCount) * usableH);
+                    points.push({ x: px, y: py, date: history[pi].date, count: history[pi].count });
+                }
+
+                if (total > 0) {
+                    // 折线路径
+                    var lineD = '';
+                    for (var li = 0; li < points.length; li++) {
+                        lineD += (li === 0 ? 'M' : 'L') + points[li].x.toFixed(1) + ',' + points[li].y.toFixed(1);
+                    }
+                    document.getElementById('linePath').setAttribute('d', lineD);
+
+                    // 面积路径（折线 + 向下闭合到底部日期标签基线）
+                    var baselineY = chartH - btmPad;
+                    var areaD = lineD + ' L' + points[points.length - 1].x.toFixed(1) + ',' + baselineY +
+                                ' L' + points[0].x.toFixed(1) + ',' + baselineY + ' Z';
+                    document.getElementById('areaPath').setAttribute('d', areaD);
+
+                    // 数据点 & 数值标签 & 日期标签
+                    var dotsHtml = '';
+                    var labelsHtml = '';
+                    var datesHtml = '';
+                    for (var di = 0; di < points.length; di++) {
+                        var p = points[di];
+                        var isLast = (di === points.length - 1);
+                        var r = isLast ? 4 : 3;
+                        var fill = isLast ? '#22c55e' : 'white';
+                        dotsHtml += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + r + '" fill="' + fill + '" stroke="#22c55e" stroke-width="2"/>';
+                        // 数值标签：显示在数据点上方
+                        labelsHtml += '<text x="' + p.x.toFixed(1) + '" y="' + (p.y - 7).toFixed(1) + '" text-anchor="middle" fill="#1e293b" font-size="9" font-weight="bold">' + fmt(p.count) + '</text>';
+                        // 日期标签
+                        var dateLabel = fmtDate(p.date);
+                        if (isLast) dateLabel = '今日';
+                        datesHtml += '<text x="' + p.x.toFixed(1) + '" y="' + (chartH - 4) + '" text-anchor="middle" fill="#94a3b8" font-size="9">' + dateLabel + '</text>';
+                    }
+                    document.getElementById('trendDots').innerHTML = dotsHtml;
+                    document.getElementById('trendLabels').innerHTML = labelsHtml;
+                    document.getElementById('dateLabels').innerHTML = datesHtml;
+
+                    // 更新日期范围
+                    var firstDate = fmtDate(points[0].date);
+                    var lastDate = '今日';
+                    document.getElementById('trendDateRange').textContent = firstDate + ' - ' + lastDate;
+                }
+
+                // ===== 功能模块使用占比 =====
+                // 功能模块仅包含：查型号、看回收价、查看单位重量（不含页面访问）
+                var cumQ = Number(stats.cumulativeModelQueries) || 0;
+                var cumP = Number(stats.cumulativePriceViews) || 0;
+                var cumU = Number(stats.cumulativeUnitWeightViews) || 0;
+                var cumTotal = cumQ + cumP + cumU;
+                if (cumTotal > 0) {
+                    var pctQ = (cumQ / cumTotal * 100).toFixed(1);
+                    var pctP = (cumP / cumTotal * 100).toFixed(1);
+                    var pctU = (cumU / cumTotal * 100).toFixed(1);
+                    // 更新文字百分比
+                    var pctEls = document.querySelectorAll('.chart-aside .flex-1 .space-y-3 .flex.items-center.justify-between span.text-metal-800');
+                    if (pctEls.length >= 3) {
+                        pctEls[0].textContent = pctQ + '%';
+                        pctEls[1].textContent = pctP + '%';
+                        pctEls[2].textContent = pctU + '%';
+                    }
+                    // 更新圆环图
+                    var circles = document.querySelectorAll('.chart-aside svg circle[stroke-dasharray]');
+                    if (circles.length >= 3) {
+                        var circumference = 2 * Math.PI * 52; // r=52
+                        var offsets = [
+                            0,
+                            -(cumQ / cumTotal) * circumference,
+                            -((cumQ + cumP) / cumTotal) * circumference
+                        ];
+                        var dasharrays = [
+                            (cumQ / cumTotal) * circumference + ' ' + circumference,
+                            (cumP / cumTotal) * circumference + ' ' + circumference,
+                            (cumU / cumTotal) * circumference + ' ' + circumference
+                        ];
+                        for (var ci = 0; ci < 3; ci++) {
+                            circles[ci].setAttribute('stroke-dasharray', dasharrays[ci]);
+                            circles[ci].setAttribute('stroke-dashoffset', offsets[ci]);
+                        }
+                    }
+                    // 更新总交互数
+                    var totalText = document.querySelector('.chart-aside svg text[font-weight="bold"]');
+                    if (totalText) totalText.textContent = fmt(cumTotal);
+                }
+            } catch (e) {
+                // 统计数据加载失败，保持默认值
+            }
         })();
     </script>
 </body>
