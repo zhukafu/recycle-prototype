@@ -173,8 +173,9 @@
                     '</div>' +
                     '<div class="grid grid-cols-2 gap-1.5">';
                 items.forEach(function (it) {
+                    var isPrecious = it.category === 'precious';
                     metalsHtml += '<label class="flex items-center gap-2 px-2.5 py-2 bg-metal-50 rounded-lg cursor-pointer hover:bg-metal-100 transition">' +
-                        '<input type="checkbox" class="metal-checkbox w-3.5 h-3.5 rounded border-metal-300 text-brand-600 focus:ring-brand-500" data-metal-id="' + it.id + '" checked>' +
+                        '<input type="checkbox" class="metal-checkbox w-3.5 h-3.5 rounded border-metal-300 text-brand-600 focus:ring-brand-500" data-metal-id="' + it.id + '"' + (isPrecious ? ' checked' : '') + '>' +
                         '<span class="text-[13px] text-metal-800 font-medium">' + it.name + '</span>' +
                         '<span class="text-[10px] text-metal-400">' + it.code + '</span>' +
                     '</label>';

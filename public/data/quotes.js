@@ -280,7 +280,7 @@
 
     var DEFAULT_CONFIG = {
         refreshInterval: 900,   // 默认 15 分钟（秒）
-        displayMetals: [],      // 空数组表示全部展示
+        displayMetals: ['q-au', 'q-ag', 'q-pt', 'q-pd', 'q-rh', 'q-ru'],   // 默认只展示贵金属
         displayStyle: 'list'    // list | grid | banner
     };
 
